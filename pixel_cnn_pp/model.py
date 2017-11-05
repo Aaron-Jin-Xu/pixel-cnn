@@ -7,7 +7,7 @@ from tensorflow.contrib.framework.python.ops import arg_scope
 import pixel_cnn_pp.nn as nn
 
 
-def model_spec(x, h=None, init=False, ema=None, dropout_p=0.5, nr_resnet=5, nr_filters=160, nr_logistic_mix=10, resnet_nonlinearity='concat_elu'):
+def model_spec(x, m=None, h=None, init=False, ema=None, dropout_p=0.5, nr_resnet=5, nr_filters=160, nr_logistic_mix=10, resnet_nonlinearity='concat_elu'):
     """
     We receive a Tensor x of shape (N,H,W,D1) (e.g. (12,32,32,3)) and produce
     a Tensor x_out of shape (N,H,W,D2) (e.g. (12,32,32,100)), where each fiber
@@ -34,8 +34,13 @@ def model_spec(x, h=None, init=False, ema=None, dropout_p=0.5, nr_resnet=5, nr_f
 
             # ////////// up pass through pixelCNN ////////
             xs = nn.int_shape(x)
+            if m is not None:
+                ms = nn.int_shape(m)
+                assert ms[0]==xs[1] and ms[1]==xs[2], "Shape of mask does not fit shape of input images"
             # add channel of ones to distinguish image from padding later on
             x_pad = tf.concat([x, tf.ones(xs[:-1] + [1])], 3)
+            if m is not None:
+                x_pad = tf.multiply(x_pad, tf.stack(m, -1))
             u_list = [nn.down_shift(nn.down_shifted_conv2d(
                 x_pad, num_filters=nr_filters, filter_size=[2, 3]))]  # stream for pixels above
             ul_list = [nn.down_shift(nn.down_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[1, 3])) +
