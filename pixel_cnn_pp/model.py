@@ -36,6 +36,8 @@ def model_spec(x, m=None, h=None, init=False, ema=None, dropout_p=0.5, nr_resnet
             xs = nn.int_shape(x)
             if m is not None:
                 ms = nn.int_shape(m)
+                print ms
+                print xs
                 assert ms[0]==xs[1] and ms[1]==xs[2], "Shape of mask does not fit shape of input images"
             # add channel of ones to distinguish image from padding later on
             x_pad = tf.concat([x, tf.ones(xs[:-1] + [1])], 3)
