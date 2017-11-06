@@ -194,7 +194,7 @@ saver = tf.train.Saver()
 
 # turn numpy inputs into feed_dict for use with tensorflow
 
-mgen = mk.CentralMaskGenerator(obs_shape[0], obs_shape[1])
+mgen = mk.CentralMaskGenerator(obs_shape[0], obs_shape[1], 0.25)
 
 def make_feed_dict(data, init=False, masks=None):
     if type(data) is tuple:
