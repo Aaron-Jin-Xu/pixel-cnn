@@ -12,6 +12,14 @@ class MaskGenerator(object):
     def gen(self, n):
         return np.ones((n, h, w))
 
+class AllOnesMaskGenerator(MaskGenerator):
+
+    def __init__(self, h, w, rng=None):
+        super().__init__(h, w, rng)
+
+    def gen(self, n):
+        return np.ones((n, self.h, self.w))
+
 
 class CentralMaskGenerator(MaskGenerator):
 

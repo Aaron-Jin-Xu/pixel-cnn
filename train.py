@@ -195,8 +195,9 @@ saver = tf.train.Saver()
 # turn numpy inputs into feed_dict for use with tensorflow
 
 mgen = mk.RandomMaskGenerator(obs_shape[0], obs_shape[1])
+agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
 
-def make_feed_dict(data, init=False, masks=None):
+def make_feed_dict(data, init=False, masks=None, is_test=False):
     if type(data) is tuple:
         x, y = data
     else:
@@ -212,7 +213,10 @@ def make_feed_dict(data, init=False, masks=None):
         x = np.split(x, args.nr_gpu)
         feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
         if masks is not None:
-            feed_dict[masks] = mgen.gen(args.batch_size)
+            if is_test:
+                feed_dict[masks] = agen.gen(args.batch_size)
+            else:
+                feed_dict[masks] = mgen.gen(args.batch_size)
         if y is not None:
             y = np.split(y, args.nr_gpu)
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
@@ -255,7 +259,7 @@ with tf.Session() as sess:
         # compute likelihood over test data
         test_losses = []
         for d in test_data:
-            feed_dict = make_feed_dict(d, masks=masks)
+            feed_dict = make_feed_dict(d, masks=masks, is_test=True)
             l = sess.run(bits_per_dim_test, feed_dict)
             test_losses.append(l)
         test_loss_gen = np.mean(test_losses)
