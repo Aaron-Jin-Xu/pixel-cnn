@@ -126,7 +126,7 @@ model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
 model = tf.make_template('model', model_spec)
 
 # run once for data dependent initialization of parameters
-gen_par = model(x_init, h_init, init=True,
+gen_par = model(x_init, None, h_init, init=True,
                 dropout_p=args.dropout_p, **model_opt)
 
 # keep track of moving average
