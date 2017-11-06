@@ -40,7 +40,7 @@ def model_spec(x, m=None, h=None, init=False, ema=None, dropout_p=0.5, nr_resnet
             # add channel of ones to distinguish image from padding later on
             x_pad = tf.concat([x, tf.ones(xs[:-1] + [1])], 3)
             if m is not None:
-                x_pad = tf.multiply(x_pad, tf.stack([m for i in range(xs[-1])], -1))
+                x_pad = tf.multiply(x_pad, tf.stack([m for i in range(xs[-1]+1)], -1))
             u_list = [nn.down_shift(nn.down_shifted_conv2d(
                 x_pad, num_filters=nr_filters, filter_size=[2, 3]))]  # stream for pixels above
             ul_list = [nn.down_shift(nn.down_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[1, 3])) +
