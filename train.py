@@ -172,7 +172,7 @@ bits_per_dim_test = loss_gen_test[
 new_x_gen = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        gen_par = model(xs[i], h_sample[i], ema=ema, dropout_p=0, **model_opt)
+        gen_par = model(xs[i], None, h_sample[i], ema=ema, dropout_p=0, **model_opt)
         new_x_gen.append(nn.sample_from_discretized_mix_logistic(
             gen_par, args.nr_logistic_mix))
 
@@ -194,7 +194,7 @@ saver = tf.train.Saver()
 
 # turn numpy inputs into feed_dict for use with tensorflow
 
-mgen = mk.CentralMaskGenerator(obs_shape[0], obs_shape[1], 0.25)
+mgen = mk.RandomMaskGenerator(obs_shape[0], obs_shape[1])
 
 def make_feed_dict(data, init=False, masks=None):
     if type(data) is tuple:
