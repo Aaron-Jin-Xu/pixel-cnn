@@ -16,6 +16,7 @@ import numpy as np
 import tensorflow as tf
 
 import pixel_cnn_pp.nn as nn
+import pixel_cnn_pp.mask as mk
 import pixel_cnn_pp.plotting as plotting
 from pixel_cnn_pp.model import model_spec
 import data.cifar10_data as cifar10_data
@@ -66,6 +67,10 @@ parser.add_argument('--polyak_decay', type=float, default=0.9995,
 # reproducibility
 parser.add_argument('-s', '--seed', type=int, default=1,
                     help='Random seed to use')
+
+parser.add_argument('-k', '--masked', dest='masked',
+                    action='store_true', help='Randomly mask input images?')
+
 args = parser.parse_args()
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
@@ -110,6 +115,11 @@ else:
     h_sample = [None] * args.nr_gpu
     hs = h_sample
 
+if args.masked:
+    masks = tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
+else:
+    masks = None
+
 # create the model
 model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
              'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
@@ -131,14 +141,14 @@ loss_gen_test = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         # train
-        gen_par = model(xs[i], hs[i], ema=None,
+        gen_par = model(xs[i], masks, hs[i], ema=None,
                         dropout_p=args.dropout_p, **model_opt)
-        loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par))
+        loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
         # gradients
         grads.append(tf.gradients(loss_gen[i], all_params))
         # test
-        gen_par = model(xs[i], hs[i], ema=ema, dropout_p=0., **model_opt)
-        loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par))
+        gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
+        loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
 
 # add losses and gradients together and get training updates
 tf_lr = tf.placeholder(tf.float32, shape=[])
@@ -184,8 +194,9 @@ saver = tf.train.Saver()
 
 # turn numpy inputs into feed_dict for use with tensorflow
 
+mgen = mk.CentralMaskGenerator(obs_shape[0], obs_shape[1])
 
-def make_feed_dict(data, init=False):
+def make_feed_dict(data, init=False, masks=None):
     if type(data) is tuple:
         x, y = data
     else:
@@ -200,6 +211,7 @@ def make_feed_dict(data, init=False):
     else:
         x = np.split(x, args.nr_gpu)
         feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
+        feed_dict[masks] = mgen.gen(args.batch_size)
         if y is not None:
             y = np.split(y, args.nr_gpu)
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
@@ -231,7 +243,7 @@ with tf.Session() as sess:
         # train for one epoch
         train_losses = []
         for d in train_data:
-            feed_dict = make_feed_dict(d)
+            feed_dict = make_feed_dict(d, masks=masks)
             # forward/backward/update model on each gpu
             lr *= args.lr_decay
             feed_dict.update({tf_lr: lr})
@@ -242,7 +254,7 @@ with tf.Session() as sess:
         # compute likelihood over test data
         test_losses = []
         for d in test_data:
-            feed_dict = make_feed_dict(d)
+            feed_dict = make_feed_dict(d, masks=masks)
             l = sess.run(bits_per_dim_test, feed_dict)
             test_losses.append(l)
         test_loss_gen = np.mean(test_losses)

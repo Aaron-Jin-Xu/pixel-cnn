@@ -32,7 +32,7 @@ def log_prob_from_logits(x):
     return x - m - tf.log(tf.reduce_sum(tf.exp(x - m), axis, keep_dims=True))
 
 
-def discretized_mix_logistic_loss(x, l, sum_all=True, mask=None):
+def discretized_mix_logistic_loss(x, l, sum_all=True, masks=None):
     """ log-likelihood for mixture of discretized logistics, assumes the data has been rescaled to [-1,1] interval """
     xs = int_shape(
         x)  # true image (i.e. labels) to regress to, e.g. (B,32,32,3)
@@ -86,8 +86,8 @@ def discretized_mix_logistic_loss(x, l, sum_all=True, mask=None):
 
     log_probs = tf.reduce_sum(log_probs, 3) + log_prob_from_logits(logit_probs)
     lse = log_sum_exp(log_probs)
-    if mask is not None:
-        lse = tf.multiply(lse, mask)
+    if masks is not None:
+        lse = tf.multiply(lse, masks)
     if sum_all:
         return -tf.reduce_sum(lse)
     else:
