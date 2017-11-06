@@ -54,7 +54,6 @@ class RandomMaskGenerator(MaskGenerator):
         mask = np.ones((n, self.h, self.w))
         for i in range(n):
             missing_h, missing_w, progress_h, progress_w, offset_h, offset_w = self.gen_par()
-            print(missing_h, missing_w, progress_h, progress_w, offset_h, offset_w)
             missing = np.zeros((missing_h, missing_w))
             missing[:progress_h, :] = 1
             missing[progress_h, :progress_w] = 1
