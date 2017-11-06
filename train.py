@@ -211,7 +211,8 @@ def make_feed_dict(data, init=False, masks=None):
     else:
         x = np.split(x, args.nr_gpu)
         feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
-        feed_dict[masks] = mgen.gen(args.batch_size)
+        if masks is not None:
+            feed_dict[masks] = mgen.gen(args.batch_size)
         if y is not None:
             y = np.split(y, args.nr_gpu)
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
