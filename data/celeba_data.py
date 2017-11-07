@@ -90,5 +90,5 @@ class DataLoader(object):
 dl = DataLoader("/data/ziz/jxu/CelebA", 'train', 12, rng=None, shuffle=False, return_labels=False)
 print(dl.get_observation_size)
 for item in dl:
-    print item
+    print(item)
     quit()
