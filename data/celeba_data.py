@@ -9,11 +9,11 @@ import numpy as np
 
 def load(data_dir, subset='train'):
     if subset=='train':
-        trainx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))[:200000]
+        trainx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))[:200000, :, :, :]
         trainy = np.ones((trainx.shape[0], ))
         return trainx, trainy
     elif subset=='test':
-        testx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))[200000:]
+        testx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))[200000:, :, :, :]
         testy = np.ones((testx.shape[0], ))
         return testx, testy
     else:
