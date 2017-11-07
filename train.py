@@ -21,6 +21,7 @@ import pixel_cnn_pp.plotting as plotting
 from pixel_cnn_pp.model import model_spec
 import data.cifar10_data as cifar10_data
 import data.imagenet_data as imagenet_data
+import data.celeba_data as celeba_data
 
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
@@ -71,6 +72,9 @@ parser.add_argument('-s', '--seed', type=int, default=1,
 parser.add_argument('-k', '--masked', dest='masked',
                     action='store_true', help='Randomly mask input images?')
 
+parser.add_argument('-j', '--rot180', dest='rot180',
+                    action='store_true', help='Rot180 the images?')
+
 args = parser.parse_args()
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
@@ -84,7 +88,8 @@ tf.set_random_seed(args.seed)
 if args.data_set == 'imagenet' and args.class_conditional:
     raise("We currently don't have labels for the small imagenet data set")
 DataLoader = {'cifar': cifar10_data.DataLoader,
-              'imagenet': imagenet_data.DataLoader}[args.data_set]
+              'imagenet': imagenet_data.DataLoader,
+              'celeba': celeba_data.DataLoader}[args.data_set]
 train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
                         rng=rng, shuffle=True, return_labels=args.class_conditional)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size *
@@ -203,7 +208,8 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
     else:
         x = data
         y = None
-    x = np.rot90(x, 2, (1,2)) #### ROT
+    if args.rot180:
+        x = np.rot90(x, 2, (1,2)) #### ROT
     # input to pixelCNN is scaled from uint8 [0,255] to float in range [-1,1]
     x = np.cast[np.float32]((x - 127.5) / 127.5)
     if init:
