@@ -85,10 +85,3 @@ class DataLoader(object):
             return x
 
     next = __next__  # Python 2 compatibility (https://stackoverflow.com/questions/29578469/how-to-make-an-object-both-a-python2-and-python3-iterator)
-
-
-dl = DataLoader("/data/ziz/jxu/CelebA", 'train', 12, rng=None, shuffle=False, return_labels=False)
-print(dl.get_observation_size())
-for item in dl:
-    print(item.shape)
-    quit()
