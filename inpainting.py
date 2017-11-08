@@ -86,9 +86,9 @@ DataLoader = {'cifar': cifar10_data.DataLoader,
               'imagenet': imagenet_data.DataLoader,
               'celeba': celeba_data.DataLoader}[args.data_set]
 train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
-                        rng=rng, shuffle=True, return_labels=args.class_conditional)
+                        rng=rng, shuffle=True, return_labels=False)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size *
-                       args.nr_gpu, shuffle=False, return_labels=args.class_conditional)
+                       args.nr_gpu, shuffle=False, return_labels=False)
 obs_shape = train_data.get_observation_size()  # e.g. a tuple (32,32,3)
 assert len(obs_shape) == 3, 'assumed right now'
 
