@@ -43,8 +43,8 @@ print('input args:\n', json.dumps(vars(args), indent=4,
 obs_shape = (32, 32, 3)
 
 # data place holders
-x_init = tf.placeholder(tf.float32, shape=(None,) + obs_shape)
-xs = [tf.placeholder(tf.float32, shape=(None, ) + obs_shape)
+x_init = tf.placeholder(tf.float32, shape=(100,) + obs_shape)
+xs = [tf.placeholder(tf.float32, shape=(12, ) + obs_shape)
       for i in range(args.nr_gpu)]
 
 
