@@ -42,6 +42,11 @@ print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
 
 
+# data place holders
+x_init = tf.placeholder(tf.float32, shape=(args.init_batch_size,) + obs_shape)
+xs = [tf.placeholder(tf.float32, shape=(args.batch_size, ) + obs_shape)
+      for i in range(args.nr_gpu)]
+
 # create the model
 model_opt = {'nr_resnet': 3, 'nr_filters': 10,
              'nr_logistic_mix': 10, 'resnet_nonlinearity': 'concat_elu'}
