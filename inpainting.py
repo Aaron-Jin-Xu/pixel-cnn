@@ -114,6 +114,17 @@ model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
              'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
 model = tf.make_template('model', model_spec)
 
+# run once for data dependent initialization of parameters
+gen_par = model(x_init, None, h_init, init=True,
+                dropout_p=args.dropout_p, **model_opt)
+
+# keep track of moving average
+all_params = tf.trainable_variables()
+ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
+maintain_averages_op = tf.group(ema.apply(all_params))
+
+
+
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
