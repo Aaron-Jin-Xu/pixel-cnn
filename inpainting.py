@@ -23,6 +23,45 @@ import data.cifar10_data as cifar10_data
 import data.imagenet_data as imagenet_data
 import data.celeba_data as celeba_data
 
+
+parser = argparse.ArgumentParser()
+# data I/O
+parser.add_argument('-i', '--data_dir', type=str,
+                    default='/tmp/pxpp/data', help='Location for the dataset')
+parser.add_argument('-o', '--save_dir', type=str, default='/tmp/pxpp/save',
+                    help='Location for parameter checkpoints and samples')
+parser.add_argument('-d', '--data_set', type=str,
+                    default='cifar', help='Can be either cifar|imagenet')
+parser.add_argument('-g', '--nr_gpu', type=int, default=8,
+                    help='How many GPUs to distribute the training across?')
+
+# evaluation
+
+args = parser.parse_args()
+print('input args:\n', json.dumps(vars(args), indent=4,
+                                  separators=(',', ':')))  # pretty print args
+
+
+# create the model
+model_opt = {'nr_resnet': 3, 'nr_filters': 10,
+             'nr_logistic_mix': 10, 'resnet_nonlinearity': 'concat_elu'}
+model = tf.make_template('model', model_spec)
+
+gen_par = model(x_init, None, h_init, init=True,
+                dropout_p=0.5, **model_opt)
+
+saver = tf.train.Saver()
+
+
+
+with tf.Session() as sess:
+    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
+
+
+quit()
+
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
 # data I/O
@@ -92,6 +131,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size *
 obs_shape = train_data.get_observation_size()  # e.g. a tuple (32,32,3)
 assert len(obs_shape) == 3, 'assumed right now'
 
+
 # data place holders
 x_init = tf.placeholder(tf.float32, shape=(args.init_batch_size,) + obs_shape)
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, ) + obs_shape)
@@ -118,10 +158,6 @@ model = tf.make_template('model', model_spec)
 gen_par = model(x_init, None, h_init, init=True,
                 dropout_p=args.dropout_p, **model_opt)
 
-# keep track of moving average
-all_params = tf.trainable_variables()
-ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
-maintain_averages_op = tf.group(ema.apply(all_params))
 
 # sample from the model
 new_x_gen = []
@@ -144,7 +180,7 @@ def sample_from_model(sess):
     return np.concatenate(x_gen, axis=0)
 
 
-initializer = tf.global_variables_initializer()
+#initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
 
