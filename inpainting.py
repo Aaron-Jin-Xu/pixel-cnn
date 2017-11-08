@@ -153,7 +153,7 @@ with tf.Session() as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-
+    epoch = 0
     # generate samples from the model
     sample_x = sample_from_model(sess)
     img_tile = plotting.img_tile(sample_x[:int(np.floor(np.sqrt(
