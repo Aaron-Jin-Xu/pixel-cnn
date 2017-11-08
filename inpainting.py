@@ -114,7 +114,8 @@ model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
              'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
 model = tf.make_template('model', model_spec)
 
-
+initializer = tf.global_variables_initializer()
+saver = tf.train.Saver()
 
 
 with tf.Session() as sess:
