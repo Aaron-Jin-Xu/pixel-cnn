@@ -123,6 +123,25 @@ all_params = tf.trainable_variables()
 ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
 maintain_averages_op = tf.group(ema.apply(all_params))
 
+# sample from the model
+new_x_gen = []
+for i in range(args.nr_gpu):
+    with tf.device('/gpu:%d' % i):
+        gen_par = model(xs[i], None, h_sample[i], ema=ema, dropout_p=0, **model_opt)
+        new_x_gen.append(nn.sample_from_discretized_mix_logistic(
+            gen_par, args.nr_logistic_mix))
+
+
+def sample_from_model(sess):
+    x_gen = [np.zeros((args.batch_size,) + obs_shape, dtype=np.float32)
+             for i in range(args.nr_gpu)]
+    for yi in range(obs_shape[0]):
+        for xi in range(obs_shape[1]):
+            new_x_gen_np = sess.run(
+                new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
 
 
 initializer = tf.global_variables_initializer()
@@ -133,3 +152,13 @@ with tf.Session() as sess:
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
+
+
+    # generate samples from the model
+    sample_x = sample_from_model(sess)
+    img_tile = plotting.img_tile(sample_x[:int(np.floor(np.sqrt(
+        args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_sample%d.png' % (args.data_set, epoch)))
+    plotting.plt.close('all')
