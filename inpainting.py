@@ -47,12 +47,13 @@ x_init = tf.placeholder(tf.float32, shape=(None,) + obs_shape)
 xs = [tf.placeholder(tf.float32, shape=(None, ) + obs_shape)
       for i in range(args.nr_gpu)]
 
+
 # create the model
 model_opt = {'nr_resnet': 3, 'nr_filters': 10,
              'nr_logistic_mix': 10, 'resnet_nonlinearity': 'concat_elu'}
 model = tf.make_template('model', model_spec)
 
-gen_par = model(x_init, None, h_init, init=True,
+gen_par = model(x_init, None, None, init=True,
                 dropout_p=0.5, **model_opt)
 
 saver = tf.train.Saver()
