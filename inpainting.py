@@ -49,7 +49,7 @@ xs = [tf.placeholder(tf.float32, shape=(12, ) + obs_shape)
 
 
 # create the model
-model_opt = {'nr_resnet': 3, 'nr_filters': 100,
+model_opt = {'nr_resnet': 4, 'nr_filters': 100,
              'nr_logistic_mix': 10, 'resnet_nonlinearity': 'concat_elu'}
 model = tf.make_template('model', model_spec)
 
