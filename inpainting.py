@@ -40,7 +40,7 @@ parser.add_argument('-g', '--nr_gpu', type=int, default=8,
 args = parser.parse_args()
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
-
+obs_shape = (32, 32, 3)
 
 # data place holders
 x_init = tf.placeholder(tf.float32, shape=(None,) + obs_shape)
