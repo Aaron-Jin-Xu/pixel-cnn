@@ -265,7 +265,6 @@ with tf.Session() as sess:
     td = next(test_data)
     td = np.cast[np.float32]((td - 127.5) / 127.5)
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
-    sample_x = complete(imgs, sess)
 
     img_tile = plotting.img_tile(ret_original_images(imgs)[:int(np.floor(np.sqrt(
         args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
@@ -281,6 +280,7 @@ with tf.Session() as sess:
         args.save_dir, '%s_masked.png' % (args.data_set, )))
     plotting.plt.close('all')
 
+    sample_x = complete(imgs, sess)
     img_tile = plotting.img_tile(sample_x[:int(np.floor(np.sqrt(
         args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
     img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
