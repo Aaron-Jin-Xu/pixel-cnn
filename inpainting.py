@@ -203,6 +203,18 @@ def complete(imgs, sess):
                 x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
+def ret_original_images(imgs):
+    x_gen = [imgs[i] for i in range(args.nr_gpu)]
+    return np.concatenate(x_gen, axis=0)
+
+def ret_masked_images(imgs):
+    x_gen = [imgs[i] for i in range(args.nr_gpu)]
+    for yi in range(22, obs_shape[0]):
+        for xi in range(obs_shape[1]):
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = 0.0
+    return np.concatenate(x_gen, axis=0)
+
 # init & save
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
@@ -254,6 +266,21 @@ with tf.Session() as sess:
     td = np.cast[np.float32]((td - 127.5) / 127.5)
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
     sample_x = complete(imgs, sess)
+
+    img_tile = plotting.img_tile(ret_original_images(imgs)[:int(np.floor(np.sqrt(
+        args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' original')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_original.png' % (args.data_set, )))
+    plotting.plt.close('all')
+
+    img_tile = plotting.img_tile(ret_masked_images(imgs)[:int(np.floor(np.sqrt(
+        args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' masked')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_masked.png' % (args.data_set, )))
+    plotting.plt.close('all')
+
     img_tile = plotting.img_tile(sample_x[:int(np.floor(np.sqrt(
         args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
     img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
