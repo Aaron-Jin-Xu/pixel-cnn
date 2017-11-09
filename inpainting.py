@@ -23,51 +23,6 @@ import data.cifar10_data as cifar10_data
 import data.imagenet_data as imagenet_data
 import data.celeba_data as celeba_data
 
-
-parser = argparse.ArgumentParser()
-# data I/O
-parser.add_argument('-i', '--data_dir', type=str,
-                    default='/tmp/pxpp/data', help='Location for the dataset')
-parser.add_argument('-o', '--save_dir', type=str, default='/tmp/pxpp/save',
-                    help='Location for parameter checkpoints and samples')
-parser.add_argument('-d', '--data_set', type=str,
-                    default='cifar', help='Can be either cifar|imagenet')
-parser.add_argument('-g', '--nr_gpu', type=int, default=8,
-                    help='How many GPUs to distribute the training across?')
-
-# evaluation
-
-args = parser.parse_args()
-print('input args:\n', json.dumps(vars(args), indent=4,
-                                  separators=(',', ':')))  # pretty print args
-obs_shape = (32, 32, 3)
-
-# data place holders
-x_init = tf.placeholder(tf.float32, shape=(100,) + obs_shape)
-xs = [tf.placeholder(tf.float32, shape=(12, ) + obs_shape)
-      for i in range(args.nr_gpu)]
-
-
-# create the model
-model_opt = {'nr_resnet': 4, 'nr_filters': 100,
-             'nr_logistic_mix': 10, 'resnet_nonlinearity': 'concat_elu'}
-model = tf.make_template('model', model_spec)
-
-gen_par = model(x_init, None, None, init=True,
-                dropout_p=0.5, **model_opt)
-
-saver = tf.train.Saver()
-
-
-
-with tf.Session() as sess:
-    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-    print('restoring parameters from', ckpt_file)
-    saver.restore(sess, ckpt_file)
-
-
-quit()
-
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
 # data I/O
@@ -77,21 +32,26 @@ parser.add_argument('-o', '--save_dir', type=str, default='/tmp/pxpp/save',
                     help='Location for parameter checkpoints and samples')
 parser.add_argument('-d', '--data_set', type=str,
                     default='cifar', help='Can be either cifar|imagenet')
-
+parser.add_argument('-t', '--save_interval', type=int, default=20,
+                    help='Every how many epochs to write checkpoint/samples?')
 parser.add_argument('-r', '--load_params', dest='load_params', action='store_true',
                     help='Restore training from previous model checkpoint?')
 # model
-parser.add_argument('-q', '--nr_resnet', type=int, default=4,
+parser.add_argument('-q', '--nr_resnet', type=int, default=5,
                     help='Number of residual blocks per stage of the model')
-parser.add_argument('-n', '--nr_filters', type=int, default=100,
+parser.add_argument('-n', '--nr_filters', type=int, default=160,
                     help='Number of filters to use across the model. Higher = larger model.')
 parser.add_argument('-m', '--nr_logistic_mix', type=int, default=10,
                     help='Number of logistic components in the mixture. Higher = more flexible model')
 parser.add_argument('-z', '--resnet_nonlinearity', type=str, default='concat_elu',
                     help='Which nonlinearity to use in the ResNet layers. One of "concat_elu", "elu", "relu" ')
-
+parser.add_argument('-c', '--class_conditional', dest='class_conditional',
+                    action='store_true', help='Condition generative model on labels?')
 # optimization
-
+parser.add_argument('-l', '--learning_rate', type=float,
+                    default=0.001, help='Base learning rate')
+parser.add_argument('-e', '--lr_decay', type=float, default=0.999995,
+                    help='Learning rate decay, applied every step of the optimization')
 parser.add_argument('-b', '--batch_size', type=int, default=12,
                     help='Batch size during training per GPU')
 parser.add_argument('-a', '--init_batch_size', type=int, default=100,
@@ -131,12 +91,11 @@ DataLoader = {'cifar': cifar10_data.DataLoader,
               'imagenet': imagenet_data.DataLoader,
               'celeba': celeba_data.DataLoader}[args.data_set]
 train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
-                        rng=rng, shuffle=True, return_labels=False)
+                        rng=rng, shuffle=True, return_labels=args.class_conditional)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size *
-                       args.nr_gpu, shuffle=False, return_labels=False)
+                       args.nr_gpu, shuffle=False, return_labels=args.class_conditional)
 obs_shape = train_data.get_observation_size()  # e.g. a tuple (32,32,3)
 assert len(obs_shape) == 3, 'assumed right now'
-
 
 # data place holders
 x_init = tf.placeholder(tf.float32, shape=(args.init_batch_size,) + obs_shape)
@@ -145,10 +104,21 @@ xs = [tf.placeholder(tf.float32, shape=(args.batch_size, ) + obs_shape)
 
 # if the model is class-conditional we'll set up label placeholders +
 # one-hot encodings 'h' to condition on
-
-h_init = None
-h_sample = [None] * args.nr_gpu
-hs = h_sample
+if args.class_conditional:
+    num_labels = train_data.get_num_labels()
+    y_init = tf.placeholder(tf.int32, shape=(args.init_batch_size,))
+    h_init = tf.one_hot(y_init, num_labels)
+    y_sample = np.split(
+        np.mod(np.arange(args.batch_size * args.nr_gpu), num_labels), args.nr_gpu)
+    h_sample = [tf.one_hot(tf.Variable(
+        y_sample[i], trainable=False), num_labels) for i in range(args.nr_gpu)]
+    ys = [tf.placeholder(tf.int32, shape=(args.batch_size,))
+          for i in range(args.nr_gpu)]
+    hs = [tf.one_hot(ys[i], num_labels) for i in range(args.nr_gpu)]
+else:
+    h_init = None
+    h_sample = [None] * args.nr_gpu
+    hs = h_sample
 
 if args.masked:
     masks = tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
@@ -164,6 +134,44 @@ model = tf.make_template('model', model_spec)
 gen_par = model(x_init, None, h_init, init=True,
                 dropout_p=args.dropout_p, **model_opt)
 
+# keep track of moving average
+all_params = tf.trainable_variables()
+ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
+maintain_averages_op = tf.group(ema.apply(all_params))
+
+# get loss gradients over multiple GPUs
+grads = []
+loss_gen = []
+loss_gen_test = []
+for i in range(args.nr_gpu):
+    with tf.device('/gpu:%d' % i):
+        # train
+        gen_par = model(xs[i], masks, hs[i], ema=None,
+                        dropout_p=args.dropout_p, **model_opt)
+        loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
+        # gradients
+        grads.append(tf.gradients(loss_gen[i], all_params))
+        # test
+        gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
+        loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
+
+# add losses and gradients together and get training updates
+tf_lr = tf.placeholder(tf.float32, shape=[])
+with tf.device('/gpu:0'):
+    for i in range(1, args.nr_gpu):
+        loss_gen[0] += loss_gen[i]
+        loss_gen_test[0] += loss_gen_test[i]
+        for j in range(len(grads[0])):
+            grads[0][j] += grads[i][j]
+    # training op
+    optimizer = tf.group(nn.adam_updates(
+        all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995), maintain_averages_op)
+
+# convert loss to bits/dim
+bits_per_dim = loss_gen[
+    0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
+bits_per_dim_test = loss_gen_test[
+    0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
 
 # sample from the model
 new_x_gen = []
@@ -185,22 +193,50 @@ def sample_from_model(sess):
                 x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
-
-#initializer = tf.global_variables_initializer()
+# init & save
+initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
+# turn numpy inputs into feed_dict for use with tensorflow
 
+mgen = mk.RandomMaskGenerator(obs_shape[0], obs_shape[1])
+agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
+
+def make_feed_dict(data, init=False, masks=None, is_test=False):
+    if type(data) is tuple:
+        x, y = data
+    else:
+        x = data
+        y = None
+    if args.rot180:
+        x = np.rot90(x, 2, (1,2)) #### ROT
+    # input to pixelCNN is scaled from uint8 [0,255] to float in range [-1,1]
+    x = np.cast[np.float32]((x - 127.5) / 127.5)
+    if init:
+        feed_dict = {x_init: x}
+        if y is not None:
+            feed_dict.update({y_init: y})
+    else:
+        x = np.split(x, args.nr_gpu)
+        feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
+        if masks is not None:
+            if is_test:
+                feed_dict[masks] = agen.gen(args.batch_size)
+            else:
+                feed_dict[masks] = mgen.gen(args.batch_size)
+        if y is not None:
+            y = np.split(y, args.nr_gpu)
+            feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
+    return feed_dict
+
+# //////////// perform training //////////////
+if not os.path.exists(args.save_dir):
+    os.makedirs(args.save_dir)
+print('starting training')
+test_bpd = []
+lr = args.learning_rate
 with tf.Session() as sess:
+
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
-
-    epoch = 0
-    # generate samples from the model
-    sample_x = sample_from_model(sess)
-    img_tile = plotting.img_tile(sample_x[:int(np.floor(np.sqrt(
-        args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
-    img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-    plotting.plt.savefig(os.path.join(
-        args.save_dir, '%s_sample%d.png' % (args.data_set, epoch)))
-    plotting.plt.close('all')
