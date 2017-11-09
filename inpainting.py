@@ -193,6 +193,16 @@ def sample_from_model(sess):
                 x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
+def complete(imgs, sess):
+    x_gen = [imgs for i in range(args.nr_gpu)]
+    for yi in range(22, obs_shape[0]):
+        for xi in range(obs_shape[1]):
+            new_x_gen_np = sess.run(
+                new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
+
 # init & save
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
@@ -240,3 +250,12 @@ with tf.Session() as sess:
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
+    imgs = next(test_data)
+    print(imgs.shape)
+    sample_x = complete(imgs, sess)
+    img_tile = plotting.img_tile(sample_x[:int(np.floor(np.sqrt(
+        args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_complete%d.png' % (args.data_set, epoch)))
+    plotting.plt.close('all')
