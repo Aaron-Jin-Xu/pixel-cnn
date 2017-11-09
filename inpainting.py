@@ -250,7 +250,7 @@ with tf.Session() as sess:
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
-    imgs = [next(test_data)[i*args.batch_size, (i+1)*args.batch_size:, :, :] for i in range(args.nr_gpu)]
+    imgs = [next(test_data)[i*args.batch_size, (i+1)*args.batch_size:, :, :, :] for i in range(args.nr_gpu)]
     sample_x = complete(imgs, sess)
     img_tile = plotting.img_tile(sample_x[:int(np.floor(np.sqrt(
         args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
