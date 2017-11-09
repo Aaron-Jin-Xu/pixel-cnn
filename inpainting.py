@@ -247,11 +247,18 @@ test_bpd = []
 lr = args.learning_rate
 with tf.Session() as sess:
 
+    feed_dict = make_feed_dict(
+            train_data.next(args.init_batch_size), init=True)
+    train_data.reset()  # rewind the iterator back to 0 to do one full epoch
+    sess.run(initializer, feed_dict)
+    print('initializing the model...')
+
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
     imgs = [next(test_data)[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
     sample_x = complete(imgs, sess)
+    print(sample_x[0])
     img_tile = plotting.img_tile(sample_x[:int(np.floor(np.sqrt(
         args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
     img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
