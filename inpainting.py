@@ -256,5 +256,5 @@ with tf.Session() as sess:
         args.batch_size * args.nr_gpu))**2)], aspect_ratio=1.0, border_color=1.0, stretch=True)
     img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
     plotting.plt.savefig(os.path.join(
-        args.save_dir, '%s_complete%d.png' % (args.data_set, epoch)))
+        args.save_dir, '%s_complete.png' % (args.data_set, )))
     plotting.plt.close('all')
