@@ -10,7 +10,7 @@ from PIL import Image
 
 def read_imgs(dir):
     dirpath, dirnames, filenames = next(os.walk(dir))
-    imgs = np.array([Image.open(os.path.join(dir, filename)) for filename in filenames]).astype(np.uint8)
+    imgs = np.array([np.array(Image.open(os.path.join(dir, filename))) for filename in filenames]).astype(np.uint8)
     return imgs
 
 def load(data_dir, subset='train'):
