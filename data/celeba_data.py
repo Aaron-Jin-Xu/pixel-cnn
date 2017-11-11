@@ -6,18 +6,22 @@ by Krizhevsky et al. and hosted here: https://www.cs.toronto.edu/~kriz/cifar.htm
 import os
 import sys
 import numpy as np
+from PIL import Image
+
+def read_imgs(dir):
+    dirpath, dirnames, filenames = next(os.walk(dir))
+    imgs = np.array([Image.open(os.path.join(dir, filename)) for filename in filenames]).astype(np.uint8)
+    return imgs
 
 def load(data_dir, subset='train'):
-    if subset=='train':
-        trainx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))['arr_0'][:200000, :, :, :]
+    if subset in ['train', 'valid', 'test']:
+        #trainx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))['arr_0'][:200000, :, :, :]
+        trainx = read_imgs(os.path.join(data_dir, "celeba32-{0}".format(subset)))
         trainy = np.ones((trainx.shape[0], ))
         return trainx, trainy
-    elif subset=='test':
-        testx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))['arr_0'][200000:, :, :, :]
-        testy = np.ones((testx.shape[0], ))
-        return testx, testy
+
     else:
-        raise NotImplementedError('subset should be either train or test')
+        raise NotImplementedError('subset should be either train, valid or test')
 
 class DataLoader(object):
     """ an object that generates batches of CelebA data for training """
