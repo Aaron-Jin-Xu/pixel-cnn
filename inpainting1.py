@@ -244,7 +244,7 @@ with tf.Session() as sess:
 
     td = next(test_data)
     from PIL import Image
-    for i in range(64):
+    for i in range(36):
         Image.fromarray(td[i]).save("/data/ziz/jxu/CelebA/celeba_cropped_test_samples/c"+str(i)+".png")
     td = np.cast[np.float32]((td - 127.5) / 127.5)
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
