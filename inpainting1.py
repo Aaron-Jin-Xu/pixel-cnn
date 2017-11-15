@@ -165,8 +165,7 @@ new_x_gen = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         gen_par = model(xs[i], None, h_sample[i], ema=ema, dropout_p=0, **model_opt)
-        new_x_gen.append(nn.sample_from_discretized_mix_logistic(
-            gen_par, args.nr_logistic_mix))
+        new_x_gen.append(gen_par)
 
 
 def sample_from_model(sess):
@@ -190,9 +189,8 @@ def complete(imgs, sess):
     #for i in range(args.nr_gpu):
     #    x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
     #return np.concatenate(x_gen, axis=0)
-    for i in range(args.nr_gpu):
-        x_gen[i] = new_x_gen_np[i]
-    return np.concatenate(x_gen, axis=0)
+
+    return np.concatenate(new_x_gen_np, axis=0)
 
 
 # init & save
@@ -251,6 +249,8 @@ with tf.Session() as sess:
         Image.fromarray(td[i]).save("/data/ziz/jxu/CelebA/celeba_cropped_test_samples/c"+str(i)+".png")
     td = np.cast[np.float32]((td - 127.5) / 127.5)
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
+
+
 
     sample_x = complete(imgs, sess)
     print(sample_x[0].shape)
