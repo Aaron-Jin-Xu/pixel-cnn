@@ -187,8 +187,11 @@ def complete(imgs, sess):
              for i in range(args.nr_gpu)]
     new_x_gen_np = sess.run(
         new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+    #for i in range(args.nr_gpu):
+    #    x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
+    #return np.concatenate(x_gen, axis=0)
     for i in range(args.nr_gpu):
-        x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
+        x_gen[i] = new_x_gen_np[i]
     return np.concatenate(x_gen, axis=0)
 
 
