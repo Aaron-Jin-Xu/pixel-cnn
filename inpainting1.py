@@ -90,8 +90,8 @@ if args.data_set == 'imagenet' and args.class_conditional:
 DataLoader = {'cifar': cifar10_data.DataLoader,
               'imagenet': imagenet_data.DataLoader,
               'celeba': celeba_data.DataLoader}[args.data_set]
-train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
-                        rng=rng, shuffle=True, return_labels=args.class_conditional)
+#train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
+#                        rng=rng, shuffle=True, return_labels=args.class_conditional)
 test_data = DataLoader(args.data_dir, 'valid', args.batch_size *
                        args.nr_gpu, shuffle=False, return_labels=args.class_conditional)
 obs_shape = train_data.get_observation_size()  # e.g. a tuple (32,32,3)
@@ -102,23 +102,10 @@ x_init = tf.placeholder(tf.float32, shape=(args.init_batch_size,) + obs_shape)
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, ) + obs_shape)
       for i in range(args.nr_gpu)]
 
-# if the model is class-conditional we'll set up label placeholders +
-# one-hot encodings 'h' to condition on
-if args.class_conditional:
-    num_labels = train_data.get_num_labels()
-    y_init = tf.placeholder(tf.int32, shape=(args.init_batch_size,))
-    h_init = tf.one_hot(y_init, num_labels)
-    y_sample = np.split(
-        np.mod(np.arange(args.batch_size * args.nr_gpu), num_labels), args.nr_gpu)
-    h_sample = [tf.one_hot(tf.Variable(
-        y_sample[i], trainable=False), num_labels) for i in range(args.nr_gpu)]
-    ys = [tf.placeholder(tf.int32, shape=(args.batch_size,))
-          for i in range(args.nr_gpu)]
-    hs = [tf.one_hot(ys[i], num_labels) for i in range(args.nr_gpu)]
-else:
-    h_init = None
-    h_sample = [None] * args.nr_gpu
-    hs = h_sample
+
+h_init = None
+h_sample = [None] * args.nr_gpu
+hs = h_sample
 
 if args.masked:
     masks = tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
@@ -193,6 +180,18 @@ def sample_from_model(sess):
                 x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
+
+def complete(imgs, sess):
+    x_gen = [imgs[i] for i in range(args.nr_gpu)]
+    x_gen = [np.zeros((args.batch_size,) + obs_shape, dtype=np.float32)
+             for i in range(args.nr_gpu)]
+    new_x_gen_np = sess.run(
+        new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+    for i in range(args.nr_gpu):
+        x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
+
+
 # init & save
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
@@ -243,8 +242,12 @@ with tf.Session() as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    feed_dict = make_feed_dict(
-                test_data.next(args.batch_size), masks=masks)
+    td = next(test_data)
+    from PIL import Image
+    for i in range(64):
+        Image.fromarray(td[i]).save("/data/ziz/jxu/CelebA/celeba_cropped_test_samples/c"+str(i)+".png")
+    td = np.cast[np.float32]((td - 127.5) / 127.5)
+    imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
 
-    sample_x = sample_from_model(sess)
+    sample_x = complete(imgs, sess)
     print(sample_x[0].shape)
