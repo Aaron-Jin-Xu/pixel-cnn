@@ -183,18 +183,14 @@ def sample_from_model(sess):
 def complete(imgs, mks, sess):
     x_gen = [imgs[i] for i in range(args.nr_gpu)]
     x_mk = [mks[i] for i in range(args.nr_gpu)]
-    new_x_gen_np = sess.run(
-        new_x_gen, {xs[i]: x_gen[i]*x_mk[i] for i in range(args.nr_gpu)})
 
-    #for i in range(args.nr_gpu):
-    #    for m in range()
-
-
-    #for i in range(args.nr_gpu):
-    #    x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
-    #return np.concatenate(x_gen, axis=0)
-
-    return np.concatenate(new_x_gen_np, axis=0)
+    for yi in range(12,24):
+        for xi in range(12,24):
+            new_x_gen_np = sess.run(
+                new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
 
 
 # init & save
@@ -255,7 +251,12 @@ with tf.Session() as sess:
     td = np.cast[np.float32]((td - 127.5) / 127.5)
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
 
-    mks = [mgen.gen(len(imgs)) for i in range(args.nr_gpu)]
+    mks = [mgen.gen(imgs[0].shape[0]) for i in range(args.nr_gpu)]
 
-    print(imgs[0].shape)
-    print(mks[0].shape)
+    sample_x = complete(imgs, mks, sess)
+
+    img_tile = plotting.img_tile(sample_x[:36], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_complete.png' % (args.data_set, )))
+    plotting.plt.close('all')
