@@ -160,12 +160,13 @@ bits_per_dim = loss_gen[
 bits_per_dim_test = loss_gen_test[
     0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
 
-# output mix logistic pars
+# sample from the model
 new_x_gen = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         gen_par = model(xs[i], None, h_sample[i], ema=ema, dropout_p=0, **model_opt)
-        new_x_gen.append(gen_par)
+        new_x_gen.append(nn.sample_from_discretized_mix_logistic(
+            gen_par, args.nr_logistic_mix))
 
 
 def sample_from_model(sess):
