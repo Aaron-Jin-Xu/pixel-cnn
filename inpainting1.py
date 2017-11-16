@@ -266,6 +266,8 @@ with tf.Session() as sess:
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
 
     mks = [mgen.gen(imgs[0].shape[0]) for i in range(args.nr_gpu)]
+    print((all_imgs[0]*127.5+127.5).astype(np.int8))
+    print((all_imgs[0]*127.5+127.5).astype(np.int8).dtype)
 
     all_imgs = ret_original_images(imgs)[:36]
     for i in range(36):
