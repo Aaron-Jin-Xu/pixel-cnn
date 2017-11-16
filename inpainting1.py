@@ -268,6 +268,8 @@ with tf.Session() as sess:
     mks = [mgen.gen(imgs[0].shape[0]) for i in range(args.nr_gpu)]
 
     all_imgs = ret_original_images(imgs)[:36]
+    print(all_imgs[0])
+    print(all_imgs[0].shape)
     for i in range(36):
         Image.fromarray(all_imgs[i]).save(os.path.join(
             "/data/ziz/jxu/results/original", '%s_original_%s.png' % (args.data_set, str(i).zfill(2))))
