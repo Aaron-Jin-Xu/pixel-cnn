@@ -235,7 +235,7 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
 
 def ret_masked_images(imgs):
     x_gen = [imgs[i] for i in range(args.nr_gpu)]
-    for yi in range(32, 32):
+    for yi in range(20, 32):
         for xi in range(32):
             for i in range(args.nr_gpu):
                 x_gen[i][:, yi, xi, :] = 0.0
