@@ -267,22 +267,23 @@ with tf.Session() as sess:
 
     mks = [mgen.gen(imgs[0].shape[0]) for i in range(args.nr_gpu)]
 
-    img_tile = plotting.img_tile(ret_original_images(imgs)[:36], aspect_ratio=1.0, border_color=1.0, stretch=True)
-    img = plotting.plot_img(img_tile, title=args.data_set + ' original')
-    plotting.plt.savefig(os.path.join(
-        args.save_dir, '%s_original.png' % (args.data_set, )))
-    plotting.plt.close('all')    
+    all_imgs = ret_original_images(imgs)[:36]
+    for i in range(36):
+        img = plotting.plot_img(all_imgs[i], title=args.data_set + ' original')
+        plotting.plt.savefig(os.path.join(
+            "/data/ziz/jxu/results/original", '%s_original_%s.png' % (args.data_set, str(i).zfill(2))))
+        plotting.plt.close('all')
 
-    sample_x = complete(imgs, mks, sess)
+    all_imgs = ret_masked_images(imgs)[:36]
+    for i in range(36):
+        img = plotting.plot_img(all_imgs[i], title=args.data_set + ' masked')
+        plotting.plt.savefig(os.path.join(
+            "/data/ziz/jxu/results/masked", '%s_masked_%s.png' % (args.data_set, str(i).zfill(2))))
+        plotting.plt.close('all')
 
-    img_tile = plotting.img_tile(sample_x[:36], aspect_ratio=1.0, border_color=1.0, stretch=True)
-    img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
-    plotting.plt.savefig(os.path.join(
-        args.save_dir, '%s_complete.png' % (args.data_set, )))
-    plotting.plt.close('all')
-
-    img_tile = plotting.img_tile(ret_masked_images(imgs)[:36], aspect_ratio=1.0, border_color=1.0, stretch=True)
-    img = plotting.plot_img(img_tile, title=args.data_set + ' masked')
-    plotting.plt.savefig(os.path.join(
-        args.save_dir, '%s_masked.png' % (args.data_set, )))
-    plotting.plt.close('all')
+    all_imgs = complete(imgs, mks, sess)
+    for i in range(36):
+        img = plotting.plot_img(all_imgs[i], title=args.data_set + ' complete')
+        plotting.plt.savefig(os.path.join(
+            "/data/ziz/jxu/results/complete", '%s_complete_%s.png' % (args.data_set, str(i).zfill(2))))
+        plotting.plt.close('all')    
