@@ -269,18 +269,16 @@ with tf.Session() as sess:
 
 
     all_imgs = ret_original_images(imgs)[:36]
-    print((all_imgs[0]*127.5+127.5).astype(np.uint8))
-    print((all_imgs[0]*127.5+127.5).astype(np.uint8).dtype)
     for i in range(36):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.int8)).save(os.path.join(
+        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
             "/data/ziz/jxu/results/original", '%s_original_%s.png' % (args.data_set, str(i).zfill(2))))
 
     all_imgs = ret_masked_images(imgs)[:36]
     for i in range(36):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.int8)).save(os.path.join(
+        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
             "/data/ziz/jxu/results/masked", '%s_masked_%s.png' % (args.data_set, str(i).zfill(2))))
 
     all_imgs = complete(imgs, mks, sess)
     for i in range(36):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.int8)).save(os.path.join(
+        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
             "/data/ziz/jxu/results/complete", '%s_complete_%s.png' % (args.data_set, str(i).zfill(2))))
