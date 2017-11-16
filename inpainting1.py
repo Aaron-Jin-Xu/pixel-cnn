@@ -269,21 +269,15 @@ with tf.Session() as sess:
 
     all_imgs = ret_original_images(imgs)[:36]
     for i in range(36):
-        img = plotting.plot_img(all_imgs[i], title=args.data_set + ' original')
-        plotting.plt.savefig(os.path.join(
+        Image.fromarray(all_imgs[i]).save(os.path.join(
             "/data/ziz/jxu/results/original", '%s_original_%s.png' % (args.data_set, str(i).zfill(2))))
-        plotting.plt.close('all')
 
     all_imgs = ret_masked_images(imgs)[:36]
     for i in range(36):
-        img = plotting.plot_img(all_imgs[i], title=args.data_set + ' masked')
-        plotting.plt.savefig(os.path.join(
+        Image.fromarray(all_imgs[i]).save(os.path.join(
             "/data/ziz/jxu/results/masked", '%s_masked_%s.png' % (args.data_set, str(i).zfill(2))))
-        plotting.plt.close('all')
 
     all_imgs = complete(imgs, mks, sess)
     for i in range(36):
-        img = plotting.plot_img(all_imgs[i], title=args.data_set + ' complete')
-        plotting.plt.savefig(os.path.join(
+        Image.fromarray(all_imgs[i]).save(os.path.join(
             "/data/ziz/jxu/results/complete", '%s_complete_%s.png' % (args.data_set, str(i).zfill(2))))
-        plotting.plt.close('all')    
