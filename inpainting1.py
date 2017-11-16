@@ -232,6 +232,15 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
     return feed_dict
 
+
+def ret_masked_images(imgs):
+    x_gen = [imgs[i] for i in range(args.nr_gpu)]
+    for yi in range(12, 24):
+        for xi in range(12,24):
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = 0.0
+    return np.concatenate(x_gen, axis=0)
+
 # //////////// perform training //////////////
 if not os.path.exists(args.save_dir):
     os.makedirs(args.save_dir)
@@ -260,4 +269,10 @@ with tf.Session() as sess:
     img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
     plotting.plt.savefig(os.path.join(
         args.save_dir, '%s_complete.png' % (args.data_set, )))
+    plotting.plt.close('all')
+
+    img_tile = plotting.img_tile(ret_masked_images(imgs)[:36], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' masked')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_masked.png' % (args.data_set, )))
     plotting.plt.close('all')
