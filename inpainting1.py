@@ -185,8 +185,8 @@ def complete(imgs, mks, sess):
     x_gen = [imgs[i] for i in range(args.nr_gpu)]
     x_mk = [mks[i] for i in range(args.nr_gpu)]
 
-    for yi in range(12,24):
-        for xi in range(12,24):
+    for yi in range(20,32):
+        for xi in range(32):
             new_x_gen_np = sess.run(
                 new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
             for i in range(args.nr_gpu):
@@ -235,10 +235,14 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
 
 def ret_masked_images(imgs):
     x_gen = [imgs[i] for i in range(args.nr_gpu)]
-    for yi in range(12, 24):
-        for xi in range(12,24):
+    for yi in range(32, 32):
+        for xi in range(32):
             for i in range(args.nr_gpu):
                 x_gen[i][:, yi, xi, :] = 0.0
+    return np.concatenate(x_gen, axis=0)
+
+def ret_original_images(imgs):
+    x_gen = [imgs[i] for i in range(args.nr_gpu)]
     return np.concatenate(x_gen, axis=0)
 
 # //////////// perform training //////////////
@@ -262,6 +266,12 @@ with tf.Session() as sess:
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
 
     mks = [mgen.gen(imgs[0].shape[0]) for i in range(args.nr_gpu)]
+
+    img_tile = plotting.img_tile(ret_original_images(imgs)[:36], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' original')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_original.png' % (args.data_set, )))
+    plotting.plt.close('all')    
 
     sample_x = complete(imgs, mks, sess)
 
