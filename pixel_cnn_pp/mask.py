@@ -84,3 +84,18 @@ class RecMaskGenerator(MaskGenerator):
             missing[progress_h, :progress_w] = 1
             mask[i, offset_h:offset_h+missing_h, offset_w:offset_w+missing_w] = missing
         return np.rot90(mask, 2, (1,2))
+
+
+
+class RecNoProgressMaskGenerator(RecMaskGenerator):
+
+    def gen(self, n):
+        mask = np.ones((n, self.h, self.w))
+        for i in range(n):
+            missing_h, missing_w, progress_h, progress_w, offset_h, offset_w = self.gen_par()
+            progress_w, progress_h = 0, 0
+            missing = np.zeros((missing_h, missing_w))
+            missing[:progress_h, :] = 1
+            missing[progress_h, :progress_w] = 1
+            mask[i, offset_h:offset_h+missing_h, offset_w:offset_w+missing_w] = missing
+        return np.rot90(mask, 2, (1,2))

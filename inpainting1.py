@@ -160,7 +160,7 @@ bits_per_dim = loss_gen[
 bits_per_dim_test = loss_gen_test[
     0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
 
-# sample from the model
+# output mix logistic pars
 new_x_gen = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
@@ -180,12 +180,16 @@ def sample_from_model(sess):
     return np.concatenate(x_gen, axis=0)
 
 
-def complete(imgs, sess):
+def complete(imgs, mks, sess):
     x_gen = [imgs[i] for i in range(args.nr_gpu)]
-    x_gen = [np.zeros((args.batch_size,) + obs_shape, dtype=np.float32)
-             for i in range(args.nr_gpu)]
+    x_mk = [mks[i] for i in range(args.nr_gpu)]
     new_x_gen_np = sess.run(
-        new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+        new_x_gen, {xs[i]: x_gen[i]*x_mk[i] for i in range(args.nr_gpu)})
+
+    #for i in range(args.nr_gpu):
+    #    for m in range()
+
+
     #for i in range(args.nr_gpu):
     #    x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
     #return np.concatenate(x_gen, axis=0)
@@ -200,7 +204,8 @@ saver = tf.train.Saver()
 # turn numpy inputs into feed_dict for use with tensorflow
 
 #mgen = mk.RandomMaskGenerator(obs_shape[0], obs_shape[1])
-mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
+#mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
+mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
 agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
 
 def make_feed_dict(data, init=False, masks=None, is_test=False):
@@ -250,7 +255,7 @@ with tf.Session() as sess:
     td = np.cast[np.float32]((td - 127.5) / 127.5)
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
 
+    mks = [mgen.gen(len(imgs)) for i in range(args.nr_gpu)]
 
-
-    sample_x = complete(imgs, sess)
-    print(sample_x[0].shape)
+    print(imgs[0].shape)
+    print(mks[0].shape)
