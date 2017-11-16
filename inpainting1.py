@@ -269,8 +269,8 @@ with tf.Session() as sess:
 
 
     all_imgs = ret_original_images(imgs)[:36]
-    print((all_imgs[0]*127.5+127.5).astype(np.int8))
-    print((all_imgs[0]*127.5+127.5).astype(np.int8).dtype)
+    print((all_imgs[0]*127.5+127.5).astype(np.uint8))
+    print((all_imgs[0]*127.5+127.5).astype(np.uint8).dtype)
     for i in range(36):
         Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.int8)).save(os.path.join(
             "/data/ziz/jxu/results/original", '%s_original_%s.png' % (args.data_set, str(i).zfill(2))))
