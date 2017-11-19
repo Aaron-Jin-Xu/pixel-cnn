@@ -254,16 +254,12 @@ lr = args.learning_rate
 
 graph = tf.Graph()
 
-
-
-
-
 with tf.Session() as sess:
     with graph.as_default():
 
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
-        saver.restore(sess, ckpt_file)
+        #saver.restore(sess, ckpt_file)
 
         vars = tf.contrib.framework.list_variables(ckpt_file)
 
