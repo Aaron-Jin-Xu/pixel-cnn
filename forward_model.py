@@ -255,7 +255,6 @@ lr = args.learning_rate
 #graph = tf.Graph()
 
 with tf.Session() as sess:
-
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
@@ -264,8 +263,8 @@ with tf.Session() as sess:
     print(ll)
     print(len(ll))
 
-        vars = tf.contrib.framework.list_variables(ckpt_file)
-        print(len(vars))
+    vars = tf.contrib.framework.list_variables(ckpt_file)
+    print(len(vars))
 
         #for name, shape in vars:
         #    v = tf.contrib.framework.load_variable(ckpt_file, name)
