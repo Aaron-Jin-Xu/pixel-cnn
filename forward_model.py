@@ -268,6 +268,6 @@ with tf.Session() as sess:
         vars = tf.contrib.framework.list_variables(ckpt_file)
 
         for name, shape in vars:
-            v = tf.contrib.framework.load_variable('.', name)
+            v = tf.contrib.framework.load_variable(ckpt_file, name)
             print(name, shape)
             #new_vars.append(tf.Variable(v, name=name.replace('my-first-scope', 'my-second-scope')))
