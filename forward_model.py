@@ -260,12 +260,11 @@ with tf.Session() as sess:
     saver.restore(sess, ckpt_file)
 
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    print([i.name for i in ll])
-    print(len(ll))
+    ll = [item.name = item.name.replace("model", "forward") for item in ll]
+    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    print([item.name for item in ll])
 
-    vars = tf.contrib.framework.list_variables(ckpt_file)
-    for v, s in vars:
-        print(v)
+
 
         #for name, shape in vars:
         #    v = tf.contrib.framework.load_variable(ckpt_file, name)
