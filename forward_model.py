@@ -259,11 +259,16 @@ with tf.Session() as sess:
 
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
-        #saver.restore(sess, ckpt_file)
+        saver.restore(sess, ckpt_file)
+
+        ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+        print(ll)
+        print(len(ll))
 
         vars = tf.contrib.framework.list_variables(ckpt_file)
+        print(len(vars))
 
-        for name, shape in vars:
-            v = tf.contrib.framework.load_variable(ckpt_file, name)
-            print(name, shape)
+        #for name, shape in vars:
+        #    v = tf.contrib.framework.load_variable(ckpt_file, name)
+        #    print(name, shape)
             #new_vars.append(tf.Variable(v, name=name.replace('my-first-scope', 'my-second-scope')))
