@@ -260,7 +260,8 @@ with tf.Session() as sess:
     saver.restore(sess, ckpt_file)
 
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    ll = [item.name = item.name.replace("model", "forward") for item in ll]
+    for item in ll:
+        item.name = item.name.replace("model", "forward")
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
     print([item.name for item in ll])
 
