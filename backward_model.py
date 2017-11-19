@@ -252,11 +252,25 @@ print('starting training')
 test_bpd = []
 lr = args.learning_rate
 
-graph = tf.Graph()
+#graph = tf.Graph()
 
 with tf.Session() as sess:
-    with graph.as_default():
+    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
 
-        ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-        print('restoring parameters from', ckpt_file)
-        saver.restore(sess, ckpt_file)
+    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    print([item.name for item in ll])
+
+
+
+    #for item in ll:
+    #    new_vars.append(tf.Variable(item, name=item.name[:-2].replace('model', 'forward')))
+    #print(new_vars)
+
+
+
+        #for name, shape in vars:
+        #    v = tf.contrib.framework.load_variable(ckpt_file, name)
+        #    print(name, shape)
+            #new_vars.append(tf.Variable(v, name=name.replace('my-first-scope', 'my-second-scope')))
