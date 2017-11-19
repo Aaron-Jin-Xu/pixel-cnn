@@ -257,7 +257,7 @@ lr = args.learning_rate
 with tf.Session() as sess:
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
     for item in ll:
-        var = tf.Variable(item, name=item.name.replace("model", "model_11"))
+        var = tf.Variable(item, name=item.name[:-2].replace("model", "model_11"))
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
     print([item.name for item in ll])
     quit()
