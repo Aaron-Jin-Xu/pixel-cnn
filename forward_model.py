@@ -264,7 +264,8 @@ with tf.Session() as sess:
     print(len(ll))
 
     vars = tf.contrib.framework.list_variables(ckpt_file)
-    print(len(vars))
+    for v, s in vars:
+        print(v)
 
         #for name, shape in vars:
         #    v = tf.contrib.framework.load_variable(ckpt_file, name)
