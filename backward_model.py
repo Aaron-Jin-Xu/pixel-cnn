@@ -27,11 +27,11 @@ import data.celeba_data as celeba_data
 parser = argparse.ArgumentParser()
 # data I/O
 parser.add_argument('-i', '--data_dir', type=str,
-                    default='/tmp/pxpp/data', help='Location for the dataset')
-parser.add_argument('-o', '--save_dir', type=str, default='/tmp/pxpp/save',
+                    default=' /data/ziz/not-backed-up/jxu/CelebA/celeba32-train', help='Location for the dataset')
+parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/save-forward',
                     help='Location for parameter checkpoints and samples')
 parser.add_argument('-d', '--data_set', type=str,
-                    default='cifar', help='Can be either cifar|imagenet')
+                    default='celeba', help='Can be either cifar|imagenet')
 parser.add_argument('-t', '--save_interval', type=int, default=20,
                     help='Every how many epochs to write checkpoint/samples?')
 parser.add_argument('-r', '--load_params', dest='load_params', action='store_true',
@@ -60,7 +60,7 @@ parser.add_argument('-p', '--dropout_p', type=float, default=0.5,
                     help='Dropout strength (i.e. 1 - keep_prob). 0 = No dropout, higher = more dropout.')
 parser.add_argument('-x', '--max_epochs', type=int,
                     default=5000, help='How many epochs to run in total?')
-parser.add_argument('-g', '--nr_gpu', type=int, default=8,
+parser.add_argument('-g', '--nr_gpu', type=int, default=4,
                     help='How many GPUs to distribute the training across?')
 # evaluation
 parser.add_argument('--polyak_decay', type=float, default=0.9995,
