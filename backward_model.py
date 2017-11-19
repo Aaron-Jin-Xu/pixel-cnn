@@ -97,167 +97,167 @@ test_data = DataLoader(args.data_dir, 'valid', args.batch_size *
 obs_shape = test_data.get_observation_size()  # e.g. a tuple (32,32,3)
 assert len(obs_shape) == 3, 'assumed right now'
 
-
-with tf.variable_scope('backward'):
-
-    # data place holders
-    x_init = tf.placeholder(tf.float32, shape=(args.init_batch_size,) + obs_shape)
-    xs = [tf.placeholder(tf.float32, shape=(args.batch_size, ) + obs_shape)
-          for i in range(args.nr_gpu)]
+# data place holders
+x_init = tf.placeholder(tf.float32, shape=(args.init_batch_size,) + obs_shape)
+xs = [tf.placeholder(tf.float32, shape=(args.batch_size, ) + obs_shape)
+      for i in range(args.nr_gpu)]
 
 
-    h_init = None
-    h_sample = [None] * args.nr_gpu
-    hs = h_sample
+h_init = None
+h_sample = [None] * args.nr_gpu
+hs = h_sample
 
-    if args.masked:
-        masks = tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
+if args.masked:
+    masks = tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
+else:
+    masks = None
+
+# create the model
+model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
+             'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
+model = tf.make_template('model', model_spec)
+
+# run once for data dependent initialization of parameters
+gen_par = model(x_init, None, h_init, init=True,
+                dropout_p=args.dropout_p, **model_opt)
+
+# keep track of moving average
+all_params = tf.trainable_variables()
+ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
+maintain_averages_op = tf.group(ema.apply(all_params))
+
+# get loss gradients over multiple GPUs
+grads = []
+loss_gen = []
+loss_gen_test = []
+for i in range(args.nr_gpu):
+    with tf.device('/gpu:%d' % i):
+        # train
+        gen_par = model(xs[i], masks, hs[i], ema=None,
+                        dropout_p=args.dropout_p, **model_opt)
+        loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
+        # gradients
+        grads.append(tf.gradients(loss_gen[i], all_params))
+        # test
+        gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
+        loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
+
+# add losses and gradients together and get training updates
+tf_lr = tf.placeholder(tf.float32, shape=[])
+with tf.device('/gpu:0'):
+    for i in range(1, args.nr_gpu):
+        loss_gen[0] += loss_gen[i]
+        loss_gen_test[0] += loss_gen_test[i]
+        #for j in range(len(grads[0])):
+        #    grads[0][j] += grads[i][j]
+    # training op
+    #optimizer = tf.group(nn.adam_updates(
+    #    all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995), maintain_averages_op)
+
+# convert loss to bits/dim
+bits_per_dim = loss_gen[
+    0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
+bits_per_dim_test = loss_gen_test[
+    0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
+
+# sample from the model
+new_x_gen = []
+for i in range(args.nr_gpu):
+    with tf.device('/gpu:%d' % i):
+        gen_par = model(xs[i], None, h_sample[i], ema=ema, dropout_p=0, **model_opt)
+        new_x_gen.append(nn.sample_from_discretized_mix_logistic(
+            gen_par, args.nr_logistic_mix))
+
+
+def sample_from_model(sess):
+    x_gen = [np.zeros((args.batch_size,) + obs_shape, dtype=np.float32)
+             for i in range(args.nr_gpu)]
+    for yi in range(obs_shape[0]):
+        for xi in range(obs_shape[1]):
+            new_x_gen_np = sess.run(
+                new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
+
+
+def complete(imgs, mks, sess):
+    x_gen = [imgs[i] for i in range(args.nr_gpu)]
+    x_mk = [mks[i] for i in range(args.nr_gpu)]
+
+    for yi in range(20,32):
+        for xi in range(32):
+            new_x_gen_np = sess.run(
+                new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
+
+
+# init & save
+initializer = tf.global_variables_initializer()
+saver = tf.train.Saver()
+
+# turn numpy inputs into feed_dict for use with tensorflow
+
+#mgen = mk.RandomMaskGenerator(obs_shape[0], obs_shape[1])
+#mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
+mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
+agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
+
+def make_feed_dict(data, init=False, masks=None, is_test=False):
+    if type(data) is tuple:
+        x, y = data
     else:
-        masks = None
-
-    # create the model
-    model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
-                 'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
-    model = tf.make_template('model', model_spec)
-
-    # run once for data dependent initialization of parameters
-    gen_par = model(x_init, None, h_init, init=True,
-                    dropout_p=args.dropout_p, **model_opt)
-
-    # keep track of moving average
-    all_params = tf.trainable_variables()
-    ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
-    maintain_averages_op = tf.group(ema.apply(all_params))
-
-    # get loss gradients over multiple GPUs
-    grads = []
-    loss_gen = []
-    loss_gen_test = []
-    for i in range(args.nr_gpu):
-        with tf.device('/gpu:%d' % i):
-            # train
-            gen_par = model(xs[i], masks, hs[i], ema=None,
-                            dropout_p=args.dropout_p, **model_opt)
-            loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
-            # gradients
-            grads.append(tf.gradients(loss_gen[i], all_params))
-            # test
-            gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
-            loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
-
-    # add losses and gradients together and get training updates
-    tf_lr = tf.placeholder(tf.float32, shape=[])
-    with tf.device('/gpu:0'):
-        for i in range(1, args.nr_gpu):
-            loss_gen[0] += loss_gen[i]
-            loss_gen_test[0] += loss_gen_test[i]
-            #for j in range(len(grads[0])):
-            #    grads[0][j] += grads[i][j]
-        # training op
-        #optimizer = tf.group(nn.adam_updates(
-        #    all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995), maintain_averages_op)
-
-    # convert loss to bits/dim
-    bits_per_dim = loss_gen[
-        0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
-    bits_per_dim_test = loss_gen_test[
-        0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
-
-    # sample from the model
-    new_x_gen = []
-    for i in range(args.nr_gpu):
-        with tf.device('/gpu:%d' % i):
-            gen_par = model(xs[i], None, h_sample[i], ema=ema, dropout_p=0, **model_opt)
-            new_x_gen.append(nn.sample_from_discretized_mix_logistic(
-                gen_par, args.nr_logistic_mix))
+        x = data
+        y = None
+    if args.rot180:
+        x = np.rot90(x, 2, (1,2)) #### ROT
+    # input to pixelCNN is scaled from uint8 [0,255] to float in range [-1,1]
+    x = np.cast[np.float32]((x - 127.5) / 127.5)
+    if init:
+        feed_dict = {x_init: x}
+        if y is not None:
+            feed_dict.update({y_init: y})
+    else:
+        x = np.split(x, args.nr_gpu)
+        feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
+        if masks is not None:
+            if is_test:
+                feed_dict[masks] = agen.gen(args.batch_size)
+            else:
+                feed_dict[masks] = mgen.gen(args.batch_size)
+        if y is not None:
+            y = np.split(y, args.nr_gpu)
+            feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
+    return feed_dict
 
 
-    def sample_from_model(sess):
-        x_gen = [np.zeros((args.batch_size,) + obs_shape, dtype=np.float32)
-                 for i in range(args.nr_gpu)]
-        for yi in range(obs_shape[0]):
-            for xi in range(obs_shape[1]):
-                new_x_gen_np = sess.run(
-                    new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
-                for i in range(args.nr_gpu):
-                    x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
-        return np.concatenate(x_gen, axis=0)
+def ret_masked_images(imgs):
+    x_gen = [imgs[i] for i in range(args.nr_gpu)]
+    for yi in range(20, 32):
+        for xi in range(32):
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = 0.0
+    return np.concatenate(x_gen, axis=0)
 
+def ret_original_images(imgs):
+    x_gen = [imgs[i] for i in range(args.nr_gpu)]
+    return np.concatenate(x_gen, axis=0)
 
-    def complete(imgs, mks, sess):
-        x_gen = [imgs[i] for i in range(args.nr_gpu)]
-        x_mk = [mks[i] for i in range(args.nr_gpu)]
-
-        for yi in range(20,32):
-            for xi in range(32):
-                new_x_gen_np = sess.run(
-                    new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
-                for i in range(args.nr_gpu):
-                    x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
-        return np.concatenate(x_gen, axis=0)
-
-
-    # init & save
-    initializer = tf.global_variables_initializer()
-    saver = tf.train.Saver()
-
-    # turn numpy inputs into feed_dict for use with tensorflow
-
-    #mgen = mk.RandomMaskGenerator(obs_shape[0], obs_shape[1])
-    #mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
-    mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
-    agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
-
-    def make_feed_dict(data, init=False, masks=None, is_test=False):
-        if type(data) is tuple:
-            x, y = data
-        else:
-            x = data
-            y = None
-        if args.rot180:
-            x = np.rot90(x, 2, (1,2)) #### ROT
-        # input to pixelCNN is scaled from uint8 [0,255] to float in range [-1,1]
-        x = np.cast[np.float32]((x - 127.5) / 127.5)
-        if init:
-            feed_dict = {x_init: x}
-            if y is not None:
-                feed_dict.update({y_init: y})
-        else:
-            x = np.split(x, args.nr_gpu)
-            feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
-            if masks is not None:
-                if is_test:
-                    feed_dict[masks] = agen.gen(args.batch_size)
-                else:
-                    feed_dict[masks] = mgen.gen(args.batch_size)
-            if y is not None:
-                y = np.split(y, args.nr_gpu)
-                feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
-        return feed_dict
-
-
-    def ret_masked_images(imgs):
-        x_gen = [imgs[i] for i in range(args.nr_gpu)]
-        for yi in range(20, 32):
-            for xi in range(32):
-                for i in range(args.nr_gpu):
-                    x_gen[i][:, yi, xi, :] = 0.0
-        return np.concatenate(x_gen, axis=0)
-
-    def ret_original_images(imgs):
-        x_gen = [imgs[i] for i in range(args.nr_gpu)]
-        return np.concatenate(x_gen, axis=0)
-
-    # //////////// perform training //////////////
-    if not os.path.exists(args.save_dir):
-        os.makedirs(args.save_dir)
-    print('starting training')
-    test_bpd = []
-    lr = args.learning_rate
+# //////////// perform training //////////////
+if not os.path.exists(args.save_dir):
+    os.makedirs(args.save_dir)
+print('starting training')
+test_bpd = []
+lr = args.learning_rate
 
 #graph = tf.Graph()
 
 with tf.Session() as sess:
+    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    for item in ll:
+        var = tf.Variable(item, name=item.name.replace("model", "model_11"))
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
     print([item.name for item in ll])
     quit()
