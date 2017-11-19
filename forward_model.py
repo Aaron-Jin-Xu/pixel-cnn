@@ -151,8 +151,8 @@ with tf.device('/gpu:0'):
         #for j in range(len(grads[0])):
         #    grads[0][j] += grads[i][j]
     # training op
-    optimizer = tf.group(nn.adam_updates(
-        all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995), maintain_averages_op)
+    #optimizer = tf.group(nn.adam_updates(
+    #    all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995), maintain_averages_op)
 
 # convert loss to bits/dim
 bits_per_dim = loss_gen[
