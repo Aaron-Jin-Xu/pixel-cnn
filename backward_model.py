@@ -148,8 +148,8 @@ with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
         loss_gen[0] += loss_gen[i]
         loss_gen_test[0] += loss_gen_test[i]
-        for j in range(len(grads[0])):
-            grads[0][j] += grads[i][j]
+        #for j in range(len(grads[0])):
+        #    grads[0][j] += grads[i][j]
     # training op
     optimizer = tf.group(nn.adam_updates(
         all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995), maintain_averages_op)
