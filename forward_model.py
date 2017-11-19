@@ -260,7 +260,7 @@ with tf.Session() as sess:
     saver.restore(sess, ckpt_file)
 
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    print([item.name for item in ll])
+    print(len([item.name for item in ll]))
 
 
 

@@ -255,8 +255,8 @@ lr = args.learning_rate
 #graph = tf.Graph()
 
 with tf.Session() as sess:
-    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1')
-    print([item.name for item in ll])
+    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1')c
+    print(len([item.name for item in ll]))
     quit()
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
