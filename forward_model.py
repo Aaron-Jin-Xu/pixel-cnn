@@ -252,18 +252,17 @@ print('starting training')
 test_bpd = []
 lr = args.learning_rate
 
-graph = tf.Graph()
+#graph = tf.Graph()
 
 with tf.Session() as sess:
-    with graph.as_default():
 
-        ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-        print('restoring parameters from', ckpt_file)
-        saver.restore(sess, ckpt_file)
+    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
 
-        ll = [n.name for n in graph.as_graph_def().node]
-        print(ll)
-        print(len(ll))
+    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    print(ll)
+    print(len(ll))
 
         vars = tf.contrib.framework.list_variables(ckpt_file)
         print(len(vars))
