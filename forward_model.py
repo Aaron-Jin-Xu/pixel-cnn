@@ -258,11 +258,15 @@ with tf.Session() as sess:
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
-    new_vars = []
+
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    for item in ll:
-        new_vars.append(tf.Variable(item, name=item.name[:-2].replace('model', 'forward')))
-    print(new_vars)
+    print([item.name for item in ll])
+
+
+
+    #for item in ll:
+    #    new_vars.append(tf.Variable(item, name=item.name[:-2].replace('model', 'forward')))
+    #print(new_vars)
 
 
 
