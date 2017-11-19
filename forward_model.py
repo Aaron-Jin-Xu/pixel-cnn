@@ -261,7 +261,7 @@ with tf.Session() as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
-        ll = [n.name for n in tf.get_default_graph().as_graph_def().node]
+        ll = [n.name for n in graph.as_graph_def().node]
         print(ll)
         print(len(ll))
 
