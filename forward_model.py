@@ -27,7 +27,7 @@ import data.celeba_data as celeba_data
 parser = argparse.ArgumentParser()
 # data I/O
 parser.add_argument('-i', '--data_dir', type=str,
-                    default=' /data/ziz/not-backed-up/jxu/CelebA', help='Location for the dataset')
+                    default='/data/ziz/not-backed-up/jxu/CelebA', help='Location for the dataset')
 parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/save-forward',
                     help='Location for parameter checkpoints and samples')
 parser.add_argument('-d', '--data_set', type=str,
