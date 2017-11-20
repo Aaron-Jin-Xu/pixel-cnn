@@ -23,6 +23,7 @@ with tf.Session() as sess:
     d = next(bm.test_data)
     feed_dict = bm.make_feed_dict(d, masks=bm.masks, is_test=True)
     o1 = sess.run(bm.outputs, feed_dict)
+    o1 = np.concatenate(o1, axis=0)
     print(o1.shape)
 
     # test_losses = []
@@ -47,6 +48,7 @@ with tf.Session() as sess:
 
     feed_dict = fm.make_feed_dict(d, masks=fm.masks, is_test=True)
     o2 = sess.run(fm.outputs, feed_dict)
+    o2 = np.concatenate(o2, axis=0)
     print(o2.shape)
 
     # test_losses = []
