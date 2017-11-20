@@ -117,10 +117,24 @@ model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
              'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
 model = tf.make_template('model', model_spec)
 
+gen_par = model(x_init, None, h_init, init=True,
+                dropout_p=args.dropout_p, **model_opt)
+
+# keep track of moving average
+all_params = tf.trainable_variables()
+ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
+maintain_averages_op = tf.group(ema.apply(all_params))
+
+
+
+
+
+
+
 loss_gen = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        gen_par = model(xs[i], masks, hs[i], ema=None,
+        gen_par = model(xs[i], None, hs[i], ema=None,
                         dropout_p=args.dropout_p, **model_opt)
         loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
 
