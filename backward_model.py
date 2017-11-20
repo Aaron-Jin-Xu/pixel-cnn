@@ -121,7 +121,7 @@ gen_par = model(x_init, None, h_init, init=True,
                 dropout_p=args.dropout_p, **model_opt)
 
 # keep track of moving average
-all_params = tf.trainable_variables(scope="model_1")
+all_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='model_1') #tf.trainable_variables(scope="model_1")
 ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
 maintain_averages_op = tf.group(ema.apply(all_params))
 
