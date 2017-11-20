@@ -160,7 +160,7 @@ with tf.Session() as sess:
     for d in test_data:
         feed_dict = make_feed_dict(d, masks=masks, is_test=True)
         l = sess.run(gen_par, feed_dict)
-        print l
+        print(l)
 
 
 
