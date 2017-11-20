@@ -149,7 +149,7 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
     return feed_dict
 
-
+saver = tf.train.Saver()
 
 with tf.Session() as sess:
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
