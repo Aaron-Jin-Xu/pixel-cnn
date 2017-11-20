@@ -169,7 +169,7 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
     return feed_dict
 
-saver = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='model_1'))
+saver = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1'))
 
 with tf.Session() as sess:
 
