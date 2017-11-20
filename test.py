@@ -5,6 +5,14 @@ import forward_model as fm
 import backward_model as bm
 
 with tf.Session() as sess:
+    vs = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model')
+    vs1 = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1')
+    print(len(vs))
+    print(len(vs1))
+    print(vs)
+    print(vs1)
+    quit()
+
     saver = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model'))
     saver1 = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1'))
 
