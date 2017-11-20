@@ -120,7 +120,8 @@ model = tf.make_template('model', model_spec)
 loss_gen = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        gen_par = model(xs[i], None, h_sample[i], ema=None, dropout_p=0, **model_opt)
+        gen_par = model(xs[i], masks, hs[i], ema=None,
+                        dropout_p=args.dropout_p, **model_opt)
         loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
 
 
