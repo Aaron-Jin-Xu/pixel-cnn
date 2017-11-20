@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser()
 # data I/O
 parser.add_argument('-i', '--data_dir', type=str,
                     default='/data/ziz/not-backed-up/jxu/CelebA', help='Location for the dataset')
-parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/save-forward',
+parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/save-test',
                     help='Location for parameter checkpoints and samples')
 parser.add_argument('-d', '--data_set', type=str,
                     default='celeba', help='Can be either cifar|imagenet')
@@ -261,37 +261,24 @@ with tf.Session() as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    #ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    #print([item.name for item in ll])
-    #quit()
-
-
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    print(len(ll))
-    new_vars = []
-    for item in ll:
-        new_vars.append(tf.Variable(item, name=item.name[:-2].replace("model", "model_1")))
-    var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="model_1")
-    print(len(var_list))
-    saver1 = tf.train.Saver(var_list=var_list)
-    sess.run(tf.variables_initializer(var_list=var_list))
-    saver1.save(sess, "/data/ziz/jxu/save-test" + '/params_' +
-               args.data_set + '.ckpt')
+    print([item.name for item in ll])
     quit()
 
 
-    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    print([item.name for item in ll])
-
-
-
-    #for item in ll:
-    #    new_vars.append(tf.Variable(item, name=item.name[:-2].replace('model', 'forward')))
-    #print(new_vars)
-
-
-
-        #for name, shape in vars:
-        #    v = tf.contrib.framework.load_variable(ckpt_file, name)
-        #    print(name, shape)
-            #new_vars.append(tf.Variable(v, name=name.replace('my-first-scope', 'my-second-scope')))
+    # ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    # print(len(ll))
+    # new_vars = []
+    # for item in ll:
+    #     new_vars.append(tf.Variable(item, name=item.name[:-2].replace("model", "model_1")))
+    # var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="model_1")
+    # print(len(var_list))
+    # saver1 = tf.train.Saver(var_list=var_list)
+    # sess.run(tf.variables_initializer(var_list=var_list))
+    # saver1.save(sess, "/data/ziz/jxu/save-test" + '/params_' +
+    #            args.data_set + '.ckpt')
+    # quit()
+    #
+    #
+    # ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    # print([item.name for item in ll])
