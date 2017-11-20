@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser()
 # data I/O
 parser.add_argument('-i', '--data_dir', type=str,
                     default='/data/ziz/not-backed-up/jxu/CelebA', help='Location for the dataset')
-parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/save-test',
+parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/save-forward',
                     help='Location for parameter checkpoints and samples')
 parser.add_argument('-d', '--data_set', type=str,
                     default='celeba', help='Can be either cifar|imagenet')
@@ -263,7 +263,7 @@ with tf.Session() as sess:
     for item in ll:
         var = tf.Variable(item, name=item.name[:-2].replace("model", "model_1"))
     tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="model_1"))
-    saver.save(sess, args.save_dir + '/params1_' +
+    saver.save(sess, "/data/ziz/jxu/save-test" + '/params_' +
                args.data_set + '.ckpt')
     quit()
 
