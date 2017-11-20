@@ -84,46 +84,41 @@ print('input args:\n', json.dumps(vars(args), indent=4,
 rng = np.random.RandomState(args.seed)
 tf.set_random_seed(args.seed)
 
-
+# initialize data loaders for train/test splits
+if args.data_set == 'imagenet' and args.class_conditional:
+    raise("We currently don't have labels for the small imagenet data set")
 DataLoader = {'cifar': cifar10_data.DataLoader,
               'imagenet': imagenet_data.DataLoader,
               'celeba': celeba_data.DataLoader}[args.data_set]
 #train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
 #                        rng=rng, shuffle=True, return_labels=args.class_conditional)
-
-data_dir = "/data/ziz/not-backed-up/jxu/CelebA"
-save_dir = "/data/ziz/jxu/save-forward"
-subset = 'valid'
-batch_size = 12
-nr_gpu = 1
-masked = False
-dropout_p = 0.5
-
-test_data = DataLoader(data_dir, subset, batch_size *nr_gpu, shuffle=False, return_labels=False)
-obs_shape = test_data.get_observation_size()
+test_data = DataLoader(args.data_dir, 'valid', args.batch_size *
+                       args.nr_gpu, shuffle=False, return_labels=args.class_conditional)
+obs_shape = test_data.get_observation_size()  # e.g. a tuple (32,32,3)
+assert len(obs_shape) == 3, 'assumed right now'
 
 # data place holders
-x_init = tf.placeholder(tf.float32, shape=(100,) + obs_shape)
-xs = [tf.placeholder(tf.float32, shape=(batch_size, ) + obs_shape)
-      for i in range(nr_gpu)]
+x_init = tf.placeholder(tf.float32, shape=(args.init_batch_size,) + obs_shape)
+xs = [tf.placeholder(tf.float32, shape=(args.batch_size, ) + obs_shape)
+      for i in range(args.nr_gpu)]
 
 
 h_init = None
-h_sample = [None] * nr_gpu
+h_sample = [None] * args.nr_gpu
 hs = h_sample
 
-if masked:
-    masks = tf.placeholder(tf.float32, shape=(batch_size,) + obs_shape[:-1])
+if args.masked:
+    masks = tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
 else:
     masks = None
 
 # create the model
-model_opt = {'nr_resnet': 5, 'nr_filters': 160,
-             'nr_logistic_mix': 10, 'resnet_nonlinearity': "concat_elu"}
+model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
+             'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
 model = tf.make_template('model', model_spec)
 
 gen_par = model(x_init, None, h_init, init=True,
-                dropout_p=dropout_p, **model_opt)
+                dropout_p=args.dropout_p, **model_opt)
 
 # keep track of moving average
 all_params = tf.trainable_variables()
@@ -141,6 +136,7 @@ for i in range(args.nr_gpu):
 with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
         loss_gen_test[0] += loss_gen_test[i]
+
 
 bits_per_dim_test = loss_gen_test[
     0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
