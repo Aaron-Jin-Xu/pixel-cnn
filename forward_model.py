@@ -126,12 +126,14 @@ ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
 maintain_averages_op = tf.group(ema.apply(all_params))
 
 
-
 loss_gen_test = []
+outputs = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
+        outputs.append(gen_par)
         loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
+
 
 with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
