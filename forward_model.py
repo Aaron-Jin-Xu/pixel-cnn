@@ -133,6 +133,10 @@ for i in range(args.nr_gpu):
         gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
         loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
 
+with tf.device('/gpu:0'):
+    for i in range(1, args.nr_gpu):
+        loss_gen_test[0] += loss_gen_test[i]
+
 bits_per_dim_test = loss_gen_test[
     0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
 
@@ -167,6 +171,7 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
 saver = tf.train.Saver()
 
 with tf.Session() as sess:
+
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
