@@ -255,15 +255,18 @@ lr = args.learning_rate
 #graph = tf.Graph()
 
 with tf.Session() as sess:
-    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    for item in ll:
-        var = tf.Variable(item, name=item.name[:-2].replace("model", "model_11"))
-    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    print([item.name for item in ll])
-    quit()
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
+
+    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    for item in ll:
+        var = tf.Variable(item, name=item.name[:-2].replace("model", "model_1"))
+    tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="model_1"))
+    saver.save(sess, args.save_dir + '/params1_' +
+               args.data_set + '.ckpt')
+    quit()
+
 
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
     print([item.name for item in ll])
