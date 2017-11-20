@@ -90,8 +90,8 @@ if args.data_set == 'imagenet' and args.class_conditional:
 DataLoader = {'cifar': cifar10_data.DataLoader,
               'imagenet': imagenet_data.DataLoader,
               'celeba': celeba_data.DataLoader}[args.data_set]
-#train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
-#                        rng=rng, shuffle=True, return_labels=args.class_conditional)
+train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
+                        rng=rng, shuffle=True, return_labels=args.class_conditional)
 test_data = DataLoader(args.data_dir, 'valid', args.batch_size *
                        args.nr_gpu, shuffle=False, return_labels=args.class_conditional)
 obs_shape = test_data.get_observation_size()  # e.g. a tuple (32,32,3)
@@ -255,6 +255,13 @@ lr = args.learning_rate
 #graph = tf.Graph()
 
 with tf.Session() as sess:
+
+    feed_dict = make_feed_dict(
+        train_data.next(args.init_batch_size), init=True)
+    train_data.reset()  # rewind the iterator back to 0 to do one full epoch
+    sess.run(initializer, feed_dict)
+    print('initializing the model...')
+
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
