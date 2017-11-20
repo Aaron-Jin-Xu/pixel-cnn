@@ -5,8 +5,8 @@ import forward_model as fm
 import backward_model as bm
 
 with tf.Session() as sess:
-    vs = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model')
-    vs1 = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1')
+    vs = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model/')
+    vs1 = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1/')
     print(len(vs))
     print(len(vs1))
     print([item.name for item in vs])

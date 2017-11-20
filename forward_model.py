@@ -196,7 +196,7 @@ def complete(imgs, mks, sess):
 
 # init & save
 initializer = tf.global_variables_initializer()
-saver = tf.train.Saver()
+#saver = tf.train.Saver()
 
 # turn numpy inputs into feed_dict for use with tensorflow
 
