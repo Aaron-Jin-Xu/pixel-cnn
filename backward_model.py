@@ -196,7 +196,7 @@ def complete(imgs, mks, sess):
 
 # init & save
 initializer = tf.global_variables_initializer()
-saver = tf.train.Saver()
+
 
 # turn numpy inputs into feed_dict for use with tensorflow
 
@@ -255,13 +255,14 @@ lr = args.learning_rate
 #graph = tf.Graph()
 
 with tf.Session() as sess:
+    saver = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1'))
 
 
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1')
     print([item.name for item in ll])
     quit()
 
