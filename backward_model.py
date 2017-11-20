@@ -148,7 +148,7 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
     else:
         x = data
         y = None
-    if args.rot180:
+    if True: #args.rot180:
         x = np.rot90(x, 2, (1,2)) #### ROT
     # input to pixelCNN is scaled from uint8 [0,255] to float in range [-1,1]
     x = np.cast[np.float32]((x - 127.5) / 127.5)
