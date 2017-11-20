@@ -9,8 +9,8 @@ with tf.Session() as sess:
     vs1 = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1')
     print(len(vs))
     print(len(vs1))
-    print(vs)
-    print(vs1)
+    print([item.name for item in vs])
+    print([item.name for item in vs1])
     quit()
 
     saver = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model'))
