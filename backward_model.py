@@ -117,93 +117,30 @@ model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
              'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
 model = tf.make_template('model', model_spec)
 
-# run once for data dependent initialization of parameters
 gen_par = model(x_init, None, h_init, init=True,
                 dropout_p=args.dropout_p, **model_opt)
 
 # keep track of moving average
-all_params = tf.trainable_variables()
+all_params = tf.trainable_variables(scope="model_1")
 ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
 maintain_averages_op = tf.group(ema.apply(all_params))
 
-# get loss gradients over multiple GPUs
-grads = []
-loss_gen = []
+
+
 loss_gen_test = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        # train
-        gen_par = model(xs[i], masks, hs[i], ema=None,
-                        dropout_p=args.dropout_p, **model_opt)
-        loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
-        # gradients
-        grads.append(tf.gradients(loss_gen[i], all_params))
-        # test
         gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
         loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
 
-# add losses and gradients together and get training updates
-tf_lr = tf.placeholder(tf.float32, shape=[])
 with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
-        loss_gen[0] += loss_gen[i]
         loss_gen_test[0] += loss_gen_test[i]
-        #for j in range(len(grads[0])):
-        #    grads[0][j] += grads[i][j]
-    # training op
-    #optimizer = tf.group(nn.adam_updates(
-    #    all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995), maintain_averages_op)
 
-# convert loss to bits/dim
-bits_per_dim = loss_gen[
-    0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
+
 bits_per_dim_test = loss_gen_test[
     0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
 
-# sample from the model
-new_x_gen = []
-for i in range(args.nr_gpu):
-    with tf.device('/gpu:%d' % i):
-        gen_par = model(xs[i], None, h_sample[i], ema=ema, dropout_p=0, **model_opt)
-        new_x_gen.append(nn.sample_from_discretized_mix_logistic(
-            gen_par, args.nr_logistic_mix))
-
-
-def sample_from_model(sess):
-    x_gen = [np.zeros((args.batch_size,) + obs_shape, dtype=np.float32)
-             for i in range(args.nr_gpu)]
-    for yi in range(obs_shape[0]):
-        for xi in range(obs_shape[1]):
-            new_x_gen_np = sess.run(
-                new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
-            for i in range(args.nr_gpu):
-                x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
-    return np.concatenate(x_gen, axis=0)
-
-
-def complete(imgs, mks, sess):
-    x_gen = [imgs[i] for i in range(args.nr_gpu)]
-    x_mk = [mks[i] for i in range(args.nr_gpu)]
-
-    for yi in range(20,32):
-        for xi in range(32):
-            new_x_gen_np = sess.run(
-                new_x_gen, {xs[i]: x_gen[i] for i in range(args.nr_gpu)})
-            for i in range(args.nr_gpu):
-                x_gen[i][:, yi, xi, :] = new_x_gen_np[i][:, yi, xi, :]
-    return np.concatenate(x_gen, axis=0)
-
-
-# init & save
-initializer = tf.global_variables_initializer()
-
-
-# turn numpy inputs into feed_dict for use with tensorflow
-
-#mgen = mk.RandomMaskGenerator(obs_shape[0], obs_shape[1])
-#mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
-mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
-agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
 
 def make_feed_dict(data, init=False, masks=None, is_test=False):
     if type(data) is tuple:
@@ -232,30 +169,28 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
     return feed_dict
 
+saver = tf.train.Saver(scope='model_1')
 
-def ret_masked_images(imgs):
-    x_gen = [imgs[i] for i in range(args.nr_gpu)]
-    for yi in range(20, 32):
-        for xi in range(32):
-            for i in range(args.nr_gpu):
-                x_gen[i][:, yi, xi, :] = 0.0
-    return np.concatenate(x_gen, axis=0)
+with tf.Session() as sess:
 
-def ret_original_images(imgs):
-    x_gen = [imgs[i] for i in range(args.nr_gpu)]
-    return np.concatenate(x_gen, axis=0)
+    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
 
-# //////////// perform training //////////////
-if not os.path.exists(args.save_dir):
-    os.makedirs(args.save_dir)
-print('starting training')
-test_bpd = []
-lr = args.learning_rate
+    test_losses = []
+    for d in test_data:
+        feed_dict = make_feed_dict(d, masks=masks, is_test=True)
+        l = sess.run(bits_per_dim_test, feed_dict)
+        test_losses.append(l)
+    test_loss_gen = np.mean(test_losses)
+
+    print("test bits_per_dim = %.4f" % (test_loss_gen))
+    sys.stdout.flush()
+
 
 #graph = tf.Graph()
 
 #with tf.Session() as sess:
-#    saver = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1'))
 #    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
 #    print('restoring parameters from', ckpt_file)
 #    saver.restore(sess, ckpt_file)
@@ -263,19 +198,13 @@ lr = args.learning_rate
 
 
 
-    # ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    # print(len(ll))
-    # new_vars = []
-    # for item in ll:
-    #     new_vars.append(tf.Variable(item, name=item.name[:-2].replace("model", "model_1")))
-    # var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="model_1")
-    # print(len(var_list))
-    # saver1 = tf.train.Saver(var_list=var_list)
-    # sess.run(tf.variables_initializer(var_list=var_list))
-    # saver1.save(sess, "/data/ziz/jxu/save-test" + '/params_' +
-    #            args.data_set + '.ckpt')
-    # quit()
-    #
-    #
-    # ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    # print([item.name for item in ll])
+    #for item in ll:
+    #    new_vars.append(tf.Variable(item, name=item.name[:-2].replace('model', 'forward')))
+    #print(new_vars)
+
+
+
+        #for name, shape in vars:
+        #    v = tf.contrib.framework.load_variable(ckpt_file, name)
+        #    print(name, shape)
+            #new_vars.append(tf.Variable(v, name=name.replace('my-first-scope', 'my-second-scope')))
