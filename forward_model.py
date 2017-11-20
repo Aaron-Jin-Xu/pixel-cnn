@@ -117,7 +117,11 @@ model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
              'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
 model = tf.make_template('model', model_spec)
 
-gen_par = model(xs[i], None, h_sample[i], ema=None, dropout_p=0, **model_opt)
+loss_gen = []
+for i in range(args.nr_gpu):
+    with tf.device('/gpu:%d' % i):
+        gen_par = model(xs[i], None, h_sample[i], ema=None, dropout_p=0, **model_opt)
+        loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
 
 
 def make_feed_dict(data, init=False, masks=None, is_test=False):
@@ -157,7 +161,7 @@ with tf.Session() as sess:
     test_losses = []
     for d in test_data:
         feed_dict = make_feed_dict(d, masks=masks, is_test=True)
-        l = sess.run(gen_par, feed_dict)
+        l = sess.run(loss_gen, feed_dict)
         print(l)
 
 
