@@ -127,16 +127,14 @@ maintain_averages_op = tf.group(ema.apply(all_params))
 
 
 
-
-
-
-
-loss_gen = []
+loss_gen_test = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        gen_par = model(xs[i], None, hs[i], ema=None,
-                        dropout_p=args.dropout_p, **model_opt)
-        loss_gen.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
+        gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
+        loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
+
+bits_per_dim_test = loss_gen_test[
+    0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
 
 
 def make_feed_dict(data, init=False, masks=None, is_test=False):
@@ -176,10 +174,12 @@ with tf.Session() as sess:
     test_losses = []
     for d in test_data:
         feed_dict = make_feed_dict(d, masks=masks, is_test=True)
-        l = sess.run(loss_gen, feed_dict)
-        print(l)
+        l = sess.run(bits_per_dim_test, feed_dict)
+        test_losses.append(l)
+    test_loss_gen = np.mean(test_losses)
 
-
+    print("test bits_per_dim = %.4f" % (test_loss_gen))
+    sys.stdout.flush()
 
 
 #graph = tf.Graph()
