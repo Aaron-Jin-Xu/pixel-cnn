@@ -117,9 +117,7 @@ model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
              'nr_logistic_mix': args.nr_logistic_mix, 'resnet_nonlinearity': args.resnet_nonlinearity}
 model = tf.make_template('model', model_spec)
 
-# run once for data dependent initialization of parameters
-gen_par = model(x_init, None, h_init, init=True,
-                dropout_p=args.dropout_p, **model_opt)
+gen_par = model(xs[i], None, h_sample[i], ema=None, dropout_p=0, **model_opt)
 
 
 def make_feed_dict(data, init=False, masks=None, is_test=False):
