@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser()
 # data I/O
 parser.add_argument('-i', '--data_dir', type=str,
                     default='/data/ziz/not-backed-up/jxu/CelebA', help='Location for the dataset')
-parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/save-forward',
+parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/save-test',
                     help='Location for parameter checkpoints and samples')
 parser.add_argument('-d', '--data_set', type=str,
                     default='celeba', help='Can be either cifar|imagenet')
