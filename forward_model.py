@@ -152,16 +152,16 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
 
 
 with tf.Session() as sess:
-   ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-   print('restoring parameters from', ckpt_file)
-   saver.restore(sess, ckpt_file)
+    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
 
     test_losses = []
     for d in test_data:
         feed_dict = make_feed_dict(d, masks=masks, is_test=True)
         l = sess.run(gen_par, feed_dict)
         print l
-        
+
 
 
 
