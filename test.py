@@ -9,12 +9,10 @@ with tf.Session() as sess:
     saver1 = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1'))
 
 
-    ckpt_file = "/data/ziz/jxu/save-forward" + '/params_' + args.data_set + '.ckpt'
+    ckpt_file = "/data/ziz/jxu/save-forward" + '/params_' + "celeba" + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    ckpt_file = "/data/ziz/jxu/save-test" + '/params_' + args.data_set + '.ckpt'
+    ckpt_file = "/data/ziz/jxu/save-test" + '/params_' + "celeba" + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver1.restore(sess, ckpt_file)
-
-    
