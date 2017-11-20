@@ -169,23 +169,7 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
     return feed_dict
 
-saver = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1'))
 
-with tf.Session() as sess:
-
-    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-    print('restoring parameters from', ckpt_file)
-    saver.restore(sess, ckpt_file)
-
-    test_losses = []
-    for d in test_data:
-        feed_dict = make_feed_dict(d, masks=masks, is_test=True)
-        l = sess.run(bits_per_dim_test, feed_dict)
-        test_losses.append(l)
-    test_loss_gen = np.mean(test_losses)
-
-    print("test bits_per_dim = %.4f" % (test_loss_gen))
-    sys.stdout.flush()
 
 
 #graph = tf.Graph()
