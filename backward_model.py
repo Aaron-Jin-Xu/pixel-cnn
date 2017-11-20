@@ -265,8 +265,9 @@ with tf.Session() as sess:
 
 
     ll = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    new_vars = []
     for item in ll:
-        var = tf.Variable(item, name=item.name[:-2].replace("model", "model_1"))
+        new_vars.append(tf.Variable(item, name=item.name[:-2].replace("model", "model_1")))
     saver1 = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="model_1"))
     saver1.save(sess, "/data/ziz/jxu/save-test" + '/params_' +
                args.data_set + '.ckpt')
