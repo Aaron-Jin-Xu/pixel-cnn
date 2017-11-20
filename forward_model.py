@@ -254,35 +254,11 @@ lr = args.learning_rate
 
 #graph = tf.Graph()
 
-with tf.Session() as sess:
-    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-    print('restoring parameters from', ckpt_file)
-    saver.restore(sess, ckpt_file)
+#with tf.Session() as sess:
+#    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+#    print('restoring parameters from', ckpt_file)
+#    saver.restore(sess, ckpt_file)
 
-    td = next(test_data)
-    from PIL import Image
-    for i in range(36):
-        Image.fromarray(td[i]).save("/data/ziz/jxu/CelebA/celeba_cropped_test_samples/c"+str(i)+".png")
-    td = np.cast[np.float32]((td - 127.5) / 127.5)
-    imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
-
-    mks = [mgen.gen(imgs[0].shape[0]) for i in range(args.nr_gpu)]
-
-
-    all_imgs = ret_original_images(imgs)[:36]
-    for i in range(36):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
-            "/data/ziz/jxu/results/original", '%s_original_%s.png' % (args.data_set, str(i).zfill(2))))
-
-    all_imgs = ret_masked_images(imgs)[:36]
-    for i in range(36):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
-            "/data/ziz/jxu/results/masked", '%s_masked_%s.png' % (args.data_set, str(i).zfill(2))))
-
-    all_imgs = complete(imgs, mks, sess)
-    for i in range(36):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
-            "/data/ziz/jxu/results/complete", '%s_completef_%s.png' % (args.data_set, str(i).zfill(2))))
 
 
 
