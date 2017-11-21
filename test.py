@@ -9,6 +9,7 @@ import forward_model as fm
 import backward_model as bm
 
 import pixel_cnn_pp.mask as mk
+from utils import *
 
 with tf.Session() as sess:
 
@@ -29,10 +30,12 @@ with tf.Session() as sess:
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
-    feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+    pixels = next_pixel(ms)
+
+    feed_dict = fm.make_feed_dict(d, mask_values=ms, rot=False)
     o1 = sess.run(fm.outputs, feed_dict)
     o1 = np.concatenate(o1, axis=0)
-    print(o1.shape)
+    print(get_params(o1))
 
     # test_losses = []
     # for d in bm.test_data:
