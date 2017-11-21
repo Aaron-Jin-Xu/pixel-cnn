@@ -5,9 +5,8 @@ import os
 import sys
 import time
 
-import backward_model as bm
 import forward_model as fm
-
+import backward_model as bm
 
 with tf.Session() as sess:
 
