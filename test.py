@@ -11,18 +11,18 @@ import forward_model as fm
 
 with tf.Session() as sess:
 
-    ## backward model
+    ## forward model
     var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model/')
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
-    ckpt_file = "/data/ziz/jxu/save-backward" + '/params_' + "celeba" + '.ckpt'
+    ckpt_file = "/data/ziz/jxu/save-forward" + '/params_' + "celeba" + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    d = next(bm.test_data)
-    feed_dict = bm.make_feed_dict(d, masks=bm.masks, is_test=True)
-    o1 = sess.run(bm.outputs, feed_dict)
+    d = next(fm.test_data)
+    feed_dict = fm.make_feed_dict(d, masks=fm.masks, is_test=True)
+    o1 = sess.run(fm.outputs, feed_dict)
     o1 = np.concatenate(o1, axis=0)
     print(o1.shape)
 
@@ -37,17 +37,17 @@ with tf.Session() as sess:
     # sys.stdout.flush()
 
 
-    ## forward model
+    ## backward model
     var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1/')
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
-    ckpt_file = "/data/ziz/jxu/save-test" + '/params_' + "celeba" + '.ckpt'
+    ckpt_file = "/data/ziz/jxu/save-backward-rename" + '/params_' + "celeba" + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    feed_dict = fm.make_feed_dict(d, masks=fm.masks, is_test=True)
-    o2 = sess.run(fm.outputs, feed_dict)
+    feed_dict = bm.make_feed_dict(d, masks=bm.masks, is_test=True)
+    o2 = sess.run(bm.outputs, feed_dict)
     o2 = np.concatenate(o2, axis=0)
     print(o2.shape)
 
