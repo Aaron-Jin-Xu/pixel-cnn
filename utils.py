@@ -39,10 +39,10 @@ def get_params(pars, pixels):
     return np.array(arr)
 
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    return 1. / (1. + np.exp(-x))
 
 def softplus(x):
-    return np.log(np.exp(x)+1)
+    return np.log(np.exp(x) + 1.)
 
 def params_to_dis(params, nr_mix, r=None, g=None, b=None):
     ps = params.shape
@@ -58,11 +58,25 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
     if r is None:
         arr = []
         for i in range(1, 255):
-            i = (i - 127.5) / 127.5
-            plus_in = inv_stdv * (i - means + 1. / 255.)
+            x = (i - 127.5) / 127.5
+            centered_x = x - means[:, 0, :]
+            plus_in = inv_stdv[:, 0, :] * (centered_x + 1. / 255.)
             cdf_plus = sigmoid(plus_in)
-            min_in = inv_stdv * (i - means - 1. / 255.)
+            min_in = inv_stdv[:, 0, :] * (centered_x - 1. / 255.)
             cdf_min = sigmoid(min_in)
-            cdf_delta = cdf_plus[:, 0, :] - cdf_min[:, 0, :]
-            arr.append(cdf_delta.mean(1))
+            cdf_delta = cdf_plus - cdf_min
+            log_cdf_plus = plus_in - tf.nn.softplus(plus_in)
+            log_one_minus_cdf_min = -tf.nn.softplus(min_in)
+            log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min, np.log(cdf_delta)))
+            print(log_probs.shape)# + log_prob_from_logits(logit_probs)
+            quit()
+            #arr.append(cdf_delta.mean(1))
         return np.array(arr)
+
+
+
+    cdf_delta = cdf_plus - cdf_min  # probability for all other cases
+    mid_in = inv_stdv * centered_x
+
+
+    log_probs = tf.select(x < -0.999, log_cdf_plus, tf.select(x > 0.999, log_one_minus_cdf_min, tf.log(cdf_delta)))
