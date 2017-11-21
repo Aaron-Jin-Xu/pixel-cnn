@@ -46,6 +46,8 @@ def params_to_dis(params, nr_mix):
     means = l[:, :, :nr_mix]
     log_scales = np.maximum(l[:, :, nr_mix:2 * nr_mix], -7.)
     coeffs = np.tanh(l[:, :, 2 * nr_mix:3 * nr_mix])
+
+    inv_stdv = np.exp(-log_scales)
     print(logit_probs.shape)
-    print(mean.shape)
+    print(means.shape)
     print(coeffs.shape)
