@@ -8,6 +8,8 @@ import time
 import forward_model as fm
 import backward_model as bm
 
+import pixel_cnn_pp.mask as mk
+
 with tf.Session() as sess:
 
     ## forward model
@@ -20,6 +22,10 @@ with tf.Session() as sess:
     saver.restore(sess, ckpt_file)
 
     d = next(fm.test_data)
+    obs_shape = d.shape[1:]
+    mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
+    ms = mgen.gen(4 * 12)
+
     feed_dict = fm.make_feed_dict(d, masks=fm.masks, is_test=True)
     o1 = sess.run(fm.outputs, feed_dict)
     o1 = np.concatenate(o1, axis=0)
@@ -45,7 +51,7 @@ with tf.Session() as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    feed_dict = bm.make_feed_dict(d, masks=bm.masks, is_test=False)
+    feed_dict = bm.make_feed_dict(d, rot=True, mask_values=ms)
     o2 = sess.run(bm.outputs, feed_dict)
     o2 = np.concatenate(o2, axis=0)
     print(o2.shape)
