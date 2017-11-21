@@ -1,5 +1,6 @@
 import numpy as np
 import pixel_cnn_pp.mask as mk
+from scipy.misc import logsumexp
 
 def next_pixel(masks, start=None):
 
@@ -79,7 +80,8 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             log_probs = log_probs + log_softmax(logit_probs)
-            print(log_probs.shape)
+            lse = logsumexp(log_probs, axis=-1)
+            print(lse)
             quit()
             #arr.append(cdf_delta.mean(1))
         return np.array(arr)
