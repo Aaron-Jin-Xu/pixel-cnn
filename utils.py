@@ -39,11 +39,11 @@ def get_params(pars, pixels):
     return np.array(arr)
 
 def sigmoid(x):
-    nx = np.minimum(-x, 10*np.ones_like(-x))
+    nx = np.minimum(-x, 50*np.ones_like(-x))
     return 1. / (1. + np.exp(nx))
 
 def softplus(x):
-    x = np.minimum(x, 10*np.ones_like(x))
+    x = np.minimum(x, 50*np.ones_like(x))
     return np.log(np.exp(x) + 1.)
 
 def log_softmax(x):
@@ -73,16 +73,23 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
             cdf_delta = cdf_plus - cdf_min
             log_cdf_plus = plus_in - softplus(plus_in)
             log_one_minus_cdf_min = - softplus(min_in)
-            log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min, np.log(cdf_delta)))
+
+            mid_in = inv_stdv * centered_x
+            log_pdf_mid = mid_in - log_scales - 2. * softplus(mid_in)
+
+
+            log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
+                                                            np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             print(log_probs.shape)# + log_prob_from_logits(logit_probs)
             quit()
             #arr.append(cdf_delta.mean(1))
         return np.array(arr)
 
 
+mid_in = inv_stdv * centered_x
+# log probability in the center of the bin, to be used in extreme cases
+# (not actually used in our code)
+log_pdf_mid = mid_in - log_scales - 2. * tf.nn.softplus(mid_in)
 
-    cdf_delta = cdf_plus - cdf_min  # probability for all other cases
-    mid_in = inv_stdv * centered_x
-
-
-    log_probs = tf.select(x < -0.999, log_cdf_plus, tf.select(x > 0.999, log_one_minus_cdf_min, tf.log(cdf_delta)))
+    log_probs = tf.where(x < -0.999, log_cdf_plus, tf.where(x > 0.999, log_one_minus_cdf_min,
+                                                            tf.where(cdf_delta > 1e-5, tf.log(tf.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
