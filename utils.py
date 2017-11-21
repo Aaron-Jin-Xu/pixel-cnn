@@ -68,7 +68,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
 
     if r is None:
         arr = []
-        for i in range(1, 255):
+        for i in range(256):
             x = (i - 127.5) / 127.5
             centered_x = x - means[:, 0, :]
             plus_in = inv_stdv[:, 0, :] * (centered_x + 1. / 255.)
@@ -89,6 +89,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
         all_probs = np.array(arr)
         print(all_probs.shape)
         print(all_probs.sum(0))
+        print(all_probs)
         quit()
             #arr.append(cdf_delta.mean(1))
         return np.array(arr)
