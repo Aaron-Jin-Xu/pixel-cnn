@@ -41,7 +41,10 @@ def get_params(pars, pixels):
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
-def params_to_dis(params, nr_mix):
+def softplus(x):
+    return np.log(np.exp(x)+1)
+
+def params_to_dis(params, nr_mix, r=None, g=None, b=None):
     ps = params.shape
     assert ps[1]==10*nr_mix, "shape of params should be (batch_size, nr_mix*10)"
     logit_probs = params[:, :nr_mix]
@@ -51,12 +54,15 @@ def params_to_dis(params, nr_mix):
     coeffs = np.tanh(l[:, :, 2 * nr_mix:3 * nr_mix])
 
     inv_stdv = np.exp(-log_scales)
-    plus_in = inv_stdv * (1.0-means + 1. / 255.)
-    cdf_plus = sigmoid(plus_in)
-    min_in = inv_stdv * (1.0-means - 1. / 255.)
-    cdf_min = sigmoid(min_in)
 
-    print(logit_probs.shape)
-    print(means.shape)
-    print(coeffs.shape)
-    print(cdf_min.shape)
+    if r is None:
+        arr = []
+        for i in range(1, 255):
+            i = (i - 127.5) / 127.5
+            plus_in = inv_stdv * (i - means + 1. / 255.)
+            cdf_plus = sigmoid(plus_in)
+            min_in = inv_stdv * (i - means - 1. / 255.)
+            cdf_min = sigmoid(min_in)
+            cdf_delta = cdf_plus[:, 0, :] - cdf_min[:, 0, :]
+            arr.append(cdf_delta.mean(1))
+        return np.array(arr)
