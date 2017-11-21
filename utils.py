@@ -38,5 +38,14 @@ def get_params(pars, pixels):
         arr.append(pars[idx, p[0], p[1], :])
     return np.array(arr)
 
-def params_to_dis(params):
-    pass
+def params_to_dis(params, nr_mix):
+    ps = params.shape
+    assert ps[1]==10*nr_mix, "shape of params should be (batch_size, nr_mix*10)"
+    logit_probs = params[:, :nr_mix]
+    l = params[:, 1:].reshape([ps[0], 3, 3*nr_mix])
+    means = l[:, :, :nr_mix]
+    log_scales = np.maximum(l[:, :, nr_mix:2 * nr_mix], -7.)
+    coeffs = np.tanh(l[:, :, 2 * nr_mix:3 * nr_mix])
+    print(logit_probs.shape)
+    print(mean.shape)
+    print(coeffs.shape)

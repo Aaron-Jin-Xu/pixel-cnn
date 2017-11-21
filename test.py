@@ -47,7 +47,9 @@ with tf.Session() as sess:
         feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
-        print(get_params(o1, target_pixels))
+        o1 = get_params(o1, target_pixels))
+
+        params_to_dis(o1, fm.args.nr_logistic_mix)
 
         backward_ms = ms.copy()
         for idx in range(len(target_pixels)):
@@ -59,4 +61,4 @@ with tf.Session() as sess:
         o2 = sess.run(bm.outputs, feed_dict)
         o2 = np.concatenate(o2, axis=0)
         o2 = np.rot90(o2, 2, (1,2))
-        print(get_params(o2, target_pixels))
+        o2 = get_params(o2, target_pixels)
