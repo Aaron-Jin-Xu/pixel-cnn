@@ -35,7 +35,7 @@ with tf.Session() as sess:
     feed_dict = fm.make_feed_dict(d, mask_values=ms, rot=False)
     o1 = sess.run(fm.outputs, feed_dict)
     o1 = np.concatenate(o1, axis=0)
-    print(get_params(o1))
+    print(get_params(o1， pixels))
 
     # test_losses = []
     # for d in bm.test_data:
@@ -60,7 +60,7 @@ with tf.Session() as sess:
     feed_dict = bm.make_feed_dict(d, mask_values=ms, rot=True)
     o2 = sess.run(bm.outputs, feed_dict)
     o2 = np.concatenate(o2, axis=0)
-    print(o2.shape)
+    print(get_params(o2， pixels))
 
     # test_losses = []
     # for d in fm.test_data:
