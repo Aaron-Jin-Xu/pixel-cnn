@@ -107,7 +107,7 @@ h_init = None
 h_sample = [None] * args.nr_gpu
 hs = h_sample
 
-if args.masked:
+if True:
     masks = tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
 else:
     masks = None
@@ -144,6 +144,10 @@ bits_per_dim_test = loss_gen_test[
     0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
 
 
+mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
+agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
+
+
 def make_feed_dict(data, init=False, masks=None, is_test=False):
     if type(data) is tuple:
         x, y = data
@@ -170,7 +174,6 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
             y = np.split(y, args.nr_gpu)
             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
     return feed_dict
-
 
 
 
