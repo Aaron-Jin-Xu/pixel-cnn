@@ -22,11 +22,14 @@ with tf.Session() as sess:
     saver.restore(sess, ckpt_file)
 
     d = next(fm.test_data)
+    # generate masks
     obs_shape = d.shape[1:]
-    mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
-    ms = mgen.gen(4 * 12)
+    mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
+    ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
+    agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
+    ams = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
-    feed_dict = fm.make_feed_dict(d, masks=fm.masks, is_test=True)
+    feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
     o1 = sess.run(fm.outputs, feed_dict)
     o1 = np.concatenate(o1, axis=0)
     print(o1.shape)

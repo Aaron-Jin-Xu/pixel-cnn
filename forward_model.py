@@ -107,10 +107,8 @@ h_init = None
 h_sample = [None] * args.nr_gpu
 hs = h_sample
 
-if args.masked:
-    masks = tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
-else:
-    masks = None
+masks = [tf.placeholder(tf.float32, shape=(args.batch_size,) + obs_shape[:-1])
+            for i in range(args.nr_gpu)]
 
 # create the model
 model_opt = {'nr_resnet': args.nr_resnet, 'nr_filters': args.nr_filters,
@@ -130,7 +128,7 @@ loss_gen_test = []
 outputs = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        gen_par = model(xs[i], masks, hs[i], ema=ema, dropout_p=0., **model_opt)
+        gen_par = model(xs[i], masks[i], hs[i], ema=ema, dropout_p=0., **model_opt)
         outputs.append(gen_par)
         loss_gen_test.append(nn.discretized_mix_logistic_loss(xs[i], gen_par, masks=masks))
 
@@ -144,34 +142,46 @@ bits_per_dim_test = loss_gen_test[
     0] / (args.nr_gpu * np.log(2.) * np.prod(obs_shape) * args.batch_size)
 
 
-def make_feed_dict(data, init=False, masks=None, is_test=False):
-    if type(data) is tuple:
-        x, y = data
-    else:
-        x = data
-        y = None
-    if args.rot180:
-        x = np.rot90(x, 2, (1,2)) #### ROT
+# def make_feed_dict(data, init=False, masks=None, is_test=False):
+#     if type(data) is tuple:
+#         x, y = data
+#     else:
+#         x = data
+#         y = None
+#     if args.rot180:
+#         x = np.rot90(x, 2, (1,2)) #### ROT
+#     # input to pixelCNN is scaled from uint8 [0,255] to float in range [-1,1]
+#     x = np.cast[np.float32]((x - 127.5) / 127.5)
+#     if init:
+#         feed_dict = {x_init: x}
+#         if y is not None:
+#             feed_dict.update({y_init: y})
+#     else:
+#         x = np.split(x, args.nr_gpu)
+#         feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
+#         if masks is not None:
+#             if is_test:
+#                 feed_dict[masks] = agen.gen(args.batch_size)
+#             else:
+#                 feed_dict[masks] = mgen.gen(args.batch_size)
+#         if y is not None:
+#             y = np.split(y, args.nr_gpu)
+#             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
+#     return feed_dict
+
+
+def make_feed_dict(data, mask_values, rot=False):
+    x = data
+    if rot:
+        x = np.rot90(x, 2, (1,2))
     # input to pixelCNN is scaled from uint8 [0,255] to float in range [-1,1]
     x = np.cast[np.float32]((x - 127.5) / 127.5)
-    if init:
-        feed_dict = {x_init: x}
-        if y is not None:
-            feed_dict.update({y_init: y})
-    else:
-        x = np.split(x, args.nr_gpu)
-        feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
-        if masks is not None:
-            if is_test:
-                feed_dict[masks] = agen.gen(args.batch_size)
-            else:
-                feed_dict[masks] = mgen.gen(args.batch_size)
-        if y is not None:
-            y = np.split(y, args.nr_gpu)
-            feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
+    x = np.split(x, args.nr_gpu)
+    feed_dict = {xs[i]: x[i] for i in range(args.nr_gpu)}
+    mvs = np.split(mask_values, args.nr_gpu)
+    for i in range(args.nr_gpu):
+        feed_dict[masks[i]] = mvs[i]
     return feed_dict
-
-
 
 
 #graph = tf.Graph()
