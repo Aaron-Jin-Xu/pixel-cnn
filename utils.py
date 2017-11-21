@@ -39,9 +39,11 @@ def get_params(pars, pixels):
     return np.array(arr)
 
 def sigmoid(x):
-    return 1. / (1. + np.exp(-x))
+    nx = np.minimum(-x, 100*np.ones_like(-x))
+    return 1. / (1. + np.exp(nx))
 
 def softplus(x):
+    x = np.minimum(x, 100*np.ones_like(x))
     return np.log(np.exp(x) + 1.)
 
 def params_to_dis(params, nr_mix, r=None, g=None, b=None):
