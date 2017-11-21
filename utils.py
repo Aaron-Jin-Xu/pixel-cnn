@@ -37,3 +37,6 @@ def get_params(pars, pixels):
         p = pixels[idx]
         arr.append(pars[idx, p[0], p[1], :])
     return np.array(arr)
+
+def params_to_dis(params):
+    pass
