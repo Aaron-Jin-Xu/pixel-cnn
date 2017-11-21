@@ -49,7 +49,14 @@ with tf.Session() as sess:
         o1 = np.concatenate(o1, axis=0)
         print(get_params(o1, target_pixels))
 
-        feed_dict = bm.make_feed_dict(d, mask_values=np.rot90(ms, 2, (1,2)), rot=True)
+        backward_ms = ms.copy()
+        for idx in range(len(target_pixels)):
+            p = target_pixels[idx]
+            backward_ms[idx, p[0], p[1]] = 1
+        backward_ms = np.rot90(ms, 2, (1,2))
+
+        feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
         o2 = sess.run(bm.outputs, feed_dict)
         o2 = np.concatenate(o2, axis=0)
+        o2 = np.rot90(o2, 2, (1,2))
         print(get_params(o2, target_pixels))
