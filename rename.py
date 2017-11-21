@@ -187,8 +187,10 @@ with tf.Session() as sess:
 
     var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1/')
     print(len(var_list))
-    print(var_list)
+    print([item.name for item in var_list])
     saver = tf.train.Saver(var_list=var_list)
+
+    sess.run(tf.initialize_variables(var_list=var_list))
 
     ckpt_file = "/data/ziz/jxu/save-backward-rename" + '/params_' + "celeba" + '.ckpt'
     print('restoring parameters from', ckpt_file)
