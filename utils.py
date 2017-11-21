@@ -51,6 +51,10 @@ def log_softmax(x):
     m = np.amax(x, axis=-1, keepdims=True)
     return x - m - np.log(np.sum(np.exp(x-m), axis=-1, keepdims=True))
 
+def sum_exp(x):
+    x = np.minimum(x, 50*np.ones_like(x))
+    return np.sum(np.exp(x), axis=-1)
+
 def params_to_dis(params, nr_mix, r=None, g=None, b=None):
     ps = params.shape
     assert ps[1]==10*nr_mix, "shape of params should be (batch_size, nr_mix*10)"
@@ -80,7 +84,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             log_probs = log_probs + log_softmax(logit_probs)
-            probs = np.sum(np.exp(log_probs), axis=-1)
+            probs = sum_exp(log_probs)
             arr.append(probs)
         all_probs = np.array(arr)
         print(all_probs.shape)
