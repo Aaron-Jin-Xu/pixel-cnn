@@ -89,7 +89,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
         all_probs = np.array(arr)
         print(all_probs.shape)
         print(all_probs.sum(0))
-        print(all_probs[:, 10])
+        print(all_probs[:, np.argmax(all_probs.sum(0))])
         quit()
             #arr.append(cdf_delta.mean(1))
         return np.array(arr)
