@@ -65,8 +65,8 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
             min_in = inv_stdv[:, 0, :] * (centered_x - 1. / 255.)
             cdf_min = sigmoid(min_in)
             cdf_delta = cdf_plus - cdf_min
-            log_cdf_plus = plus_in - tf.nn.softplus(plus_in)
-            log_one_minus_cdf_min = -tf.nn.softplus(min_in)
+            log_cdf_plus = plus_in - softplus(plus_in)
+            log_one_minus_cdf_min = - softplus(min_in)
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min, np.log(cdf_delta)))
             print(log_probs.shape)# + log_prob_from_logits(logit_probs)
             quit()
