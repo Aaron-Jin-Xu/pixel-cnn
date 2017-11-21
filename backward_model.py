@@ -174,7 +174,7 @@ agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
 #             feed_dict.update({ys[i]: y[i] for i in range(args.nr_gpu)})
 #     return feed_dict
 
-def make_feed_dict(data, rot=True, mask_values):
+def make_feed_dict(data, mask_values, rot=False):
     x = data
     if rot:
         x = np.rot90(x, 2, (1,2))

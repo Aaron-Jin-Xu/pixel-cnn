@@ -51,7 +51,7 @@ with tf.Session() as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    feed_dict = bm.make_feed_dict(d, rot=True, mask_values=ms)
+    feed_dict = bm.make_feed_dict(d, mask_values=ms, rot=True)
     o2 = sess.run(bm.outputs, feed_dict)
     o2 = np.concatenate(o2, axis=0)
     print(o2.shape)
