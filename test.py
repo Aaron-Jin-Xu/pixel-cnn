@@ -50,6 +50,7 @@ with tf.Session() as sess:
 
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
+        print(pars)
         color_r = []
         for i in range(pars.shape[0]):
             color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -59,6 +60,7 @@ with tf.Session() as sess:
 
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
+        print(pars)
         color_g = []
         for i in range(pars.shape[0]):
             color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -68,6 +70,7 @@ with tf.Session() as sess:
 
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
+        print(pars)
         color_b = []
         for i in range(pars.shape[0]):
             color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
