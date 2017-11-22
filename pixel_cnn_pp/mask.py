@@ -66,8 +66,9 @@ class RecMaskGenerator(MaskGenerator):
     def __init__(self, h, w, rng=None):
         super().__init__(h, w, rng)
 
-    def gen_par(self, rng=None):
-        self.rng = rng
+    def gen_par(self, seed=None):
+        if seed is not None:
+            self.rng = np.random.RandomState(seed)
         mh = int(self.h * 0.4)
         mw = int(self.w * 0.4)
         pgh = self.rng.randint(low=0, high=mh)
