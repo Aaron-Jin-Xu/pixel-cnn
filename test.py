@@ -47,13 +47,33 @@ with tf.Session() as sess:
         o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
         pars = params_to_dis(o1, fm.args.nr_logistic_mix)
+
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
-        arr = []
+        color_r = []
         for i in range(pars.shape[0]):
-            arr.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-        pars = params_to_dis(o1, fm.args.nr_logistic_mix, r=np.array(arr))
-        print(pars)
+            color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+        color_r = np.array(color_r)
+        pars = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
+        print(color_r)
+
+        pars = pars.astype(np.float64)
+        pars = pars / np.sum(pars, axis=-1)[:, None]
+        color_g = []
+        for i in range(pars.shape[0]):
+            color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+        color_g = np.array(color_g)
+        pars = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
+        print(color_g)
+
+        pars = pars.astype(np.float64)
+        pars = pars / np.sum(pars, axis=-1)[:, None]
+        color_b = []
+        for i in range(pars.shape[0]):
+            color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+        color_b = np.array(color_b)
+        print(color_b)
+
         quit()
 
         backward_ms = ms.copy()
