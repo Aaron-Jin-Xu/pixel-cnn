@@ -76,7 +76,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = pars1 * pars2 / pr[:, 0, :]
+        pars = pars1**2 * pars2**2 #/ pr[:, 0, :]
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_r = []
@@ -86,7 +86,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = pars1 * pars2 / pr[:, 1, :]
+        pars = pars1**2 * pars2**2 #/ pr[:, 1, :]
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_g = []
@@ -96,7 +96,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1 * pars2 / pr[:, 2, :]
+        pars = pars1**2 * pars2**2 #/ pr[:, 2, :]
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_b = []
@@ -114,4 +114,4 @@ with tf.Session() as sess:
             d[idx, p[0], p[1], :] = color[idx, :]
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/complete_prior.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/complete_e2.png")
