@@ -53,7 +53,7 @@ with tf.Session() as sess:
         pars = pars / np.sum(pars, axis=-1)[:, None]
         arr = []
         for i in range(pars.shape[0]):
-            arr.append(np.random.multinomial(1, pars[i, :]))
+            arr.append(np.argmax(np.random.multinomial(1, pars[i, :])))
         print(np.array(arr).shape)
         pars = params_to_dis(o1, fm.args.nr_logistic_mix, r=np.array(arr))
         print(pars)
