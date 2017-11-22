@@ -44,7 +44,7 @@ with tf.Session() as sess:
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
-    ams = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
+    ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     while True:
 
@@ -71,7 +71,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = pars2 #* pars2
+        pars = pars1 #* pars2
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_r = []
@@ -81,7 +81,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = pars2 #* pars2
+        pars = pars1 #* pars2
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_g = []
@@ -91,7 +91,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars2 #* pars2
+        pars = pars1 #* pars2
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_b = []
