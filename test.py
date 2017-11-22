@@ -97,7 +97,6 @@ with tf.Session() as sess:
         color_b = np.array(color_b)
 
         color = np.array([color_r, color_g, color_b]).T
-        color = (color - 127.5) / 127.5
         print(color)
 
         for idx in range(len(target_pixels)):
