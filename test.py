@@ -54,6 +54,7 @@ with tf.Session() as sess:
         arr = []
         for i in range(pars.shape[0]):
             arr.append(np.random.multinomial(1, pars[i, :]))
+        print(np.array(arr).shape)
         pars = params_to_dis(o1, fm.args.nr_logistic_mix, r=np.array(arr))
         print(pars)
         quit()
