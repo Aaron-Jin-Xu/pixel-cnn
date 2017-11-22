@@ -35,7 +35,7 @@ with tf.Session() as sess:
     ###############################
 
     d = next(fm.test_data)
-    img = Image.fromarray(tile_images(d.astype(np.uint8)))
+    img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
     img.save("~/projects/ImageInpainting/samples/before.png")
     # generate masks
     obs_shape = d.shape[1:]
@@ -108,5 +108,5 @@ with tf.Session() as sess:
 
             d[idx, p[0], p[1], :] = color[idx, :]
 
-    img = Image.fromarray(tile_images(d.astype(np.uint8)))
+    img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
     img.save("~/projects/ImageInpainting/samples/after.png")
