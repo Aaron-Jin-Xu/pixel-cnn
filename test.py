@@ -38,6 +38,7 @@ with tf.Session() as sess:
     obs_shape = d.shape[1:]
     mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
+    d *= ms[:, :, :, None]
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
@@ -70,7 +71,6 @@ with tf.Session() as sess:
         for i in range(pars.shape[0]):
             color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
         color_r = np.array(color_r)
-        print(color_r)
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
@@ -81,7 +81,6 @@ with tf.Session() as sess:
         for i in range(pars.shape[0]):
             color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
         color_g = np.array(color_g)
-        print(color_g)
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
@@ -92,4 +91,6 @@ with tf.Session() as sess:
         for i in range(pars.shape[0]):
             color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
         color_b = np.array(color_b)
-        print(color_b)
+
+        color = np.array([color_r, color_g, color_b])
+        color = (color - 127.5) / 127.5
