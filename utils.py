@@ -95,8 +95,6 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
         arr = []
         for i in range(256):
             x = (i - 127.5) / 127.5
-            print(coeffs[:, 0, :].shape)
-            print(r[:, None].shape)
             m2 = means[:, 1, :] + coeffs[:, 0, :] * r[:, None]
             centered_x = x - m2
             plus_in = inv_stdv[:, 0, :] * (centered_x + 1. / 255.)

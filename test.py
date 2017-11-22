@@ -41,20 +41,18 @@ with tf.Session() as sess:
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     for step in range(1):
-
         target_pixels = next_pixel(ms)
-
         feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
         pars = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars = pars.astype(np.float64)
+        print(pars)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         arr = []
         for i in range(pars.shape[0]):
             arr.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-        print(np.array(arr).shape)
         pars = params_to_dis(o1, fm.args.nr_logistic_mix, r=np.array(arr))
         print(pars)
         quit()
