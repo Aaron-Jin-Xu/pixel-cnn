@@ -1,6 +1,7 @@
 import numpy as np
 import pixel_cnn_pp.mask as mk
 from scipy.misc import logsumexp
+from scipy.special import expit
 
 def next_pixel(masks, start=None):
 
@@ -40,8 +41,7 @@ def get_params(pars, pixels):
     return np.array(arr)
 
 def sigmoid(x):
-    nx = np.minimum(-x, 50*np.ones_like(-x))
-    return 1. / (1. + np.exp(nx))
+    return expit(x)
 
 def softplus(x):
     x = np.minimum(x, 50*np.ones_like(x))
@@ -52,8 +52,9 @@ def log_softmax(x):
     return x - m - np.log(np.sum(np.exp(x-m), axis=-1, keepdims=True))
 
 def sum_exp(x):
-    x = np.minimum(x, 50*np.ones_like(x))
-    return np.sum(np.exp(x), axis=-1)
+    return np.exp(logsumexp(x, axis=-1))
+    #x = np.minimum(x, 50*np.ones_like(x))
+    #return np.sum(np.exp(x), axis=-1)
 
 def params_to_dis(params, nr_mix, r=None, g=None, b=None):
     ps = params.shape
