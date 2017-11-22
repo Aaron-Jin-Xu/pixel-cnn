@@ -145,8 +145,8 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
 def tile_images(imgs, size=(6, 6)):
     imgs = imgs[:size[0]*size[1], :, :, :]
     img_h, img_w = imgs.shape[1], imgs.shape[2]
-    all_images = np.zeros((img_h*size[0], img_w*size[1], 3))
+    all_images = np.zeros((img_h*size[0], img_w*size[1], 3), np.uint8)
     for j in range(size[0]):
         for i in range(size[1]):
-            all_images[img_h*j:img_h*(j+1), img_w*i:img_w*(i+1), :] = imgs[j*size[0]+i]
+            all_images[img_h*j:img_h*(j+1), img_w*i:img_w*(i+1), :] = imgs[j*size[0]+i, :, :, :]
     return all_images
