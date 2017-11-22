@@ -95,3 +95,4 @@ with tf.Session() as sess:
 
         color = np.array([color_r, color_g, color_b])
         color = (color - 127.5) / 127.5
+        print(color)
