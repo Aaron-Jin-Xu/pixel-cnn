@@ -10,6 +10,7 @@ import backward_model as bm
 
 import pixel_cnn_pp.mask as mk
 from utils import *
+from PIL import Image
 
 with tf.Session() as sess:
 
@@ -34,6 +35,8 @@ with tf.Session() as sess:
     ###############################
 
     d = next(fm.test_data)
+    img = Image.fromarray(tile_images(d.astype(np.uint8)))
+    img.save("~/projects/ImageInpainting/samples/before.png")
     # generate masks
     obs_shape = d.shape[1:]
     mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
@@ -105,4 +108,5 @@ with tf.Session() as sess:
 
             d[idx, p[0], p[1], :] = color[idx, :]
 
-    print(tile_images(d).shape)
+    img = Image.fromarray(tile_images(d.astype(np.uint8)))
+    img.save("~/projects/ImageInpainting/samples/after.png")
