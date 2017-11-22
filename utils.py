@@ -44,8 +44,9 @@ def sigmoid(x):
     return expit(x)
 
 def softplus(x):
-    x = np.minimum(x, 50*np.ones_like(x))
-    return np.log(np.exp(x) + 1.)
+    return np.where(x < 50., np.log(np.exp(x) + 1.), x)
+    #x = np.minimum(x, 50*np.ones_like(x))
+    #return np.log(np.exp(x) + 1.)
 
 def log_softmax(x):
     m = np.amax(x, axis=-1, keepdims=True)
