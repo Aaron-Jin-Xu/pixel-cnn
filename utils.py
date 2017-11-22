@@ -97,16 +97,16 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
             x = (i - 127.5) / 127.5
             m2 = means[:, 1, :] + coeffs[:, 0, :] * r[:, None]
             centered_x = x - m2
-            plus_in = inv_stdv[:, 0, :] * (centered_x + 1. / 255.)
+            plus_in = inv_stdv[:, 1, :] * (centered_x + 1. / 255.)
             cdf_plus = sigmoid(plus_in)
-            min_in = inv_stdv[:, 0, :] * (centered_x - 1. / 255.)
+            min_in = inv_stdv[:, 1, :] * (centered_x - 1. / 255.)
             cdf_min = sigmoid(min_in)
             cdf_delta = cdf_plus - cdf_min
             log_cdf_plus = plus_in - softplus(plus_in)
             log_one_minus_cdf_min = - softplus(min_in)
 
-            mid_in = inv_stdv[:, 0, :] * centered_x
-            log_pdf_mid = mid_in - log_scales[:, 0, :] - 2. * softplus(mid_in)
+            mid_in = inv_stdv[:, 1, :] * centered_x
+            log_pdf_mid = mid_in - log_scales[:, 1, :] - 2. * softplus(mid_in)
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             log_probs = log_probs + log_softmax(logit_probs)

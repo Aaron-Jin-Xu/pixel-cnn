@@ -48,7 +48,6 @@ with tf.Session() as sess:
         o1 = get_params(o1, target_pixels)
         pars = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars = pars.astype(np.float64)
-        print(pars)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         arr = []
         for i in range(pars.shape[0]):
