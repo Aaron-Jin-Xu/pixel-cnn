@@ -104,3 +104,5 @@ with tf.Session() as sess:
             ms[idx, p[0], p[1]] = 1
 
             d[idx, p[0], p[1], :] = color[idx, :]
+
+    print(tile_images(d).shape)
