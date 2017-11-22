@@ -46,7 +46,7 @@ with tf.Session() as sess:
     while True:
 
         target_pixels = next_pixel(ms)
-        print target_pixels[0]
+        print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
         backward_ms = ms.copy()
