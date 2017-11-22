@@ -43,6 +43,8 @@ with tf.Session() as sess:
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
+    img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
+    img.save("/homes/jxu/projects/ImageInpainting/samples/masked.png")
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
