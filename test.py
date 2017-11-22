@@ -48,9 +48,7 @@ with tf.Session() as sess:
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
-
         print(params_to_dis(o1, fm.args.nr_logistic_mix))
-        quit()
 
         backward_ms = ms.copy()
         for idx in range(len(target_pixels)):
@@ -63,3 +61,4 @@ with tf.Session() as sess:
         o2 = np.concatenate(o2, axis=0)
         o2 = np.rot90(o2, 2, (1,2))
         o2 = get_params(o2, target_pixels)
+        print(params_to_dis(o2, fm.args.nr_logistic_mix))

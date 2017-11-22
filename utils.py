@@ -83,19 +83,10 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
 
             mid_in = inv_stdv[:, 0, :] * centered_x
             log_pdf_mid = mid_in - log_scales[:, 0, :] - 2. * softplus(mid_in)
-
-            print(log_cdf_plus.max())
-            print(log_one_minus_cdf_min.max())
-            print(np.log(np.maximum(cdf_delta, 1e-12)).max())
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             log_probs = log_probs + log_softmax(logit_probs)
             probs = sum_exp(log_probs)
             arr.append(probs)
         all_probs = np.array(arr)
-        print(all_probs.shape)
-        print(all_probs.sum(0))
-        print(all_probs[:, np.argmax(all_probs.sum(0))])
-        quit()
-            #arr.append(cdf_delta.mean(1))
-        return np.array(arr)
+        return all_probs
