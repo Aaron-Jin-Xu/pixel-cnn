@@ -10,6 +10,7 @@ import backward_model as bm
 
 import pixel_cnn_pp.mask as mk
 from utils import *
+from np.random import multinomial
 
 with tf.Session() as sess:
 
@@ -48,7 +49,14 @@ with tf.Session() as sess:
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
-        print(params_to_dis(o1, fm.args.nr_logistic_mix))
+        pars = params_to_dis(o1, fm.args.nr_logistic_mix)
+        pars = pars / np.sum(pars, axis=-1)[:, None]
+        arr = []
+        for i in range(pars.shape[0]):
+            arr.append(multinomial(1, pars[i, :]))
+        pars = params_to_dis(o1, fm.args.nr_logistic_mix, r=np.array(arr))
+        print(pars)
+        quit()
 
         backward_ms = ms.copy()
         for idx in range(len(target_pixels)):
