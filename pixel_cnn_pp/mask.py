@@ -66,7 +66,8 @@ class RecMaskGenerator(MaskGenerator):
     def __init__(self, h, w, rng=None):
         super().__init__(h, w, rng)
 
-    def gen_par(self):
+    def gen_par(self， rng=None):
+        self.rng = rng
         mh = int(self.h * 0.4)
         mw = int(self.w * 0.4)
         pgh = self.rng.randint(low=0, high=mh)
@@ -92,7 +93,7 @@ class RecNoProgressMaskGenerator(RecMaskGenerator):
     def gen(self, n):
         mask = np.ones((n, self.h, self.w))
         for i in range(n):
-            missing_h, missing_w, progress_h, progress_w, offset_h, offset_w = self.gen_par()
+            missing_h, missing_w, progress_h, progress_w, offset_h, offset_w = self.gen_par(i)
             progress_w, progress_h = 0, 0
             missing = np.zeros((missing_h, missing_w))
             missing[:progress_h, :] = 1
