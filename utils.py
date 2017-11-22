@@ -150,3 +150,9 @@ def tile_images(imgs, size=(6, 6)):
         for i in range(size[1]):
             all_images[img_h*j:img_h*(j+1), img_w*i:img_w*(i+1), :] = imgs[j*size[0]+i, :, :, :]
     return all_images
+
+def get_prior(prior, target_pixels):
+    arr = []
+    for p in target_pixels:
+        arr.append(prior[:, p[0], p[1], :].T)
+    return np.array(arr)

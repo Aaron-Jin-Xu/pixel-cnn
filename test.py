@@ -48,12 +48,15 @@ with tf.Session() as sess:
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
+    prior = np.load("/data/ziz/jxu/prior.npz")["arr"]
+
     while True:
 
         target_pixels = next_pixel(ms)
         #print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
+        pr = get_prior(prior, target_pixels)
         backward_ms = ms.copy()
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
@@ -73,7 +76,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = pars1# * pars2
+        pars = pars1 * pars2 / pr[:, 0, :]
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_r = []
@@ -83,7 +86,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = pars1# * pars2
+        pars = pars1 * pars2 / pr[:, 1, :]
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_g = []
@@ -93,7 +96,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1# * pars2
+        pars = pars1 * pars2 / pr[:, 2, :]
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_b = []
@@ -111,4 +114,4 @@ with tf.Session() as sess:
             d[idx, p[0], p[1], :] = color[idx, :]
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/complete1.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/complete_prior.png")
