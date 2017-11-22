@@ -73,7 +73,7 @@ with tf.Session() as sess:
         print(color_r)
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
-        pars2 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
+        pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
         pars = pars1 * pars2
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
@@ -84,7 +84,7 @@ with tf.Session() as sess:
         print(color_g)
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars2 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
+        pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars = pars1 * pars2
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
@@ -93,10 +93,3 @@ with tf.Session() as sess:
             color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
         color_b = np.array(color_b)
         print(color_b)
-
-        quit()
-
-
-
-
-        print(params_to_dis(o2, fm.args.nr_logistic_mix))
