@@ -10,7 +10,6 @@ import backward_model as bm
 
 import pixel_cnn_pp.mask as mk
 from utils import *
-from np.random import multinomial
 
 with tf.Session() as sess:
 
@@ -53,7 +52,7 @@ with tf.Session() as sess:
         pars = pars / np.sum(pars, axis=-1)[:, None]
         arr = []
         for i in range(pars.shape[0]):
-            arr.append(multinomial(1, pars[i, :]))
+            arr.append(np.random.multinomial(1, pars[i, :]))
         pars = params_to_dis(o1, fm.args.nr_logistic_mix, r=np.array(arr))
         print(pars)
         quit()
