@@ -97,6 +97,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
             x = (i - 127.5) / 127.5
             r = (r - 127.5) / 127.5
             m2 = means[:, 1, :] + coeffs[:, 0, :] * r[:, None]
+            print(r)
             centered_x = x - m2
             plus_in = inv_stdv[:, 1, :] * (centered_x + 1. / 255.)
             cdf_plus = sigmoid(plus_in)
