@@ -36,7 +36,7 @@ with tf.Session() as sess:
 
     d = next(fm.test_data)
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
-    img.save("~/projects/ImageInpainting/samples/before.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/before.png")
     # generate masks
     obs_shape = d.shape[1:]
     mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
@@ -109,4 +109,4 @@ with tf.Session() as sess:
             d[idx, p[0], p[1], :] = color[idx, :]
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
-    img.save("~/projects/ImageInpainting/samples/after.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/after.png")
