@@ -43,7 +43,7 @@ with tf.Session() as sess:
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
-    for step in range(1):
+    for step in range(5):
 
         target_pixels = next_pixel(ms)
         backward_ms = ms.copy()
@@ -96,3 +96,9 @@ with tf.Session() as sess:
         color = np.array([color_r, color_g, color_b])
         color = (color - 127.5) / 127.5
         print(color)
+
+        for idx in range(len(target_pixels)):
+            p = target_pixels[idx]
+            ms[idx, p[0], p[1]] = 1
+
+        d[:, p[0], p[1], :] = color
