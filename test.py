@@ -103,4 +103,4 @@ with tf.Session() as sess:
             p = target_pixels[idx]
             ms[idx, p[0], p[1]] = 1
 
-        d[:, p[0], p[1], :] = color
+            d[idx, p[0], p[1], :] = color[idx, :]
