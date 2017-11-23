@@ -50,6 +50,9 @@ with tf.Session() as sess:
 
     prior = np.load("/data/ziz/jxu/prior.npz")["arr"]
     dis_record = []
+    data_record = []
+
+    data_record.append(d.copy())
 
     while True:
 
@@ -79,7 +82,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = np.power(pars1 * pars2,0.5) / pr[:, 0, :]
+        pars = pars1 * pars2 #/ pr[:, 0, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
         #pars = np.power(pars, 0.5)
@@ -93,7 +96,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = np.power(pars1 * pars2,0.5) / pr[:, 1, :]
+        pars = pars1 * pars2 #/ pr[:, 1, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
         #pars = np.power(pars, 0.5)
@@ -107,7 +110,7 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = np.power(pars1 * pars2,0.5) / pr[:, 2, :]
+        pars = pars1 * pars2 #/ pr[:, 2, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
         #pars = np.power(pars, 0.5)
@@ -129,8 +132,13 @@ with tf.Session() as sess:
 
             d[idx, p[0], p[1], :] = color[idx, :]
 
+        data_record.append(d.copy())
+
     dis_record = np.array(dis_record)
+    data_record = np.array(data_record)
+    print(data_record.shape)
     #np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
+    np.savez_compressed("/data/ziz/jxu/inpaintng_img", img=data_record)
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/complete_e0.5_prior.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/complete.png")
