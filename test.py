@@ -79,10 +79,10 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = pars1 * pars2 #/ pr[:, 0, :]
+        pars = np.power(pars1 * pars2,0.5) / pr[:, 0, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
-        pars = np.power(pars, 0.5)
+        #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         rgb_record.append(np.array([pars1, pars2, pars]))
@@ -93,10 +93,10 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = pars1 * pars2 #/ pr[:, 1, :]
+        pars = np.power(pars1 * pars2,0.5) / pr[:, 1, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
-        pars = np.power(pars, 0.5)
+        #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         rgb_record.append(np.array([pars1, pars2, pars]))
@@ -107,10 +107,10 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1 * pars2 #/ pr[:, 2, :]
+        pars = np.power(pars1 * pars2,0.5) / pr[:, 2, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
-        pars = np.power(pars, 0.5)
+        #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         rgb_record.append(np.array([pars1, pars2, pars]))
@@ -133,4 +133,4 @@ with tf.Session() as sess:
     #np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/complete_e0.5.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/complete_e0.5_prior.png")
