@@ -49,8 +49,11 @@ with tf.Session() as sess:
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     prior = np.load("/data/ziz/jxu/prior.npz")["arr"]
+    dis_record = []
 
     while True:
+
+        rgb_record = []
 
         target_pixels = next_pixel(ms)
         #print(target_pixels[0])
@@ -76,7 +79,8 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = np.power(pars1,2) * np.power(pars2,2) #/ pr[:, 0, :]
+        pars = pars1 * pars2 #/ pr[:, 0, :]
+        rgb_record.append(np.array([pars1, pars2, pars]))
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_r = []
@@ -86,7 +90,8 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = np.power(pars1,2) * np.power(pars2,2) #/ pr[:, 1, :]
+        pars = pars1 * pars2 #/ pr[:, 1, :]
+        rgb_record.append(np.array([pars1, pars2, pars]))
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_g = []
@@ -96,7 +101,8 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = np.power(pars1,2) * np.power(pars2,2) #/ pr[:, 2, :]
+        pars = pars1 * pars2 #/ pr[:, 2, :]
+        rgb_record.append(np.array([pars1, pars2, pars]))
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         color_b = []
@@ -106,12 +112,16 @@ with tf.Session() as sess:
 
         color = np.array([color_r, color_g, color_b]).T
         #print(color)
+        dis_record.append(np.array(rgb_record))
 
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
             ms[idx, p[0], p[1]] = 1
 
             d[idx, p[0], p[1], :] = color[idx, :]
+
+    dis_record = np.array(dis_record)
+    print(dis_record.shape)
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/samples/complete_e2.png")
