@@ -88,7 +88,7 @@ with tf.Session() as sess:
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars]))
+        rgb_record.append(np.array([pars1, pars2, pars, pars/pr[:, 0, :]]))
         color_r = []
         for i in range(pars.shape[0]):
             color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -102,7 +102,7 @@ with tf.Session() as sess:
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars]))
+        rgb_record.append(np.array([pars1, pars2, pars, pars/pr[:, 1, :]]))
         color_g = []
         for i in range(pars.shape[0]):
             color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -116,7 +116,7 @@ with tf.Session() as sess:
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars]))
+        rgb_record.append(np.array([pars1, pars2, pars, pars/pr[:, 2, :]]))
         color_b = []
         for i in range(pars.shape[0]):
             color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -136,8 +136,7 @@ with tf.Session() as sess:
 
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
-    print(data_record.shape)
-    #np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
+    np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
     np.savez_compressed("/data/ziz/jxu/inpaintng_img", img=data_record)
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
