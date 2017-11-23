@@ -121,7 +121,7 @@ with tf.Session() as sess:
             d[idx, p[0], p[1], :] = color[idx, :]
 
     dis_record = np.array(dis_record)
-    print(dis_record.shape)
+    np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/samples/complete_e2.png")
