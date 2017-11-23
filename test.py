@@ -80,9 +80,12 @@ with tf.Session() as sess:
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
         pars = pars1 * pars2 #/ pr[:, 0, :]
-        rgb_record.append(np.array([pars1, pars2, pars]))
+        pars[:, 0] = 0.
+        pars[:, 255] = 0.
+        pars = np.power(pars, 5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
+        rgb_record.append(np.array([pars1, pars2, pars]))
         color_r = []
         for i in range(pars.shape[0]):
             color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -91,9 +94,12 @@ with tf.Session() as sess:
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
         pars = pars1 * pars2 #/ pr[:, 1, :]
-        rgb_record.append(np.array([pars1, pars2, pars]))
+        pars[:, 0] = 0.
+        pars[:, 255] = 0.
+        pars = np.power(pars, 5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
+        rgb_record.append(np.array([pars1, pars2, pars]))
         color_g = []
         for i in range(pars.shape[0]):
             color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -102,9 +108,12 @@ with tf.Session() as sess:
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars = pars1 * pars2 #/ pr[:, 2, :]
-        rgb_record.append(np.array([pars1, pars2, pars]))
+        pars[:, 0] = 0.
+        pars[:, 255] = 0.
+        pars = np.power(pars, 5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
+        rgb_record.append(np.array([pars1, pars2, pars]))
         color_b = []
         for i in range(pars.shape[0]):
             color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -121,7 +130,7 @@ with tf.Session() as sess:
             d[idx, p[0], p[1], :] = color[idx, :]
 
     dis_record = np.array(dis_record)
-    np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
+    #np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
 
     img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/complete_e2.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/complete_ext.png")
