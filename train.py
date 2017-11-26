@@ -20,6 +20,7 @@ import pixel_cnn_pp.mask as mk
 import pixel_cnn_pp.plotting as plotting
 from pixel_cnn_pp.model import model_spec
 import data.cifar10_data as cifar10_data
+import data.svhn_data as svhn_data
 import data.imagenet_data as imagenet_data
 import data.celeba_data as celeba_data
 
@@ -89,7 +90,8 @@ if args.data_set == 'imagenet' and args.class_conditional:
     raise("We currently don't have labels for the small imagenet data set")
 DataLoader = {'cifar': cifar10_data.DataLoader,
               'imagenet': imagenet_data.DataLoader,
-              'celeba': celeba_data.DataLoader}[args.data_set]
+              'celeba': celeba_data.DataLoader,
+              'svhn': svhn_data.DataLoader}[args.data_set]
 train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
                         rng=rng, shuffle=True, return_labels=args.class_conditional)
 test_data = DataLoader(args.data_dir, 'valid', args.batch_size *
