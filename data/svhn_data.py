@@ -17,7 +17,7 @@ def read_imgs(dir):
 
 def load(data_dir, subset='train'):
     if subset in ['train', 'valid', 'test']:
-        data = np.load(os.path.join(data_dir, "SVHN32-{0}".format(subset)))
+        data = np.load(os.path.join(data_dir, "SVHN32-{0}.npz".format(subset)))
         trainx, trainy = data['X'], data['y'][:, 0]
         return trainx, trainy
 
