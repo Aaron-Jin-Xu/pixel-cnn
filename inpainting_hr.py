@@ -94,6 +94,8 @@ DataLoader = {'cifar': cifar10_data.DataLoader,
 #                        rng=rng, shuffle=True, return_labels=args.class_conditional)
 test_data = DataLoader(args.data_dir, 'valid', args.batch_size *
                        args.nr_gpu, shuffle=False, return_labels=args.class_conditional)
+train_data = test_data
+
 obs_shape = train_data.get_observation_size()  # e.g. a tuple (32,32,3)
 assert len(obs_shape) == 3, 'assumed right now'
 
@@ -253,6 +255,7 @@ def make_feed_dict(data, init=False, masks=None, is_test=False):
     return feed_dict
 
 # //////////// perform training //////////////
+# //////////// perform training //////////////
 if not os.path.exists(args.save_dir):
     os.makedirs(args.save_dir)
 print('starting training')
@@ -260,30 +263,29 @@ test_bpd = []
 lr = args.learning_rate
 with tf.Session() as sess:
 
-
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
-
     td = next(test_data)
     from PIL import Image
     td = np.cast[np.float32]((td - 127.5) / 127.5)
     imgs = [td[i*args.batch_size:(i+1)*args.batch_size, :, :, :] for i in range(args.nr_gpu)]
 
-    mks = [mgen.gen(imgs[0].shape[0]) for i in range(args.nr_gpu)]
+    img_tile = plotting.img_tile(ret_original_images(imgs)[:4], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' original')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_original.png' % (args.data_set, )))
+    plotting.plt.close('all')
 
+    img_tile = plotting.img_tile(ret_masked_images(imgs)[:4], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' masked')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_masked.png' % (args.data_set, )))
+    plotting.plt.close('all')
 
-    all_imgs = ret_original_images(imgs)[:9]
-    for i in range(9):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
-            "/data/ziz/jxu/results/original", '%s_original_%s.png' % (args.data_set, str(i).zfill(2))))
-
-    all_imgs = ret_masked_images(imgs)[:36]
-    for i in range(9):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
-            "/data/ziz/jxu/results/masked", '%s_masked_%s.png' % (args.data_set, str(i).zfill(2))))
-
-    all_imgs = complete(imgs, mks, sess)
-    for i in range(9):
-        Image.fromarray((all_imgs[i]*127.5+127.5).astype(np.uint8)).save(os.path.join(
-            "/data/ziz/jxu/results/complete", '%s_complete_%s.png' % (args.data_set, str(i).zfill(2))))
+    sample_x = complete(imgs, sess)
+    img_tile = plotting.img_tile(sample_x[:4], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    img = plotting.plot_img(img_tile, title=args.data_set + ' completion')
+    plotting.plt.savefig(os.path.join(
+        args.save_dir, '%s_complete.png' % (args.data_set, )))
+    plotting.plt.close('all')
