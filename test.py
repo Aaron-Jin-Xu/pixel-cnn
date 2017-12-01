@@ -40,7 +40,8 @@ with tf.Session() as sess:
     # generate masks
     obs_shape = d.shape[1:]
     #mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
-    mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 10)
+    #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 10)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]

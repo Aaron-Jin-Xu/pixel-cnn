@@ -103,6 +103,38 @@ class RecNoProgressMaskGenerator(RecMaskGenerator):
         return np.rot90(mask, 2, (1,2))
 
 
+
+
+class RectangleMaskGenerator(MaskGenerator):
+
+    def __init__(self, h, w, rng=None):
+        super().__init__(h, w, rng)
+
+    def gen_par(self, seed=None):
+        if seed is not None:
+            self.rng = np.random.RandomState(seed)
+        mh = self.rng.randint(low=int(self.h * 0.2), high=int(self.h*0.8))
+        mw = self.rng.randint(low=int(self.w * 0.2), high=int(self.w*0.8))
+        pgh = self.rng.randint(low=0, high=mh)
+        pgw =  self.rng.randint(low=0, high=mw)
+        oh = self.rng.randint(low=1, high=self.h - mh)
+        ow = self.rng.randint(low=1, high=self.w - mw)
+        return mh, mw, pgh, pgw, oh, ow
+
+    def gen(self, n):
+        mask = np.ones((n, self.h, self.w))
+        for i in range(n):
+            missing_h, missing_w, progress_h, progress_w, offset_h, offset_w = self.gen_par(i)
+            progress_w, progress_h = 0, 0
+            missing = np.zeros((missing_h, missing_w))
+            missing[:progress_h, :] = 1
+            missing[progress_h, :progress_w] = 1
+            mask[i, offset_h:offset_h+missing_h, offset_w:offset_w+missing_w] = missing
+        return np.rot90(mask, 2, (1,2))
+
+
+
+
 # https://stackoverflow.com/questions/8647024/how-to-apply-a-disc-shaped-mask-to-a-numpy-array
 def cmask(index, radius, array):
     a, b = index
