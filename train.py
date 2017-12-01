@@ -201,8 +201,8 @@ saver = tf.train.Saver()
 
 # turn numpy inputs into feed_dict for use with tensorflow
 
-#mgen = mk.RandomMaskGenerator(obs_shape[0], obs_shape[1])
-mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
+#mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
+mgen = mk.RectangleInProgressMaskGenerator(obs_shape[0], obs_shape[1])
 agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
 
 def make_feed_dict(data, init=False, masks=None, is_test=False):
