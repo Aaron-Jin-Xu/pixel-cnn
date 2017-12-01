@@ -128,7 +128,4 @@ class CircleMaskGenerator(MaskGenerator):
             m = cmask((c_y, c_x), self.radius, np.ones((self.height, self.width)))
             masks.append(m)
         masks = np.array(masks)
-        return masks
-
-
-    
+        return 1-masks
