@@ -101,3 +101,34 @@ class RecNoProgressMaskGenerator(RecMaskGenerator):
             missing[progress_h, :progress_w] = 1
             mask[i, offset_h:offset_h+missing_h, offset_w:offset_w+missing_w] = missing
         return np.rot90(mask, 2, (1,2))
+
+
+# https://stackoverflow.com/questions/8647024/how-to-apply-a-disc-shaped-mask-to-a-numpy-array
+def cmask(index, radius, array):
+    a, b = index
+    nx, ny = array.shape
+    y, x = np.ogrid[-a:nx-a,-b:ny-b]
+    mask = x*x + y*y <= radius*radius
+    return mask
+
+class CircleMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width, radius):
+        assert radius < min(height, width) // 2
+        self.height = height
+        self.width = width
+        self.radius = radius
+
+
+    def gen(self, n):
+        masks = []
+        for i in range(n):
+            c_y = np.random.randint(self.radius+1, self.height-self.radius-1)
+            c_x = np.random.randint(self.radius+1, self.width-self.radius-1)
+            m = cmask((c_y, c_x), self.radius, np.ones((self.height, self.width)))
+            masks.append(m)
+        masks = np.array(masks)
+        return masks
+
+
+    
