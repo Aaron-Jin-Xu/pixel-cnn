@@ -113,8 +113,10 @@ class RectangleMaskGenerator(MaskGenerator):
     def gen_par(self, seed=None):
         if seed is not None:
             self.rng = np.random.RandomState(seed)
-        mh = self.rng.randint(low=int(self.h * 0.2), high=int(self.h*0.8))
-        mw = self.rng.randint(low=int(self.w * 0.2), high=int(self.w*0.8))
+        #mh = self.rng.randint(low=int(self.h * 0.2), high=int(self.h*0.8))
+        #mw = self.rng.randint(low=int(self.w * 0.2), high=int(self.w*0.8))
+        mh = int(self.h * 0.4)
+        mw = int(self.w * 0.4)
         pgh = self.rng.randint(low=0, high=mh)
         pgw =  self.rng.randint(low=0, high=mw)
         oh = self.rng.randint(low=1, high=self.h - mh)
