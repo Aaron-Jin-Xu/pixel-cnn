@@ -20,7 +20,19 @@ def parse_args(args, data_dir, save_dir, data_set, save_interval=10, load_params
     args.save_dir = save_dir
     args.data_set = data_set
     args.save_interval = save_interval
-    args.load_params = load_params 
+    args.load_params = load_params
+
+    args.nr_resnet = nr_resnet
+    args.nr_filters = nr_filters
+    args.nr_logistic_mix = nr_logistic_mix
+    args.learning_rate = learning_rate
+    args.lr_decay = lr_decay
+    args.batch_size = batch_size
+    args.init_batch_size = init_batch_size
+    args.nr_gpu = nr_gpu
+    args.polyak_decay = polyak_decay
+    args.masked = masked
+    args.rot180 = rot180
 
 
 def next_pixel(masks, start=None):
