@@ -14,6 +14,8 @@ from PIL import Image
 
 from configs import configs
 
+display_size = (4,4)
+
 with tf.Session() as sess:
 
     ## forward model
@@ -37,7 +39,7 @@ with tf.Session() as sess:
     ###############################
 
     d = next(fm.test_data)
-    img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
+    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/samples/original.png")
     # generate masks
     obs_shape = d.shape[1:]
@@ -47,7 +49,7 @@ with tf.Session() as sess:
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
-    img = Image.fromarray(tile_images(d.astype(np.uint8)), 'RGB')
+    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/samples/masked.png")
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
@@ -142,8 +144,5 @@ with tf.Session() as sess:
     data_record = np.array(data_record)
     np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
     np.savez_compressed("/data/ziz/jxu/inpaintng_img", img=data_record)
-    print(d.shape)
-    import sys
-    sys.stdout.flush()
-    img = Image.fromarray(tile_images(d.astype(np.uint8), size=(4,4)), 'RGB')
+    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size, 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/samples/complete.png")
