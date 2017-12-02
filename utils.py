@@ -3,6 +3,26 @@ import pixel_cnn_pp.mask as mk
 from scipy.misc import logsumexp
 from scipy.special import expit
 
+
+def parse_args(args, data_dir, save_dir, data_set, save_interval=10, load_params=False,
+                    nr_resnet=5, nr_filters=160, nr_logistic_mix=10,
+                    learning_rate=0.001, lr_decay=0.999995, batch_size=12, init_batch_size=100,
+                    nr_gpu=1, polyak_decay=0.9995, masked=False, rot180=False):
+    ## Default, never change
+    args.class_conditional = False
+    args.resnet_nonlinearity = 'concat_elu'
+    args.dropout_p = 0.5
+    args.max_epochs = 5000
+    args.seed = 1
+
+    ## Parse Argument
+    args.data_dir = data_dir
+    args.save_dir = save_dir
+    args.data_set = data_set
+    args.save_interval = save_interval
+    args.load_params = load_params 
+
+
 def next_pixel(masks, start=None):
 
     assert len(masks.shape)==3, "mask shape should be (batch_size, num_row, num_col)"

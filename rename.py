@@ -22,6 +22,8 @@ from pixel_cnn_pp.model import model_spec
 import data.cifar10_data as cifar10_data
 import data.imagenet_data as imagenet_data
 import data.celeba_data as celeba_data
+from utils import parse_args
+from configs import configs
 
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
@@ -75,11 +77,17 @@ parser.add_argument('-k', '--masked', dest='masked',
 parser.add_argument('-j', '--rot180', dest='rot180',
                     action='store_true', help='Rot180 the images?')
 
+parse_args(args, configs)
+
 args = parser.parse_args()
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
 
 # -----------------------------------------------------------------------------
+quit()
+
+
+
 # fix random seed for reproducibility
 rng = np.random.RandomState(args.seed)
 tf.set_random_seed(args.seed)
