@@ -144,5 +144,5 @@ with tf.Session() as sess:
     data_record = np.array(data_record)
     np.savez_compressed("/data/ziz/jxu/inpainting_dis", dis=dis_record)
     np.savez_compressed("/data/ziz/jxu/inpaintng_img", img=data_record)
-    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size, 'RGB')
+    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/samples/complete.png")
