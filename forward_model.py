@@ -23,6 +23,8 @@ import data.cifar10_data as cifar10_data
 import data.imagenet_data as imagenet_data
 import data.celeba_data as celeba_data
 import data.svhn_data as svhn_data
+from utils import parse_args
+from configs import configs
 
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
