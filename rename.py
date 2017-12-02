@@ -191,7 +191,7 @@ with tf.Session() as sess:
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
-    ckpt_file = args.save_dir + '/params_' + "celeba" + '.ckpt'
+    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
@@ -205,6 +205,6 @@ with tf.Session() as sess:
 
     sess.run(tf.initialize_variables(var_list=var_list))
 
-    ckpt_file = args.save_dir +"-rename" + '/params_' + "celeba" + '.ckpt'
+    ckpt_file = args.save_dir +"-rename" + '/params_' + args.data_set + '.ckpt'
     print('save parameters to', ckpt_file)
     saver.save(sess, ckpt_file)
