@@ -1,3 +1,5 @@
+
+
 configs = {}
 configs["svhn-forward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
