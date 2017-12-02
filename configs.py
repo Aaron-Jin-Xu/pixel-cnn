@@ -6,7 +6,7 @@ configs["svhn-forward"] = {
     "nr_resnet": 5,
     "data_set": "svhn",
     "batch_size": 12,
-    "init_batch_size": 100
+    "init_batch_size": 12,
 }
 configs["svhn-backward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
@@ -15,7 +15,7 @@ configs["svhn-backward"] = {
     "nr_resnet": 5,
     "data_set": "svhn",
     "batch_size": 12,
-    "init_batch_size": 100,
+    "init_batch_size": 12,
     "masked": True,
-    "rot180": True
+    "rot180": True,
 }
