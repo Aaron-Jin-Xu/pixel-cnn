@@ -23,6 +23,8 @@ import data.cifar10_data as cifar10_data
 import data.svhn_data as svhn_data
 import data.imagenet_data as imagenet_data
 import data.celeba_data as celeba_data
+from utils import parse_args
+from configs import configs
 
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
@@ -77,6 +79,10 @@ parser.add_argument('-j', '--rot180', dest='rot180',
                     action='store_true', help='Rot180 the images?')
 
 args = parser.parse_args()
+
+parse_args(args, **configs['svhn-forward'])
+args.save_dir = "/data/ziz/jxu/save-svhn-forward-less-epoch"
+
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
 

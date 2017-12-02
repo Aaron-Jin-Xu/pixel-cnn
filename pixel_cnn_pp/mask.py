@@ -172,4 +172,4 @@ class BottomMaskGenerator(MaskGenerator):
     def gen(self, n):
         masks = np.ones((n, self.height, self.width))
         masks[:, -self.mask_height:, :] = 0
-        return masks
+        return masks        
