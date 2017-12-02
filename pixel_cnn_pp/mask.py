@@ -158,3 +158,19 @@ class CircleMaskGenerator(MaskGenerator):
             masks.append(m)
         masks = np.array(masks)
         return 1-masks
+
+
+
+class BottomMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width, mask_height):
+        assert radius < min(height, width) // 2
+        self.height = height
+        self.width = width
+        self.mask_height = mask_height
+
+
+    def gen(self, n):
+        masks = np.ones((n, self.height, self.width))
+        masks[:, -self.mask_height:, :] = 0
+        return masks
