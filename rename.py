@@ -77,9 +77,12 @@ parser.add_argument('-k', '--masked', dest='masked',
 parser.add_argument('-j', '--rot180', dest='rot180',
                     action='store_true', help='Rot180 the images?')
 
-parse_args(args, configs['svhn-backward'])
+
 
 args = parser.parse_args()
+
+parse_args(args, configs['svhn-backward'])
+
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
 
