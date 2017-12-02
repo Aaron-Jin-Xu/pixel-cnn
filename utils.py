@@ -4,12 +4,20 @@ from scipy.misc import logsumexp
 from scipy.special import expit
 import os
 
+from tensorflow.python.client import device_lib
+
+# https://stackoverflow.com/questions/38559755/how-to-get-current-available-gpus-in-tensorflow
+def get_available_gpus():
+    local_device_protos = device_lib.list_local_devices()
+    return [x.name for x in local_device_protos if x.device_type == 'GPU']
+
 
 def parse_args(args, data_dir, save_dir, data_set, save_interval=10, load_params=False,
                     nr_resnet=5, nr_filters=160, nr_logistic_mix=10,
                     learning_rate=0.001, lr_decay=0.999995, batch_size=12, init_batch_size=100,
                     nr_gpu=1, polyak_decay=0.9995, masked=False, rot180=False):
-    nr_gpu = len(os.environ["CUDA_VISIBLE_DEVICES"].split(","))       
+    print(get_available_gpus())
+    nr_gpu = len(get_available_gpus())
     ## Default, never change
     args.class_conditional = False
     args.resnet_nonlinearity = 'concat_elu'
