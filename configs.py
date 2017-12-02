@@ -13,7 +13,7 @@ configs["svhn-backward"] = {
     "save_dir": "/data/ziz/jxu/save-svhn-forward",
     "nr_filter": 100,
     "nr_resnet": 5,
-    "data_set": "svhn"
+    "data_set": "svhn",
     "batch_size": 12,
     "init_batch_size": 100,
     "masked": True,
