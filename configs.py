@@ -1,4 +1,4 @@
-configs = []
+configs = {}
 configs["svhn-forward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
     "save_dir": "/data/ziz/jxu/save-svhn-forward",
