@@ -164,7 +164,6 @@ class CircleMaskGenerator(MaskGenerator):
 class BottomMaskGenerator(MaskGenerator):
 
     def __init__(self, height, width, mask_height):
-        assert radius < min(height, width) // 2
         self.height = height
         self.width = width
         self.mask_height = mask_height
