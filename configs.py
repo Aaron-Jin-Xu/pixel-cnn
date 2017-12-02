@@ -2,7 +2,7 @@ configs = {}
 configs["svhn-forward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
     "save_dir": "/data/ziz/jxu/save-svhn-forward",
-    "nr_filter": 100,
+    "nr_filters": 100,
     "nr_resnet": 5,
     "data_set": "svhn",
     "batch_size": 12,
@@ -11,7 +11,7 @@ configs["svhn-forward"] = {
 configs["svhn-backward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
     "save_dir": "/data/ziz/jxu/save-svhn-forward",
-    "nr_filter": 100,
+    "nr_filters": 100,
     "nr_resnet": 5,
     "data_set": "svhn",
     "batch_size": 12,
