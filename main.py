@@ -12,6 +12,8 @@ import pixel_cnn_pp.mask as mk
 from utils import *
 from PIL import Image
 
+from configs import configs
+
 with tf.Session() as sess:
 
     ## forward model
@@ -19,7 +21,7 @@ with tf.Session() as sess:
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
-    ckpt_file = "/data/ziz/jxu/save-forward" + '/params_' + "celeba" + '.ckpt'
+    ckpt_file = fm.args.save_dir + '/params_' + fm.args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
@@ -28,7 +30,7 @@ with tf.Session() as sess:
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
-    ckpt_file = "/data/ziz/jxu/save-backward-rename" + '/params_' + "celeba" + '.ckpt'
+    ckpt_file = bm.args.save_dir + '/params_' + bm.args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
