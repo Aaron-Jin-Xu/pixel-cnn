@@ -79,7 +79,7 @@ parser.add_argument('-j', '--rot180', dest='rot180',
                     action='store_true', help='Rot180 the images?')
 
 args = parser.parse_args()
-parse_args(args, **configs['celeba-forward'])
+parse_args(args, **configs['svhn-forward'])
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
 
