@@ -21,7 +21,10 @@ import pixel_cnn_pp.plotting as plotting
 from pixel_cnn_pp.model_hr import model_spec
 import data.cifar10_data as cifar10_data
 import data.imagenet_data as imagenet_data
-import data.celeba_data_hr as celeba_data
+import data.celeba_data_hr as celeba_data #!!!!!!
+import data.svhn_data as svhn_data
+from utils import parse_args
+from configs import configs
 
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
@@ -76,6 +79,8 @@ parser.add_argument('-j', '--rot180', dest='rot180',
                     action='store_true', help='Rot180 the images?')
 
 args = parser.parse_args()
+
+parse_args(args, **configs['celeba-hr-backward'])
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
 
@@ -89,7 +94,8 @@ if args.data_set == 'imagenet' and args.class_conditional:
     raise("We currently don't have labels for the small imagenet data set")
 DataLoader = {'cifar': cifar10_data.DataLoader,
               'imagenet': imagenet_data.DataLoader,
-              'celeba': celeba_data.DataLoader}[args.data_set]
+              'celeba': celeba_data.DataLoader,
+              'svhn': svhn_data.DataLoader}[args.data_set]
 train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
                         rng=rng, shuffle=True, return_labels=args.class_conditional)
 test_data = DataLoader(args.data_dir, 'valid', args.batch_size *
