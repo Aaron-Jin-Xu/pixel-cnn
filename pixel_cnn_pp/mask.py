@@ -172,4 +172,19 @@ class BottomMaskGenerator(MaskGenerator):
     def gen(self, n):
         masks = np.ones((n, self.height, self.width))
         masks[:, -self.mask_height:, :] = 0
-        return masks        
+        return masks
+
+
+class HorizontalMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width, upper_bound, lower_bound):
+        self.height = height
+        self.width = width
+        self.upper_bound = upper_bound
+        self.lower_bound = lower_bound
+
+
+    def gen(self, n):
+        masks = np.ones((n, self.height, self.width))
+        masks[:, self.upper_bound:self.lower_bound, :] = 0
+        return masks       

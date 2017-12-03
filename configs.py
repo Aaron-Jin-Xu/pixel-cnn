@@ -5,7 +5,8 @@ configs = {}
 ## SVHN
 configs["svhn-forward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
-    "save_dir": "/data/ziz/jxu/save-svhn-forward",
+    #"save_dir": "/data/ziz/jxu/save-svhn-forward",
+    "save_dir": "/data/ziz/jxu/save-svhn-forward-less-epoch",
     "nr_filters": 100,
     "nr_resnet": 5,
     "data_set": "svhn",
