@@ -73,7 +73,7 @@ configs["celeba-hr-backward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/save64-backward",
     "nr_filters": 100,
-    "nr_resnet": 5,
+    "nr_resnet": 4,
     "data_set": "celeba",
     "batch_size": 6,
     "init_batch_size": 6,
