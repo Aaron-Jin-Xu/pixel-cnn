@@ -186,5 +186,5 @@ class HorizontalMaskGenerator(MaskGenerator):
 
     def gen(self, n):
         masks = np.ones((n, self.height, self.width))
-        masks[:, self.upper_bound:self.lower_bound, :] = 0
-        return masks       
+        masks[:, self.upper_bound:self.lower_bound, self.upper_bound:self.lower_bound] = 0
+        return masks
