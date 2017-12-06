@@ -14,7 +14,7 @@ from PIL import Image
 
 from configs import configs
 
-display_size = (4,4)
+display_size = (3,3)
 
 with tf.Session() as sess:
 
