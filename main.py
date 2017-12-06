@@ -47,7 +47,7 @@ with tf.Session() as sess:
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 10)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 15)
-    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 30, 50)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 16, 48)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
