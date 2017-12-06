@@ -47,7 +47,7 @@ with tf.Session() as sess:
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 10)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 15)
-    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 54, 64)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 59, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
@@ -94,8 +94,6 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars1 = np.power(pars1, 0.5)
-        pars2 = np.power(pars2, 0.5)
         pars = pars1 * pars2 #/ pr[:, 0, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
@@ -111,8 +109,6 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars1 = np.power(pars1, 0.5)
-        pars2 = np.power(pars2, 0.5)
         pars = pars1 * pars2 #/ pr[:, 1, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
@@ -127,8 +123,6 @@ with tf.Session() as sess:
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars1 = np.power(pars1, 0.5)
-        pars2 = np.power(pars2, 0.5)
         pars = pars1 * pars2 #/ pr[:, 2, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
