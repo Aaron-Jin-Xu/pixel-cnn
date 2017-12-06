@@ -56,7 +56,7 @@ with tf.Session() as sess:
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
-    #prior = np.load("/data/ziz/jxu/prior.npz")["arr"]
+    prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
     dis_record = []
     data_record = []
 
