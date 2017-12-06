@@ -82,3 +82,17 @@ configs["celeba-hr-backward"] = {
     "save_interval":5,
     "nr_gpu":7,
 }
+
+configs["celeba-hr-backward-rename"] = {
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/save64-backward-rename",
+    "nr_filters": 100,
+    "nr_resnet": 4,
+    "data_set": "celeba",
+    "batch_size": 6,
+    "init_batch_size": 6,
+    "masked": True,
+    "rot180": True,
+    "save_interval":5,
+    "nr_gpu":7,
+}
