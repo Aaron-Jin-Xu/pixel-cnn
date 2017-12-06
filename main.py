@@ -63,7 +63,7 @@ with tf.Session() as sess:
     data_record.append(d.copy())
 
     while True:
-        print "--:)"
+        print("--:)")
 
         rgb_record = []
 
