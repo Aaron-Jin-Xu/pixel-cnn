@@ -80,7 +80,7 @@ configs["celeba-hr-forward"] = {
     "masked": True,
     "rot180": True,
     "save_interval":5,
-    "nr_gpu":7,
+    "nr_gpu":4,
 }
 
 configs["celeba-hr-backward"] = {
@@ -108,5 +108,5 @@ configs["celeba-hr-backward-rename"] = {
     "masked": True,
     "rot180": True,
     "save_interval":5,
-    "nr_gpu":7,
+    "nr_gpu":4,
 }
