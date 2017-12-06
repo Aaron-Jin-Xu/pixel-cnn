@@ -63,6 +63,7 @@ with tf.Session() as sess:
     data_record.append(d.copy())
 
     while True:
+        print "--:)"
 
         rgb_record = []
 
@@ -97,6 +98,7 @@ with tf.Session() as sess:
         #pars[:, 255] = 0.
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
+        print(pars)
         pars = pars / np.sum(pars, axis=-1)[:, None]
         #rgb_record.append(np.array([pars1, pars2, pars, pars/pr[:, 0, :]]))
         color_r = []
