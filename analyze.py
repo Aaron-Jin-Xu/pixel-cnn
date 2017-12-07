@@ -46,4 +46,4 @@ def analyze_record(records, image_id):
         cur_backward_dis = backward[p]
         cur_combine_dis = combine[p]
         cur_sample = sample[p]
-        print cur_sample
+        print(cur_sample)
