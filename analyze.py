@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+plt.style.use("ggplot")
 
 def load_records(dir):
     path = os.path.join(dir, "inpainting_record.npz")
@@ -8,7 +9,7 @@ def load_records(dir):
     params = {}
     params['num_images'] = d['dis'].shape[0]
     params['num_pixels'] = d['dis'].shape[1]
-    return d['img'], d['dis'], d['smp'], params
+    return d['img'].astype(np.uint8), d['dis'], d['smp'], params
 
 def get_image_record(records, image_id, t="image", dist_type="combine"):
     img, dis, smp, params = records
@@ -49,18 +50,12 @@ def analyze_record(records, image_id):
         cur_combine_dis = combine[p]
         cur_sample = sample[p]
 
-        plot(cur_forward_dis, cur_backward_dis, cur_combine_dis, cur_image, cur_sample)
-        break
-
-        print("red", cur_forward_dis[0])
-        print("red", cur_backward_dis[0])
-        print("red", cur_combine_dis[0])
-        print("sample", cur_sample[0])
-        print("------------------------")
+        plot(cur_forward_dis, cur_backward_dis, cur_combine_dis, cur_image, cur_sample, pid=p)
 
 
-def plot(forward_dist, backward_dist, combine_dist, image, sample):
+def plot(forward_dist, backward_dist, combine_dist, image, sample, pid):
     fig = plt.figure(figsize=(16,16))
+
     ax = fig.add_subplot(2,2,1)
     ax.imshow(image)
     ax.axis("off")
@@ -70,11 +65,13 @@ def plot(forward_dist, backward_dist, combine_dist, image, sample):
     ax.plot(np.arange(256), forward_dist[0], label="forward")
     ax.plot(np.arange(256), backward_dist[0], label="backward")
     ax.plot(np.arange(256), combine_dist[0], label="combine")
+    print(sample)
+    ax.plot([sample[0], sample[0]], [0, 0.15], '-')
 
     ax.legend(loc=0)
     ax.set_ylim(0., 0.15)
     ax.set_title("Red Channel")
-    fig.savefig("analyze_report.png")
+    fig.savefig("plots/ana-{0}.png".format(pid))
     plt.close()
 
 
@@ -85,5 +82,5 @@ def plot(forward_dist, backward_dist, combine_dist, image, sample):
 
 
 
-records = load_records("/data/ziz/jxu")
+records = load_records("/Users/Aaron-MAC/Code")
 analyze_record(records, 0)
