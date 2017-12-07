@@ -45,9 +45,12 @@ def analyze_record(records, image_id):
         cur_backward_dis = backward[p]
         cur_combine_dis = combine[p]
         cur_sample = sample[p]
-        print(cur_sample)
 
-
+        print("red", cur_forward_dis[0])
+        print("red", cur_backward_dis[0])
+        print("red", cur_combine_dis[0])
+        print("sample", cur_sample[0])
+        print("------------------------")
 
 
 records = load_records("/data/ziz/jxu")
