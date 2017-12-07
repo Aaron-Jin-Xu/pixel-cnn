@@ -75,6 +75,7 @@ def plot(forward_dist, backward_dist, combine_dist, image, sample):
     ax.set_ylim(0., 0.15)
     ax.set_title("Red Channel")
     fig.savefig("analyze_report.png")
+    plt.close()
 
 
 
