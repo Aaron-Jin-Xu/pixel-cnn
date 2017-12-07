@@ -4,10 +4,15 @@ import os
 def load_records(dir):
     path = os.path.join(dir, "inpainting_record.npz")
     d = np.load(path)
-    return d['img'], d['dis'], d['smp']
+    params = {}
+    params['num_images'] = d['dis'].shape[0]
+    params['num_pixels'] = d['dis'].shape[1]
+    return d['img'], d['dis'], d['smp'], params
 
 def get_image_record(records, image_id, t="image", dist_type="combine"):
-    img, dis, smp = records
+    img, dis, smp, params = records
+    num_images = params['num_images']
+    num_pixels = params['num_pixels']
     if t=='image':
         return img[:, image_id, :, :, :]
     elif t=='dist':
@@ -25,3 +30,20 @@ def get_image_record(records, image_id, t="image", dist_type="combine"):
         return smp[:, image_id, :]
     else:
         raise Exception(t+" type not found")
+
+def analyze_record(records, image_id):
+    num_images = params['num_images']
+    assert image_id < num_images, "image_id too large"
+    num_pixels = params['num_pixels']
+    images = get_image_record(records, image_id, t="image")
+    forward = get_image_record(records, image_id, t="dis", dist_type="forward")
+    backward = get_image_record(records, image_id, t="dis", dist_type="backward")
+    combine = get_image_record(records, image_id, t="dis", dist_type="combine")
+    sample = get_image_record(records, image_id, t="sample")
+    for p in range(num_pixels):
+        cur_image = images[p]
+        cur_forward_dis = forward[p]
+        cur_backward_dis = backward[p]
+        cur_combine_dis = combine[p]
+        cur_sample = sample[p]
+        print cur_sample
