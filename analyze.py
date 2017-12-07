@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 import imageio
 from utils import KL_divergence
 plt.style.use("ggplot")
+import cv2
+
+def find_coutour(mask):
+    border = cv2.copyMakeBorder((mask*255).astype(np.uint8), 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=0 )
+    _, contours, hierarchy = cv2.findContours(border, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE, offset=(-1, -1))
+    return contours[0]
 
 def load_records(dir):
     path = os.path.join(dir, "inpainting_record.npz")
@@ -11,10 +17,10 @@ def load_records(dir):
     params = {}
     params['num_images'] = d['dis'].shape[3]
     params['num_pixels'] = d['dis'].shape[0]
-    return d['img'].astype(np.uint8), d['dis'], d['smp'], params
+    return d['img'].astype(np.uint8), d['dis'], d['smp'], d['ms'], params
 
 def get_image_record(records, image_id, t="image", dist_type="combine"):
-    img, dis, smp, params = records
+    img, dis, smp, ms, params = records
     if t=='image':
         return img[:, image_id, :, :, :]
     elif t=='dist':
@@ -35,7 +41,7 @@ def get_image_record(records, image_id, t="image", dist_type="combine"):
 
 def analyze_record(records, image_id):
 
-    _, _, _, params = records
+    _, _, _, _, params = records
     num_images = params['num_images']
     assert image_id < num_images, "image_id too large"
     num_pixels = params['num_pixels']
@@ -50,8 +56,9 @@ def analyze_record(records, image_id):
         cur_forward_dis = forward[p]
         cur_backward_dis = backward[p]
         cur_combine_dis = combine[p]
+        cur_prior_dis = prior[p]
         cur_sample = sample[p]
-        plot(cur_forward_dis, cur_backward_dis, cur_combine_dis, cur_image, cur_sample, pid=p)
+        plot(cur_forward_dis, cur_backward_dis, cur_combine_dis, cur_prior_dis, cur_image, cur_sample, pid=p)
 
 
 def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, pid):
@@ -87,6 +94,6 @@ def make_movie(dir, duration=0.5):
 
 
 records = load_records("/Users/Aaron-MAC/Code")
-analyze_record(records, 2)
 
-make_movie("plots")
+analyze_record(records, 2)
+make_movie("plots", 0.3)
