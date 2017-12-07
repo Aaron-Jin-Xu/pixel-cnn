@@ -35,9 +35,9 @@ def analyze_record(records, image_id):
     assert image_id < num_images, "image_id too large"
     num_pixels = params['num_pixels']
     images = get_image_record(records, image_id, t="image")
-    forward = get_image_record(records, image_id, t="dis", dist_type="forward")
-    backward = get_image_record(records, image_id, t="dis", dist_type="backward")
-    combine = get_image_record(records, image_id, t="dis", dist_type="combine")
+    forward = get_image_record(records, image_id, t="dist", dist_type="forward")
+    backward = get_image_record(records, image_id, t="dist", dist_type="backward")
+    combine = get_image_record(records, image_id, t="dist", dist_type="combine")
     sample = get_image_record(records, image_id, t="sample")
     for p in range(num_pixels):
         cur_image = images[p]
