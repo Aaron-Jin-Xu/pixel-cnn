@@ -3,7 +3,7 @@ import os
 
 def load_records(dir):
     path = os.path.join(dir, "inpainting_record.npz")
-    d = os.load(path)
+    d = np.load(path)
     return d['img'], d['dis'], d['smp']
 
 def get_image_record(records, image_id, t="image", dist_type="combine"):
