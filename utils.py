@@ -189,3 +189,8 @@ def get_prior(prior, target_pixels):
     for p in target_pixels:
         arr.append(prior[:, p[0], p[1], :].T)
     return np.array(arr)
+
+from scipy.stats import entropy
+
+def KL_divergence(p, q):
+    return entropy(p, q)
