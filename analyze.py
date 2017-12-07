@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 def load_records(dir):
     path = os.path.join(dir, "inpainting_record.npz")
