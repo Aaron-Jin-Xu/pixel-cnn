@@ -11,8 +11,6 @@ def load_records(dir):
 
 def get_image_record(records, image_id, t="image", dist_type="combine"):
     img, dis, smp, params = records
-    num_images = params['num_images']
-    num_pixels = params['num_pixels']
     if t=='image':
         return img[:, image_id, :, :, :]
     elif t=='dist':
@@ -32,6 +30,7 @@ def get_image_record(records, image_id, t="image", dist_type="combine"):
         raise Exception(t+" type not found")
 
 def analyze_record(records, image_id):
+    _, _, _, params = records
     num_images = params['num_images']
     assert image_id < num_images, "image_id too large"
     num_pixels = params['num_pixels']
@@ -47,3 +46,9 @@ def analyze_record(records, image_id):
         cur_combine_dis = combine[p]
         cur_sample = sample[p]
         print(cur_sample)
+
+
+
+
+records = load_records("/data/ziz/jxu")
+analyze_record(records, 0)
