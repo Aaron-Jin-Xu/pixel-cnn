@@ -49,7 +49,7 @@ with tf.Session() as sess:
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 10)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 15)
-    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 30, 50)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 20)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     # Mask the images
@@ -61,7 +61,8 @@ with tf.Session() as sess:
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     # Load prior
-    prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+    #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+    prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
 
     dis_record = []

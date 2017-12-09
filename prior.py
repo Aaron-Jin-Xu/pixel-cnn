@@ -11,3 +11,9 @@ p = (p+1) / num_samples
 np.savez_compressed("/data/ziz/jxu/prior-svhn", arr=p)
 
 print(np.load("/data/ziz/jxu/prior-svhn.npz")["arr"].shape)
+
+
+def show_prior(prior):
+    p = np.argmax(prior, axis=0).astype(np.uint8)
+    img = Image.fromarray(p, 'RGB')
+    return img
