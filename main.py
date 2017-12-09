@@ -49,7 +49,7 @@ with tf.Session() as sess:
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 10)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 15)
-    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 20)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 8, 24)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     # Mask the images
