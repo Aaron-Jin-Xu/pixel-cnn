@@ -7,9 +7,19 @@ plt.style.use("ggplot")
 import cv2
 
 def find_coutour(mask):
-    border = cv2.copyMakeBorder((mask*255).astype(np.uint8), 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=0 )
-    _, contours, hierarchy = cv2.findContours(border, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE, offset=(-1, -1))
-    return contours[0]
+    contour = np.zeros_like(mask)
+    h, w = mask.shape
+    for y in range(h):
+        for x in range(w):
+            if mask[y, x] > 0:
+                lower_bound = max(y-1, 0)
+                upper_bound = min(y+1, h-1)
+                left_bound = max(x-1, 0)
+                right_bound = min(x+1, w-1)
+                nb = mask[lower_bound:upper_bound+1, left_bound:right_bound+1]
+                if np.min(nb)  == 0:
+                    contour[y, x] = 1
+    return contour
 
 def load_records(dir):
     path = os.path.join(dir, "inpainting_record.npz")
@@ -36,6 +46,8 @@ def get_image_record(records, image_id, t="image", dist_type="combine"):
             raise Exception(t+" type not found")
     elif t=='sample':
         return smp[:, image_id, :]
+    elif t=='mask':
+        return ms[image_id, :, :]
     else:
         raise Exception(t+" type not found")
 
@@ -62,40 +74,72 @@ def analyze_record(records, image_id):
 
 
 def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, pid):
-    fig = plt.figure(figsize=(16,16))
+    fig = plt.figure(figsize=(8,8))
 
-    ax = fig.add_subplot(2,2,1)
+    ax = fig.add_subplot(1,1,1)
     ax.imshow(image)
     ax.axis("off")
 
     # Red channel
+    b = 0
     ax = fig.add_subplot(2,2,2)
-    ax.plot(np.arange(256), forward_dist[0], label="Forward KL={0:.2f}".format(KL_divergence(forward_dist[0], combine_dist[0]+1e-10)))
-    ax.plot(np.arange(256), backward_dist[0], label="Backward KL={0:.2f}".format(KL_divergence(backward_dist[0], combine_dist[0]+1e-10)))
-    ax.plot(np.arange(256), combine_dist[0], label="Combine KL={0:.2f}".format(KL_divergence(combine_dist[0], combine_dist[0]+1e-10)))
-    ax.plot(np.arange(256), prior_dist[0], label="Prior KL={0:.2f}".format(KL_divergence(prior_dist[0], combine_dist[0]+1e-10)))
-    ax.plot([sample[0]], [0.1], '-o', c='green', markersize=8)
+    ax.plot(np.arange(256), forward_dist[b], label="Forward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, forward_dist[b])))
+    ax.plot(np.arange(256), backward_dist[b], label="Backward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, backward_dist[b])))
+    ax.plot(np.arange(256), combine_dist[b], label="Combine KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, combine_dist[b])))
+    ax.plot(np.arange(256), prior_dist[b], label="Prior KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, prior_dist[b])))
+    ax.plot([sample[b]], [0.1], '-o', c='green', markersize=8)
     ax.legend(loc=0)
     ax.set_ylim(0., 0.2)
     ax.set_title("Red Channel")
-    fig.savefig("plots/ana-{0}.png".format(str(pid).zfill(4)))
+
+    # Green channel
+    b = 1
+    ax = fig.add_subplot(2,2,3)
+    ax.plot(np.arange(256), forward_dist[b], label="Forward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, forward_dist[b])))
+    ax.plot(np.arange(256), backward_dist[b], label="Backward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, backward_dist[b])))
+    ax.plot(np.arange(256), combine_dist[b], label="Combine KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, combine_dist[b])))
+    ax.plot(np.arange(256), prior_dist[b], label="Prior KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, prior_dist[b])))
+    ax.plot([sample[b]], [0.1], '-o', c='green', markersize=8)
+    ax.legend(loc=0)
+    ax.set_ylim(0., 0.2)
+    ax.set_title("Green Channel")
+
+    # Blue channel
+    b = 2
+    ax = fig.add_subplot(2,2,4)
+    ax.plot(np.arange(256), forward_dist[b], label="Forward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, forward_dist[b])))
+    ax.plot(np.arange(256), backward_dist[b], label="Backward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, backward_dist[b])))
+    ax.plot(np.arange(256), combine_dist[b], label="Combine KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, combine_dist[b])))
+    ax.plot(np.arange(256), prior_dist[b], label="Prior KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, prior_dist[b])))
+    ax.plot([sample[b]], [0.1], '-o', c='green', markersize=8)
+    ax.legend(loc=0)
+    ax.set_ylim(0., 0.2)
+    ax.set_title("Blue Channel")
+
+
+    fig.savefig("plots/ana-{0}.png".format(str(pid).zfill(4))) #, dpi='figure')
     plt.close()
 
-def make_movie(dir, duration=0.5):
+def make_movie(dir, duration=0.5, name='movie'):
     images = []
     dirpath, dirnames, filenames = next(os.walk(dir))
     for f in filenames:
         if ".png" in f:
             images.append(imageio.imread(os.path.join(dir, f)))
-    imageio.mimsave(os.path.join(dir, "movie.gif"), images, "GIF", duration=duration)
-
-
-
+    imageio.mimsave(os.path.join(dir, "{0}.gif".format(name)), images, "GIF", duration=duration)
 
 
 records = load_records("/Users/Aaron-MAC/Code")
-if not os.path.exists("plots"):
-    os.makedirs("plots")
+#if not os.path.exists("plots"):
+#    os.makedirs("plots")
 
-analyze_record(records, 0)
-make_movie("plots", 0.5)
+#analyze_record(records, 0)
+#make_movie("plots", 0.5, 'movie-svhn-0')
+
+mask = np.ones((32,32))
+mask[10:20, 10:20] = 0
+
+contour = find_coutour(mask)
+plt.imshow(contour, cmap='Greys')
+plt.axis("off")
+plt.show()

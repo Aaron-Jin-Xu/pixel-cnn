@@ -51,6 +51,7 @@ with tf.Session() as sess:
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
     mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 22)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
+    ms_ori = ms.copy()
 
     # Mask the images
     d = d.astype(np.float64)
@@ -153,23 +154,20 @@ with tf.Session() as sess:
         color_b = np.array(color_b)
 
         color = np.array([color_r, color_g, color_b]).T
-        print(color)
         sample_record.append(color)
         #print(color)
         dis_record.append(np.array(rgb_record))
 
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
-            print("p:", p)
             ms[idx, p[0], p[1]] = 1
             d[idx, p[0], p[1], :] = color[idx, :]
-            print(d[idx, p[0], p[1], :])
 
         data_record.append(d.copy())
 
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
-    np.savez_compressed("/data/ziz/jxu/inpainting_record", dis=dis_record, img=data_record, smp=sample_record, ms=ms)
+    np.savez_compressed("/data/ziz/jxu/inpainting_record", dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
 
     # Store the completed images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
