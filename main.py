@@ -153,14 +153,17 @@ with tf.Session() as sess:
         color_b = np.array(color_b)
 
         color = np.array([color_r, color_g, color_b]).T
+        print(color)
         sample_record.append(color)
         #print(color)
         dis_record.append(np.array(rgb_record))
 
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
+            print("p:", p)
             ms[idx, p[0], p[1]] = 1
             d[idx, p[0], p[1], :] = color[idx, :]
+            print(d[idx, p[0], p[1], :])
 
         data_record.append(d.copy())
 

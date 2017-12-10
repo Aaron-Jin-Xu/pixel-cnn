@@ -94,6 +94,8 @@ def make_movie(dir, duration=0.5):
 
 
 records = load_records("/Users/Aaron-MAC/Code")
+if not os.path.exists("plots"):
+    os.makedirs("plots")
 
-analyze_record(records, 2)
-make_movie("plots", 0.3)
+analyze_record(records, 0)
+make_movie("plots", 0.5)
