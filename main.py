@@ -129,7 +129,7 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = pars1 #* pars2 / pr[:, 0, :]
+        pars = pars1 * pars2 / pr[:, 0, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
         #pars = np.power(pars, 0.5)
@@ -144,7 +144,7 @@ with tf.Session() as sess:
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = pars1 #* pars2 / pr[:, 1, :]
+        pars = pars1 * pars2 / pr[:, 1, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
         #pars = np.power(pars, 0.5)
@@ -159,7 +159,7 @@ with tf.Session() as sess:
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1 #* pars2 / pr[:, 2, :]
+        pars = pars1 * pars2 / pr[:, 2, :]
         #pars[:, 0] = 0.
         #pars[:, 255] = 0.
         #pars = np.power(pars, 0.5)
