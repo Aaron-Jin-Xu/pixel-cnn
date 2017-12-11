@@ -189,7 +189,7 @@ with tf.Session() as sess:
     # Store the completed images
     for i in range(d.shape[0]):
         contour = 1-find_coutour(ms_ori[i])[:, :, None]
-        contour = (contour + 1) / 2
+        contour[contour<1] = 0.9
         d[i] *= contour
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/samples/complete-{0}.png".format(exp_label))
