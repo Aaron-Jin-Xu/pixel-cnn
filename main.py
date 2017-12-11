@@ -31,7 +31,7 @@ def find_coutour(mask):
 
 display_size = (6,6)
 
-exp_label = "svhn-noise"
+exp_label = "svhn-center"
 
 with tf.Session() as sess:
 
@@ -66,8 +66,8 @@ with tf.Session() as sess:
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 16)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-    #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 16, 48)
-    mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 8, 24)
+    #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -189,10 +189,10 @@ with tf.Session() as sess:
 
     # Store the completed images
 
-    # for i in range(d.shape[0]):
-    #     contour = 1-find_coutour(ms_ori[i])[:, :, None]
-    #     contour[contour<1] = 0.8
-    #     d[i] *= contour
+    for i in range(d.shape[0]):
+        contour = 1-find_coutour(ms_ori[i])[:, :, None]
+        contour[contour<1] = 0.8
+        d[i] *= contour
 
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/complete-{0}.png".format(exp_label))
