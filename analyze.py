@@ -79,7 +79,7 @@ def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, m
 
     ax = fig.add_subplot(2,2,1)
     contour = 1-find_coutour(mask)[:, :, None]
-    contour = (contour + 1) / 2
+    contour[contour<1] = 0.8
     image = image * contour
     ax.imshow(image.astype(np.uint8))
     ax.axis("off")
@@ -125,7 +125,7 @@ def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, m
 
     plt.tight_layout()
 
-    fig.savefig("plots/ana-{0}.png".format(str(pid).zfill(4))) #, dpi='figure')
+    fig.savefig("plots/plot-{0}-{1}.png".format(image_id, str(pid).zfill(4))) #, dpi='figure')
     plt.close()
 
 def make_movie(dir, duration=0.5, name='movie'):
@@ -137,9 +137,10 @@ def make_movie(dir, duration=0.5, name='movie'):
     imageio.mimsave(os.path.join(dir, "{0}.gif".format(name)), images, "GIF", duration=duration)
 
 
+image_id = 0
 records = load_records("/Users/Aaron-MAC/Code", 'svhn-center')
 if not os.path.exists("plots"):
     os.makedirs("plots")
 
-analyze_record(records, 9)
-make_movie("plots", 0.5, 'movie-svhn-9')
+analyze_record(records, image_id)
+make_movie("plots", 0.5, 'movie-svhn-{0}'.format(image_id))

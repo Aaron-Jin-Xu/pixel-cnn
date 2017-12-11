@@ -58,7 +58,7 @@ with tf.Session() as sess:
     d = next(fm.test_data)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/original-{0}.png".format(exp_label))
+    img.save("/homes/jxu/projects/ImageInpainting/plots/original-{0}.png".format(exp_label))
 
     # generate masks
     obs_shape = d.shape[1:]
@@ -74,7 +74,7 @@ with tf.Session() as sess:
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/masked-{0}.png".format(exp_label))
+    img.save("/homes/jxu/projects/ImageInpainting/plots/masked-{0}.png".format(exp_label))
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
@@ -189,7 +189,7 @@ with tf.Session() as sess:
     # Store the completed images
     for i in range(d.shape[0]):
         contour = 1-find_coutour(ms_ori[i])[:, :, None]
-        contour[contour<1] = 0.9
+        contour[contour<1] = 0.8
         d[i] *= contour
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/complete-{0}.png".format(exp_label))
+    img.save("/homes/jxu/projects/ImageInpainting/plots/complete-{0}.png".format(exp_label))
