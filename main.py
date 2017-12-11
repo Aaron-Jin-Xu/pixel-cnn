@@ -31,7 +31,7 @@ def find_coutour(mask):
 
 display_size = (6,6)
 
-exp_label = "svhn-center-noise"
+exp_label = "celeba-hr-center"
 
 with tf.Session() as sess:
 
