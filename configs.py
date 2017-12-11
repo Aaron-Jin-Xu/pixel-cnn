@@ -83,8 +83,6 @@ configs["celeba-hr-forward"] = {
     "data_set": "celeba",
     "batch_size": 4,
     "init_batch_size": 4,
-    "masked": True,
-    "rot180": True,
     "save_interval":5,
     "nr_gpu":8,
 }
