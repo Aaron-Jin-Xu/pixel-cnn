@@ -63,6 +63,7 @@ def analyze_record(records, image_id):
     combine = get_image_record(records, image_id, t="dist", dist_type="combine")
     prior = get_image_record(records, image_id, t="dist", dist_type="prior")
     sample = get_image_record(records, image_id, t="sample")
+    cur_mask = get_image_record(records, image_id, t="mask")
     for p in range(num_pixels):
         cur_image = images[p]
         cur_forward_dis = forward[p]
@@ -70,23 +71,26 @@ def analyze_record(records, image_id):
         cur_combine_dis = combine[p]
         cur_prior_dis = prior[p]
         cur_sample = sample[p]
-        plot(cur_forward_dis, cur_backward_dis, cur_combine_dis, cur_prior_dis, cur_image, cur_sample, pid=p)
+        plot(cur_forward_dis, cur_backward_dis, cur_combine_dis, cur_prior_dis, cur_image, cur_sample, cur_mask, pid=p)
 
 
-def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, pid):
+def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, mask, pid):
     fig = plt.figure(figsize=(8,8))
 
-    ax = fig.add_subplot(1,1,1)
-    ax.imshow(image)
+    ax = fig.add_subplot(2,2,1)
+    contour = 1-find_coutour(mask)[:, :, None]
+    contour = (contour + 1) / 2
+    image = image * contour
+    ax.imshow(image.astype(np.uint8))
     ax.axis("off")
 
     # Red channel
     b = 0
     ax = fig.add_subplot(2,2,2)
-    ax.plot(np.arange(256), forward_dist[b], label="Forward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, forward_dist[b])))
-    ax.plot(np.arange(256), backward_dist[b], label="Backward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, backward_dist[b])))
-    ax.plot(np.arange(256), combine_dist[b], label="Combine KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, combine_dist[b])))
-    ax.plot(np.arange(256), prior_dist[b], label="Prior KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, prior_dist[b])))
+    ax.plot(np.arange(256), forward_dist[b], label="Forward KL={0:.2f}".format(KL_divergence(combine_dist[b], forward_dist[b]+1e-10)))
+    ax.plot(np.arange(256), backward_dist[b], label="Backward KL={0:.2f}".format(KL_divergence(combine_dist[b], backward_dist[b]+1e-10)))
+    ax.plot(np.arange(256), combine_dist[b], label="Combine KL={0:.2f}".format(KL_divergence(combine_dist[b], combine_dist[b]+1e-10)))
+    ax.plot(np.arange(256), prior_dist[b], label="Prior KL={0:.2f}".format(KL_divergence(combine_dist[b], prior_dist[b]+1e-10)))
     ax.plot([sample[b]], [0.1], '-o', c='green', markersize=8)
     ax.legend(loc=0)
     ax.set_ylim(0., 0.2)
@@ -95,10 +99,10 @@ def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, p
     # Green channel
     b = 1
     ax = fig.add_subplot(2,2,3)
-    ax.plot(np.arange(256), forward_dist[b], label="Forward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, forward_dist[b])))
-    ax.plot(np.arange(256), backward_dist[b], label="Backward KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, backward_dist[b])))
-    ax.plot(np.arange(256), combine_dist[b], label="Combine KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, combine_dist[b])))
-    ax.plot(np.arange(256), prior_dist[b], label="Prior KL={0:.2f}".format(KL_divergence(combine_dist[b]+1e-10, prior_dist[b])))
+    ax.plot(np.arange(256), forward_dist[b], label="Forward KL={0:.2f}".format(KL_divergence(combine_dist[b], forward_dist[b]+1e-10)))
+    ax.plot(np.arange(256), backward_dist[b], label="Backward KL={0:.2f}".format(KL_divergence(combine_dist[b], backward_dist[b]+1e-10)))
+    ax.plot(np.arange(256), combine_dist[b], label="Combine KL={0:.2f}".format(KL_divergence(combine_dist[b], combine_dist[b]+1e-10)))
+    ax.plot(np.arange(256), prior_dist[b], label="Prior KL={0:.2f}".format(KL_divergence(combine_dist[b], prior_dist[b]+1e-10)))
     ax.plot([sample[b]], [0.1], '-o', c='green', markersize=8)
     ax.legend(loc=0)
     ax.set_ylim(0., 0.2)
@@ -130,16 +134,8 @@ def make_movie(dir, duration=0.5, name='movie'):
 
 
 records = load_records("/Users/Aaron-MAC/Code")
-#if not os.path.exists("plots"):
-#    os.makedirs("plots")
+if not os.path.exists("plots"):
+    os.makedirs("plots")
 
-#analyze_record(records, 0)
-#make_movie("plots", 0.5, 'movie-svhn-0')
-
-mask = np.ones((32,32))
-mask[10:20, 10:20] = 0
-
-contour = find_coutour(mask)
-plt.imshow(contour, cmap='Greys')
-plt.axis("off")
-plt.show()
+analyze_record(records, 0)
+make_movie("plots", 0.5, 'movie-svhn-0')

@@ -14,7 +14,9 @@ from PIL import Image
 
 from configs import configs
 
-display_size = (3,3)
+display_size = (6,6)
+
+exp_label = "svhn-center"
 
 with tf.Session() as sess:
 
@@ -41,7 +43,7 @@ with tf.Session() as sess:
     d = next(fm.test_data)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/original.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/original-{0}.png".format(exp_label))
 
     # generate masks
     obs_shape = d.shape[1:]
@@ -57,7 +59,7 @@ with tf.Session() as sess:
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/masked.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/masked-{0}.png".format(exp_label))
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
@@ -167,8 +169,8 @@ with tf.Session() as sess:
 
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
-    np.savez_compressed("/data/ziz/jxu/inpainting_record", dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
+    np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
 
     # Store the completed images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/complete.png")
+    img.save("/homes/jxu/projects/ImageInpainting/samples/complete-{0}.png".formrat(exp_label))
