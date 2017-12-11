@@ -12,6 +12,7 @@ configs["svhn-forward"] = {
     "data_set": "svhn",
     "batch_size": 6,
     "init_batch_size": 6,
+    "nr_gpu": 8,
 }
 configs["svhn-backward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
@@ -23,6 +24,7 @@ configs["svhn-backward"] = {
     "init_batch_size": 6,
     "masked": True,
     "rot180": True,
+    "nr_gpu": 8,
 }
 configs["svhn-backward-rename"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
@@ -34,6 +36,7 @@ configs["svhn-backward-rename"] = {
     "init_batch_size": 6,
     "masked": True,
     "rot180": True,
+    "nr_gpu": 8,
 }
 
 ## CelebA
@@ -45,6 +48,7 @@ configs["celeba-forward"] = {
     "data_set": "celeba",
     "batch_size": 6,
     "init_batch_size": 6,
+    "nr_gpu": 8,
 }
 configs["celeba-backward"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
@@ -56,6 +60,7 @@ configs["celeba-backward"] = {
     "init_batch_size": 6,
     "masked": True,
     "rot180": True,
+    "nr_gpu": 8,
 }
 configs["celeba-backward-rename"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
@@ -67,6 +72,7 @@ configs["celeba-backward-rename"] = {
     "init_batch_size": 6,
     "masked": True,
     "rot180": True,
+    "nr_gpu": 8,
 }
 
 configs["celeba-hr-forward"] = {
@@ -80,7 +86,7 @@ configs["celeba-hr-forward"] = {
     "masked": True,
     "rot180": True,
     "save_interval":5,
-    "nr_gpu":4,
+    "nr_gpu":6,
 }
 
 configs["celeba-hr-backward"] = {
@@ -94,7 +100,7 @@ configs["celeba-hr-backward"] = {
     "masked": True,
     "rot180": True,
     "save_interval":5,
-    "nr_gpu":7,
+    "nr_gpu":8,
 }
 
 configs["celeba-hr-backward-rename"] = {
@@ -108,5 +114,5 @@ configs["celeba-hr-backward-rename"] = {
     "masked": True,
     "rot180": True,
     "save_interval":5,
-    "nr_gpu":4,
+    "nr_gpu":8,
 }
