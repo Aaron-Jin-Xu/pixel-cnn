@@ -198,6 +198,10 @@ class RandomNoiseMaskGenerator(MaskGenerator):
 
     def gen(self, n):
         masks = np.ones((n, self.height, self.width))
+        idx_arr = [(y, x) for y in range(self.height) for x in range(self.width)]
         for i in range(n):
-            masks[i] = 0
-        
+            idxs = np.random.choice(range(len(idx_arr)), size=int(self.height*self.width*self.lossy_ratio), replace=False)
+            for d in idxs:
+                d = idx_arr[d]
+                masks[i, d[0], d[1]] = 0
+        return masks
