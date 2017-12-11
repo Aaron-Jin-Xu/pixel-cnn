@@ -14,6 +14,21 @@ from PIL import Image
 
 from configs import configs
 
+def find_coutour(mask):
+    contour = np.zeros_like(mask)
+    h, w = mask.shape
+    for y in range(h):
+        for x in range(w):
+            if mask[y, x] > 0:
+                lower_bound = max(y-1, 0)
+                upper_bound = min(y+1, h-1)
+                left_bound = max(x-1, 0)
+                right_bound = min(x+1, w-1)
+                nb = mask[lower_bound:upper_bound+1, left_bound:right_bound+1]
+                if np.min(nb)  == 0:
+                    contour[y, x] = 1
+    return contour
+
 display_size = (6,6)
 
 exp_label = "svhn-center"
@@ -172,5 +187,9 @@ with tf.Session() as sess:
     np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
 
     # Store the completed images
+    for i in range(d.shape[0]):
+        contour = 1-find_coutour(ms_ori[i])[:, :, None]
+        contour = (contour + 1) / 2
+        d[i] *= contour
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/samples/complete-{0}.png".format(exp_label))
