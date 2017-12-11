@@ -137,8 +137,8 @@ def make_movie(dir, duration=0.5, name='movie'):
     imageio.mimsave(os.path.join(dir, "{0}.gif".format(name)), images, "GIF", duration=duration)
 
 
-image_id = 0
-records = load_records("/Users/Aaron-MAC/Code", 'svhn-center')
+image_id = 4
+records = load_records("/Users/Aaron-MAC/Code", 'celeba-hr-circle')
 if not os.path.exists("plots"):
     os.makedirs("plots")
 
