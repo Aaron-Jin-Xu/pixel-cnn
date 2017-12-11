@@ -173,4 +173,4 @@ with tf.Session() as sess:
 
     # Store the completed images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/samples/complete-{0}.png".formrat(exp_label))
+    img.save("/homes/jxu/projects/ImageInpainting/samples/complete-{0}.png".format(exp_label))
