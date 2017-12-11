@@ -29,9 +29,9 @@ def find_coutour(mask):
                     contour[y, x] = 1
     return contour
 
-display_size = (5,5)
+display_size = (6,6)
 
-exp_label = "celeba-hr-noise"
+exp_label = "svhn-noise"
 
 with tf.Session() as sess:
 
@@ -80,8 +80,8 @@ with tf.Session() as sess:
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     # Load prior
-    prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-    #prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+    #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+    prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
 
     dis_record = []
