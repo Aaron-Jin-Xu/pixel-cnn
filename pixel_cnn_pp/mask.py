@@ -188,3 +188,16 @@ class HorizontalMaskGenerator(MaskGenerator):
         masks = np.ones((n, self.height, self.width))
         masks[:, self.upper_bound:self.lower_bound, self.upper_bound:self.lower_bound] = 0
         return masks
+
+class RandomNoiseMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width, lossy_ratio=0.5):
+        self.height = height
+        self.width = width
+        self.lossy_ratio = lossy_ratio
+
+    def gen(self, n):
+        masks = np.ones((n, self.height, self.width))
+        for i in range(n):
+            masks[i] = 0
+        
