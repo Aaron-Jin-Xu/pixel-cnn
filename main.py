@@ -31,7 +31,7 @@ def find_coutour(mask):
 
 display_size = (5,5)
 
-exp_label = "celeba-hr-circle"
+exp_label = "celeba-hr-center"
 
 with tf.Session() as sess:
 
@@ -63,10 +63,10 @@ with tf.Session() as sess:
     # generate masks
     obs_shape = d.shape[1:]
     #mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
-    mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 16)
+    #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 16)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-    #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 16, 48)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 16, 48)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
