@@ -139,7 +139,7 @@ with tf.Session() as sess:
                 pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
                 pars = pars1 * pars2 #/ pr[:, 2, :]
                 pars[:, 0] = 0.
-                spars[:, 255] = 0.
+                pars[:, 255] = 0.
                 #pars = np.power(pars, 0.5)
                 pars = pars.astype(np.float64)
                 pars = pars / np.sum(pars, axis=-1)[:, None]
