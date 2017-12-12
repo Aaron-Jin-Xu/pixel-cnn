@@ -62,15 +62,11 @@ with tf.Session() as sess:
     #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
     prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
-    data_record.append(d.copy())
-
     count = 0
 
     while True:
         count += 1
         print(count)
-
-        rgb_record = []
 
         target_pixels = next_pixel(ms)
         #print(target_pixels[0])
@@ -105,7 +101,6 @@ with tf.Session() as sess:
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars, pr[:, 0, :]]))
         color_r = []
         for i in range(pars.shape[0]):
             color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -120,7 +115,6 @@ with tf.Session() as sess:
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars, pr[:, 1, :]]))
         color_g = []
         for i in range(pars.shape[0]):
             color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
@@ -135,7 +129,6 @@ with tf.Session() as sess:
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars, pr[:, 2, :]]))
         color_b = []
         for i in range(pars.shape[0]):
             color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
