@@ -162,3 +162,5 @@ with tf.Session() as sess:
         images_completed = np.mean(completed_images_arr, axis=0)
 
         psnr = batch_psnr(images_completed, images_ori, output_mean=True)
+
+        print(psnr)
