@@ -125,7 +125,7 @@ def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, m
 
     plt.tight_layout()
 
-    fig.savefig("plots/plot-{0}-{1}.png".format(image_id, str(pid).zfill(4))) #, dpi='figure')
+    fig.savefig("plots-{0}/plot-{1}-{2}.png".format(exp_label, image_id, str(pid).zfill(4))) #, dpi='figure')
     plt.close()
 
 def make_movie(dir, duration=0.5, name='movie'):
@@ -144,4 +144,4 @@ if not os.path.exists("plots-{0}".format(exp_label)):
     os.makedirs("plots-{0}".format(exp_label))
 
 analyze_record(records, image_id)
-make_movie("plots-{0}".format(exp_label), 0.5, 'movie-{0}-{1}'.format(exp_label, image_id))
+make_movie("plots-{0}".format(exp_label), 0.25, 'movie-{0}-{1}'.format(exp_label, image_id))

@@ -2,6 +2,8 @@ import numpy as np
 import math
 
 ## https://github.com/aizvorski/video-quality/blob/master/psnr.py
+
+
 def psnr(img1, img2):
     mse = np.mean( (img1 - img2) ** 2 )
     #if mse == 0:
