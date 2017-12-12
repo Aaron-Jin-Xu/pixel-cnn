@@ -53,7 +53,7 @@ with tf.Session() as sess:
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 15)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 8, 24)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
@@ -63,7 +63,7 @@ with tf.Session() as sess:
 
     completed_images_arr = []
 
-    for k in range(10):
+    for k in range(3):
         print("------------", k)
 
         d = images_ori.copy()
