@@ -137,10 +137,11 @@ def make_movie(dir, duration=0.5, name='movie'):
     imageio.mimsave(os.path.join(dir, "{0}.gif".format(name)), images, "GIF", duration=duration)
 
 
-image_id = 4
-records = load_records("/Users/Aaron-MAC/Code", 'celeba-hr-circle')
-if not os.path.exists("plots"):
-    os.makedirs("plots")
+image_id = 0
+exp_label = "celeba-hr-circle"
+records = load_records("/Users/Aaron-MAC/Code/ImageInpainting", exp_label)
+if not os.path.exists("plots-{0}".format(exp_label)):
+    os.makedirs("plots-{0}".format(exp_label))
 
 analyze_record(records, image_id)
-make_movie("plots", 0.5, 'movie-svhn-{0}'.format(image_id))
+make_movie("plots-{0}".format(exp_label), 0.5, 'movie-{0}-{1}'.format(exp_label, image_id))
