@@ -58,14 +58,18 @@ with tf.Session() as sess:
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
+    d = d.astype(np.float64)
+    images_ori = d.copy()
+
     completed_images_arr = []
 
     for k in range(10):
         print("------------", k)
 
+        d = images_ori.copy()
+        ms = ms_ori.copy()
+
         # Mask the images
-        d = d.astype(np.float64)
-        images_ori = d.copy()
         d *= ms[:, :, :, None]
         agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
         ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
