@@ -12,6 +12,8 @@ import pixel_cnn_pp.mask as mk
 from utils import *
 from PIL import Image
 
+from evaluation import *
+
 from configs import configs
 
 exp_label = "svhn-center"
@@ -44,16 +46,17 @@ with tf.Session() as sess:
     # generate masks
     obs_shape = d.shape[1:]
     #mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
-    mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
+    #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-    #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 8, 24)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 14)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
     # Mask the images
     d = d.astype(np.float64)
+    images_ori = d.copy()
     d *= ms[:, :, :, None]
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
@@ -140,3 +143,11 @@ with tf.Session() as sess:
             p = target_pixels[idx]
             ms[idx, p[0], p[1]] = 1
             d[idx, p[0], p[1], :] = color[idx, :]
+
+
+    images_completed = d.copy()
+
+    print(images_ori.shape)
+    print(images_completed.shape)
+
+    print(batch_psnr(images_completed, images_ori, output_mean=True))
