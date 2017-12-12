@@ -41,7 +41,11 @@ with tf.Session() as sess:
 
     # Get test images, batch_size X nr_gpu
     d = next(fm.test_data)
+
     # Store original images
+    # Load prior
+    # prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+    prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
     # generate masks
     obs_shape = d.shape[1:]
@@ -49,103 +53,107 @@ with tf.Session() as sess:
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 8, 24)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 13)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
-    # Mask the images
-    d = d.astype(np.float64)
-    images_ori = d.copy()
-    d *= ms[:, :, :, None]
-    agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
-    ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
+    completed_images_arr = []
 
-    # Load prior
-    #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-    prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+    for k in range(10):
+        print("------------", k)
 
-    count = 0
+        # Mask the images
+        d = d.astype(np.float64)
+        images_ori = d.copy()
+        d *= ms[:, :, :, None]
+        agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
+        ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
-    while True:
-        count += 1
-        print(count)
+        count = 0
 
-        target_pixels = next_pixel(ms)
-        #print(target_pixels[0])
-        if target_pixels[0][0] is None:
-            break
-        pr = get_prior(prior, target_pixels)
-        backward_ms = ms.copy()
-        for idx in range(len(target_pixels)):
-            p = target_pixels[idx]
-            backward_ms[idx, p[0], p[1]] = 1
-        backward_ms = np.rot90(ms, 2, (1,2))
+        while True:
+            count += 1
+            print(count)
+            target_pixels = next_pixel(ms)
+            #print(target_pixels[0])
+            if target_pixels[0][0] is None:
+                break
+            pr = get_prior(prior, target_pixels)
+            backward_ms = ms.copy()
+            for idx in range(len(target_pixels)):
+                p = target_pixels[idx]
+                backward_ms[idx, p[0], p[1]] = 1
+            backward_ms = np.rot90(ms, 2, (1,2))
 
-        # Forward model prediction
-        feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-        o1 = sess.run(fm.outputs, feed_dict)
-        o1 = np.concatenate(o1, axis=0)
-        o1 = get_params(o1, target_pixels)
+            # Forward model prediction
+            feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+            o1 = sess.run(fm.outputs, feed_dict)
+            o1 = np.concatenate(o1, axis=0)
+            o1 = get_params(o1, target_pixels)
 
-        # Backward model prediction
-        feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
-        o2 = sess.run(bm.outputs, feed_dict)
-        o2 = np.concatenate(o2, axis=0)
-        o2 = np.rot90(o2, 2, (1,2))
-        o2 = get_params(o2, target_pixels)
+            # Backward model prediction
+            feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
+            o2 = sess.run(bm.outputs, feed_dict)
+            o2 = np.concatenate(o2, axis=0)
+            o2 = np.rot90(o2, 2, (1,2))
+            o2 = get_params(o2, target_pixels)
 
-        # Sample red channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
-        pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = pars1 * pars2 / pr[:, 0, :]
-        #pars[:, 0] = 0.
-        #pars[:, 255] = 0.
-        #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
-        color_r = []
-        for i in range(pars.shape[0]):
-            color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-        color_r = np.array(color_r)
+            # Sample red channel
+            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
+            pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
+            pars = pars1 * pars2 / pr[:, 0, :]
+            #pars[:, 0] = 0.
+            #pars[:, 255] = 0.
+            #pars = np.power(pars, 0.5)
+            pars = pars.astype(np.float64)
+            pars = pars / np.sum(pars, axis=-1)[:, None]
+            color_r = []
+            for i in range(pars.shape[0]):
+                color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_r = np.array(color_r)
 
-        # Sample green channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
-        pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = pars1 * pars2 / pr[:, 1, :]
-        #pars[:, 0] = 0.
-        #pars[:, 255] = 0.
-        #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
-        color_g = []
-        for i in range(pars.shape[0]):
-            color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-        color_g = np.array(color_g)
+            # Sample green channel
+            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
+            pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
+            pars = pars1 * pars2 / pr[:, 1, :]
+            #pars[:, 0] = 0.
+            #pars[:, 255] = 0.
+            #pars = np.power(pars, 0.5)
+            pars = pars.astype(np.float64)
+            pars = pars / np.sum(pars, axis=-1)[:, None]
+            color_g = []
+            for i in range(pars.shape[0]):
+                color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_g = np.array(color_g)
 
-        # Sample blue channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1 * pars2 / pr[:, 2, :]
-        #pars[:, 0] = 0.
-        #spars[:, 255] = 0.
-        #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
-        color_b = []
-        for i in range(pars.shape[0]):
-            color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-        color_b = np.array(color_b)
+            # Sample blue channel
+            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
+            pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
+            pars = pars1 * pars2 / pr[:, 2, :]
+            #pars[:, 0] = 0.
+            #spars[:, 255] = 0.
+            #pars = np.power(pars, 0.5)
+            pars = pars.astype(np.float64)
+            pars = pars / np.sum(pars, axis=-1)[:, None]
+            color_b = []
+            for i in range(pars.shape[0]):
+                color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_b = np.array(color_b)
 
-        color = np.array([color_r, color_g, color_b]).T
+            color = np.array([color_r, color_g, color_b]).T
 
-        for idx in range(len(target_pixels)):
-            p = target_pixels[idx]
-            ms[idx, p[0], p[1]] = 1
-            d[idx, p[0], p[1], :] = color[idx, :]
+            for idx in range(len(target_pixels)):
+                p = target_pixels[idx]
+                ms[idx, p[0], p[1]] = 1
+                d[idx, p[0], p[1], :] = color[idx, :]
 
 
-    images_completed = d.copy()
+        images_completed = d.copy()
+        completed_images_arr.append(images_completed)
+
+    images_completed = np.mean(completed_images_arr, axis=0)
+    print(images_completed.shape)
 
     print(batch_psnr(images_completed, images_ori, output_mean=False))
     print(batch_psnr(images_completed, images_ori, output_mean=True))
