@@ -29,7 +29,8 @@ def find_coutour(mask):
                     contour[y, x] = 1
     return contour
 
-display_size = (6,6)
+#display_size = (6,6)
+display_size = (5,5)
 
 exp_label = "vs dcgan"
 
