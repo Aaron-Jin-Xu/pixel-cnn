@@ -16,7 +16,7 @@ def read_imgs(dir):
 
 def load(data_dir, subset='train'):
     if subset=='valid':
-        trainx = read_imgs("/home/jxu/projects/semantic_image_inpainting/testimages")
+        trainx = read_imgs("~/projects/semantic_image_inpainting/testimages")
         trainy = np.ones((trainx.shape[0], ))
         return trainx, trainy
     if subset in ['train', 'valid', 'test']:
