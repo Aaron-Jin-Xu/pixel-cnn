@@ -81,7 +81,7 @@ with tf.Session() as sess:
 
             while True:
                 count += 1
-                #print(count)
+                print(count)
                 target_pixels = next_pixel(ms)
                 #print(target_pixels[0])
                 if target_pixels[0][0] is None:
@@ -165,3 +165,5 @@ with tf.Session() as sess:
         print(np.mean(psnr))
         print(np.std(psnr))
         print(len(psnr))
+
+        break
