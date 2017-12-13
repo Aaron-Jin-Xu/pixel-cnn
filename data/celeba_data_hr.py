@@ -15,13 +15,13 @@ def read_imgs(dir):
     return imgs
 
 def load(data_dir, subset='train'):
+    if subset=='valid':
+        trainx = read_imgs("/home/jxu/projects/semantic_image_inpainting/testimages")
+        trainy = np.ones((trainx.shape[0], ))
+        return trainx, trainy
     if subset in ['train', 'valid', 'test']:
         #trainx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))['arr_0'][:200000, :, :, :]
         trainx = read_imgs(os.path.join(data_dir, "celeba64-{0}".format(subset)))
-        trainy = np.ones((trainx.shape[0], ))
-        return trainx, trainy
-    if subset=='valid':
-        trainx = read_imgs("/home/jxu/projects/semantic_image_inpainting/testimages")
         trainy = np.ones((trainx.shape[0], ))
         return trainx, trainy
     else:
