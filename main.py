@@ -31,7 +31,7 @@ def find_coutour(mask):
 
 display_size = (6,6)
 
-exp_label = "svhn-circle"
+exp_label = "vs dcgan"
 
 with tf.Session() as sess:
 
@@ -80,8 +80,8 @@ with tf.Session() as sess:
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     # Load prior
-    #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-    prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+    prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+    #prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
 
     dis_record = []
@@ -185,7 +185,7 @@ with tf.Session() as sess:
 
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
-    np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
+    #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
 
     # Store the completed images
 

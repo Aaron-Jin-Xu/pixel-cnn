@@ -20,7 +20,10 @@ def load(data_dir, subset='train'):
         trainx = read_imgs(os.path.join(data_dir, "celeba64-{0}".format(subset)))
         trainy = np.ones((trainx.shape[0], ))
         return trainx, trainy
-
+    if subset=='valid':
+        trainx = read_imgs("/home/jxu/projects/semantic_image_inpainting/testimages")
+        trainy = np.ones((trainx.shape[0], ))
+        return trainx, trainy
     else:
         raise NotImplementedError('subset should be either train, valid or test')
 
