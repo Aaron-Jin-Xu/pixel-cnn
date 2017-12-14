@@ -205,3 +205,37 @@ class RandomNoiseMaskGenerator(MaskGenerator):
                 d = idx_arr[d]
                 masks[i, d[0], d[1]] = 0
         return masks
+
+
+class RandomHalfMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width):
+        self.height = height
+        self.width = width
+
+    def gen(self, n):
+        masks = np.ones((n, self.height, self.width))
+        choices = ['upper', 'lower', 'left', 'right']
+        c = np.random.randint(4, size=n)
+        for i in range(n):
+            if choices[c[i]]=='upper':
+                masks[i][:self.height/2, :] = 0
+            elif choices[c[i]]=='lower':
+                masks[i][-self.height/2:, :] = 0
+            elif choices[c[i]]=='left':
+                masks[i][:, :self.width/2] = 0
+            elif choices[c[i]]=='right':
+                masks[i][:, -self.width/2:] = 0
+        return masks
+
+class CenterMaskGenerator(MaskGenerator):
+
+
+    def __init__(self, height, width, scale):
+        self.height = height
+        self.width = width
+        self.scale = scale
+
+    def gen(self, n):
+        masks = np.ones((n, self.height, self.width))
+        
