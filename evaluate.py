@@ -66,7 +66,7 @@ with tf.Session() as sess:
 
         completed_images_arr = []
 
-        for k in range(5):
+        for k in range(2):
             print("------------", k)
 
             d = images_ori.copy()
@@ -110,6 +110,7 @@ with tf.Session() as sess:
                 pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
                 pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
                 pars = pars1 * pars2 #/ pr[:, 0, :]
+                pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
                 #pars[:, 0] = 0.
                 #pars[:, 255] = 0.
                 #pars = np.power(pars, 0.5)
@@ -124,6 +125,7 @@ with tf.Session() as sess:
                 pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
                 pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
                 pars = pars1 * pars2 #/ pr[:, 1, :]
+                pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
                 #pars[:, 0] = 0.
                 #pars[:, 255] = 0.
                 #pars = np.power(pars, 0.5)
@@ -138,6 +140,7 @@ with tf.Session() as sess:
                 pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
                 pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
                 pars = pars1 * pars2 #/ pr[:, 2, :]
+                pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
                 #pars[:, 0] = 0.
                 #pars[:, 255] = 0.
                 #pars = np.power(pars, 0.5)
