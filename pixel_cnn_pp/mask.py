@@ -238,4 +238,18 @@ class CenterMaskGenerator(MaskGenerator):
 
     def gen(self, n):
         masks = np.ones((n, self.height, self.width))
-        
+
+
+class GridMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width):
+        self.height = height
+        self.width = width
+
+    def gen(self, n, grid_size):
+        masks = np.ones((n, self.height, self.width))
+        for y in range(self.height//grid_size):
+            for x in range(self.width//grid_size):
+                if (y * (self.height//grid_size) + x + y) % 2 ==0:
+                    masks[:, y*grid_size:(y+1)*grid_size, x*grid_size:(x+1)*grid_size] = 0
+        return masks

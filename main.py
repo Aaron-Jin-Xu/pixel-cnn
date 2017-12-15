@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (5,5)
 
-exp_label = "vs dcgan"
+exp_label = "grid"
 
 with tf.Session() as sess:
 
@@ -130,9 +130,8 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = pars1 * pars2 / pr[:, 0, :]
-        pars[:, 0] = 0.
-        pars[:, 255] = 0.
+        pars = pars1 * pars2 #/ pr[:, 0, :]
+        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
@@ -145,9 +144,8 @@ with tf.Session() as sess:
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = pars1 * pars2 / pr[:, 1, :]
-        pars[:, 0] = 0.
-        pars[:, 255] = 0.
+        pars = pars1 * pars2 #/ pr[:, 1, :]
+        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
@@ -160,9 +158,8 @@ with tf.Session() as sess:
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1 * pars2 / pr[:, 2, :]
-        pars[:, 0] = 0.
-        pars[:, 255] = 0.
+        pars = pars1 * pars2 #/ pr[:, 2, :]
+        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
         pars = pars / np.sum(pars, axis=-1)[:, None]
