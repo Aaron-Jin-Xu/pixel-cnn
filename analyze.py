@@ -1,12 +1,13 @@
 import numpy as np
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import imageio
 from utils import KL_divergence
 plt.style.use("ggplot")
 import cv2
-import matplotlib
-matplotlib.use('Agg')
+
 
 def find_coutour(mask):
     contour = np.zeros_like(mask)
