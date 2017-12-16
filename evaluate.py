@@ -56,8 +56,8 @@ with tf.Session() as sess:
         #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
         #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
         #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-        #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 16, 48)
-        mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
+        mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 8, 24)
+        #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
         #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
         ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
         ms_ori = ms.copy()
@@ -67,7 +67,7 @@ with tf.Session() as sess:
 
         completed_images_arr = []
 
-        for k in range(1):
+        for k in range(5):
             print("------------", k)
 
             d = images_ori.copy()
@@ -82,7 +82,7 @@ with tf.Session() as sess:
 
             while True:
                 count += 1
-                print(count)
+                #print(count)
                 target_pixels = next_pixel(ms)
                 #print(target_pixels[0])
                 if target_pixels[0][0] is None:
