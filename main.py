@@ -30,9 +30,9 @@ def find_coutour(mask):
     return contour
 
 #display_size = (6,6)
-display_size = (5,5)
+display_size = (8,8)
 
-exp_label = "grid"
+exp_label = "celeba-hr-center"
 
 with tf.Session() as sess:
 
@@ -67,8 +67,8 @@ with tf.Session() as sess:
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-    #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 16, 48)
-    mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
+    mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 16, 48)
+    #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
@@ -89,10 +89,6 @@ with tf.Session() as sess:
     dis_record = []
     data_record = []
     sample_record = []
-
-    # 0. image_id
-    # 1. pixel_id
-    # 2. sub_pixel_id (r, g, b)
 
     data_record.append(d.copy())
 
@@ -184,14 +180,14 @@ with tf.Session() as sess:
 
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
-    #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
+    np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
 
     # Store the completed images
 
-    # for i in range(d.shape[0]):
-    #     contour = 1-find_coutour(ms_ori[i])[:, :, None]
-    #     contour[contour<1] = 0.8
-    #     d[i] *= contour
+    for i in range(d.shape[0]):
+        contour = 1-find_coutour(ms_ori[i])[:, :, None]
+        contour[contour<1] = 0.8
+        d[i] *= contour
 
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/complete-{0}.png".format(exp_label))
