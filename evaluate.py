@@ -16,7 +16,7 @@ from evaluation import *
 
 from configs import configs
 
-exp_label = "celeba-hr-grid"
+exp_label = "svhn-center"
 
 with tf.Session() as sess:
 
@@ -47,8 +47,8 @@ with tf.Session() as sess:
 
         # Store original images
         # Load prior
-        prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-        # prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+        #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+        prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
         # generate masks
         obs_shape = d.shape[1:]
@@ -67,7 +67,7 @@ with tf.Session() as sess:
 
         completed_images_arr = []
 
-        for k in range(5):
+        for k in range(1):
             print("------------", k)
 
             d = images_ori.copy()
@@ -82,7 +82,7 @@ with tf.Session() as sess:
 
             while True:
                 count += 1
-                # print(count)
+                print(count)
                 target_pixels = next_pixel(ms)
                 #print(target_pixels[0])
                 if target_pixels[0][0] is None:
