@@ -138,8 +138,10 @@ def make_movie(dir, duration=0.5, name='movie'):
 
 
 image_id = 0
-exp_label = "celeba-hr-circle"
-records = load_records("/Users/Aaron-MAC/Code/ImageInpainting", exp_label)
+exp_label = "celeba-hr-center"
+#DATA_DIR = "/Users/Aaron-MAC/Code/ImageInpainting"
+DATA_DIR = "/data/ziz/jxu"
+records = load_records(DATA_DIR, exp_label)
 if not os.path.exists("plots-{0}".format(exp_label)):
     os.makedirs("plots-{0}".format(exp_label))
 
