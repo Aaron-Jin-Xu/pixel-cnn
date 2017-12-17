@@ -142,11 +142,11 @@ def make_movie(dir, duration=0.5, name='movie'):
 
 image_id = 0
 exp_label = "svhn-center"
-#DATA_DIR = "/Users/Aaron-MAC/Code/ImageInpainting"
+#DATA_DIR = "/Users/Aaron-MAC/Code/ImageInpainting/results"
 DATA_DIR = "/data/ziz/jxu"
 records = load_records(DATA_DIR, exp_label)
 if not os.path.exists("plots-{0}".format(exp_label)):
     os.makedirs("plots-{0}".format(exp_label))
 
 analyze_record(records, image_id)
-make_movie("plots-{0}".format(exp_label), 0.25, 'movie-{0}-{1}'.format(exp_label, image_id))
+#make_movie("plots-{0}".format(exp_label), 0.25, 'movie-{0}-{1}'.format(exp_label, image_id))
