@@ -141,7 +141,7 @@ def make_movie(dir, duration=0.5, name='movie'):
 
 
 image_id = 0
-exp_label = "celeba-hr-grid"
+exp_label = "celeba-hr-half"
 #DATA_DIR = "/Users/Aaron-MAC/Code/ImageInpainting"
 DATA_DIR = "/data/ziz/jxu"
 records = load_records(DATA_DIR, exp_label)
