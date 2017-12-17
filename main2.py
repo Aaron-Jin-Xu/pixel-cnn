@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (8,8)
 
-exp_label = "celeba-hr-half"
+exp_label = "svhn-half"
 
 with tf.Session() as sess:
 
@@ -83,8 +83,8 @@ with tf.Session() as sess:
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     # Load prior
-    prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-    #prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+    #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+    prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
 
     dis_record = []
