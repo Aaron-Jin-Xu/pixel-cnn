@@ -131,9 +131,11 @@ def plot(forward_dist, backward_dist, combine_dist, prior_dist, image, sample, m
     fig.savefig("plots-{0}/plot-{1}-{2}.png".format(exp_label, image_id, str(pid).zfill(4))) #, dpi='figure')
     plt.close()
 
-def make_movie(dir, duration=0.5, name='movie'):
+def make_movie(dir, duration=0.5, name='movie', frame_step=1):
     images = []
     dirpath, dirnames, filenames = next(os.walk(dir))
+    filenames = sorted(list(filter(lambda x: x.endswith(".png"), filenames)))
+    filenames = filenames[::frame_step]
     for f in filenames:
         if ".png" in f:
             images.append(imageio.imread(os.path.join(dir, f)))
@@ -141,12 +143,16 @@ def make_movie(dir, duration=0.5, name='movie'):
 
 
 image_id = 0
-exp_label = "svhn-center"
-#DATA_DIR = "/Users/Aaron-MAC/Code/ImageInpainting/results"
-DATA_DIR = "/data/ziz/jxu"
-records = load_records(DATA_DIR, exp_label)
-if not os.path.exists("plots-{0}".format(exp_label)):
-    os.makedirs("plots-{0}".format(exp_label))
+exp_label = "celeba-hr-half"
+DATA_DIR = "/Users/Aaron-MAC/Code/ImageInpainting"
+#DATA_DIR = "/data/ziz/jxu"
 
-analyze_record(records, image_id)
-#make_movie("plots-{0}".format(exp_label), 0.25, 'movie-{0}-{1}'.format(exp_label, image_id))
+
+# records = load_records(DATA_DIR, exp_label)
+# if not os.path.exists("plots-{0}".format(exp_label)):
+#     os.makedirs("plots-{0}".format(exp_label))
+#
+# analyze_record(records, image_id)
+
+
+make_movie("plots-{0}".format(exp_label), 0.5, 'reduce-movie-{0}-{1}'.format(exp_label, image_id), frame_step=10)
