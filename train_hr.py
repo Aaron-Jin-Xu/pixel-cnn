@@ -81,6 +81,7 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 args = parser.parse_args()
 
 parse_args(args, **configs['celeba-hr-forward'])
+args.save_dir = "/data/ziz/jxu/save-test"
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
 
