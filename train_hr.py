@@ -82,6 +82,7 @@ args = parser.parse_args()
 
 parse_args(args, **configs['celeba-hr-forward'])
 args.save_dir = "/data/ziz/jxu/save-test"
+args.nr_logistic_mix = 20
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
 
