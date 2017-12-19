@@ -66,7 +66,7 @@ with tf.Session() as sess:
     #mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
     #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
-    mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 32)
+    mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
     #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 8, 24)
     #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
@@ -127,7 +127,7 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-        pars = pars1 * pars2 #/ pr[:, 0, :]
+        pars = pars1 #* pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -141,7 +141,7 @@ with tf.Session() as sess:
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = pars1 * pars2 #/ pr[:, 1, :]
+        pars = pars1 #* pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -155,7 +155,7 @@ with tf.Session() as sess:
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1 * pars2 #/ pr[:, 2, :]
+        pars = pars1 #* pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -180,7 +180,7 @@ with tf.Session() as sess:
 
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
-    np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
+    #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
 
     # Store the completed images
 
