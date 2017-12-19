@@ -97,7 +97,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
     l = params[:, nr_mix:].reshape([ps[0], 3, 3*nr_mix])
     means = l[:, :, :nr_mix]
     log_scales = np.maximum(l[:, :, nr_mix:2 * nr_mix], -7.)
-    print(log_scales)
+    log_scales -= 1.0
     coeffs = np.tanh(l[:, :, 2 * nr_mix:3 * nr_mix])
 
     inv_stdv = np.exp(-log_scales)
