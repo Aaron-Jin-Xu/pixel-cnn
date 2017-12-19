@@ -122,8 +122,11 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None):
             p = log_softmax(logit_probs)
             p = np.exp(p)
             p = p / np.sum(p, axis=-1)[:, None]
-            print(p)
-            print(p.shape)
+            ps = []
+            for i in range(p.shape[0]):
+                ps.append(np.random.multinomial(1, p[i, :]))
+            ps = np.array(ps) * 7.0 - 7.0
+            print (ps)
             log_probs = log_probs + log_softmax(logit_probs)
             probs = sum_exp(log_probs)
             arr.append(probs)
