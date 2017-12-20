@@ -82,8 +82,7 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['celeba-hr-test'])
-#parse_args(args, **configs['celeba-hr-backward-rename'])
+parse_args(args, **configs['celeba-hr-backward-rename'])
 #parse_args(args, **configs['svhn-backward-rename'])
 
 print('input args:\n', json.dumps(vars(args), indent=4,
