@@ -82,7 +82,8 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['celeba-hr-forward'])
+parse_args(args, **configs['celeba-hr-test'])
+#parse_args(args, **configs['celeba-hr-forward'])
 #parse_args(args, **configs['svhn-forward'])
 
 print('input args:\n', json.dumps(vars(args), indent=4,
