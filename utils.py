@@ -121,7 +121,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             if log_scales_shift > 0:
                 p = log_softmax(logit_probs)
-                p = np.exp(p)
+                p = np.exp(p).astype(np.float64)
                 p = p / np.sum(p, axis=-1)[:, None]
                 ps = []
                 for i in range(p.shape[0]):
@@ -157,7 +157,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
 
             if log_scales_shift > 0:
                 p = log_softmax(logit_probs)
-                p = np.exp(p)
+                p = np.exp(p).astype(np.float64)
                 p = p / np.sum(p, axis=-1)[:, None]
                 ps = []
                 for i in range(p.shape[0]):
@@ -193,7 +193,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             if log_scales_shift > 0:
                 p = log_softmax(logit_probs)
-                p = np.exp(p)
+                p = np.exp(p).astype(np.float64)
                 p = p / np.sum(p, axis=-1)[:, None]
                 ps = []
                 for i in range(p.shape[0]):
