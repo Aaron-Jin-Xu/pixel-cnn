@@ -117,7 +117,7 @@ configs["celeba-hr-backward-rename"] = {
 
 configs["celeba-hr-test"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/save-test",
+    "save_dir": "/data/ziz/jxu/save64-forward-new-20",
     "nr_filters": 100,
     "nr_resnet": 4,
     "data_set": "celeba",
