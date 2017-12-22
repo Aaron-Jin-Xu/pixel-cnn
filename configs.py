@@ -122,7 +122,7 @@ configs["celeba-hr-test"] = {
     "nr_resnet": 4,
     "data_set": "celeba",
     "batch_size": 8,
-    "init_batch_size": 8,
+    "init_batch_size": 50,
     "save_interval":5,
     "nr_gpu":8,
     "nr_logistic_mix": 20,
