@@ -82,7 +82,7 @@ configs["celeba-hr-forward"] = {
     "nr_resnet": 4,
     "data_set": "celeba",
     "batch_size": 8,
-    "init_batch_size": 50,
+    "init_batch_size": 8,
     "save_interval":5,
     "nr_gpu":8,
 }
