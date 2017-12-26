@@ -18,12 +18,12 @@ import tensorflow as tf
 import pixel_cnn_pp.nn as nn
 import pixel_cnn_pp.mask as mk
 import pixel_cnn_pp.plotting as plotting
-#from pixel_cnn_pp.model_hr import model_spec
-from pixel_cnn_pp.model import model_spec
+from pixel_cnn_pp.model_hr import model_spec
+#from pixel_cnn_pp.model import model_spec
 import data.cifar10_data as cifar10_data
 import data.imagenet_data as imagenet_data
-#import data.celeba_data_hr as celeba_data
-import data.celeba_data as celeba_data
+import data.celeba_data_hr as celeba_data
+#import data.celeba_data as celeba_data
 import data.svhn_data as svhn_data
 from utils import parse_args
 from configs import configs
@@ -85,6 +85,9 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 args = parser.parse_args()
 
 parse_args(args, **configs['celeba-hr-backward'])
+args.save_dir = "/data/ziz/jxu/save64-backward-new-20"
+args.nr_logistic_mix = 20
+args.learning_rate = 0.0005
 
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args
