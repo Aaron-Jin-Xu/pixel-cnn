@@ -127,3 +127,31 @@ configs["celeba-hr-test"] = {
     "nr_gpu":8,
     "nr_logistic_mix": 20,
 }
+
+configs["celeba-hr-forward-new-20"] = {
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/save64-forward-new-20-e40",
+    "nr_filters": 100,
+    "nr_resnet": 4,
+    "data_set": "celeba",
+    "batch_size": 8,
+    "init_batch_size": 8,
+    "save_interval":5,
+    "nr_gpu":8,
+    "nr_logistic_mix": 20,
+}
+
+configs["celeba-hr-backward-new-20-rename"] = {
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/save64-backward-new-20-rename",
+    "nr_filters": 100,
+    "nr_resnet": 4,
+    "data_set": "celeba",
+    "batch_size": 8,
+    "init_batch_size": 8,
+    "masked": True,
+    "rot180": True,
+    "save_interval":5,
+    "nr_gpu":8,
+    'nr_logistic_mix': 20,
+}
