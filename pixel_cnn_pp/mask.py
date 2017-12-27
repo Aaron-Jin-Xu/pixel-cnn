@@ -113,8 +113,8 @@ class RectangleInProgressMaskGenerator(MaskGenerator):
     def gen_par(self, seed=None):
         if seed is not None:
             self.rng = np.random.RandomState(seed)
-        mh = self.rng.randint(low=int(self.h * 0.1), high=int(self.h * 0.4))
-        mw = self.rng.randint(low=int(self.w * 0.1), high=int(self.w * 0.4))
+        mh = self.rng.randint(low=int(self.h * 0.1), high=int(self.h * 0.5))
+        mw = self.rng.randint(low=int(self.w * 0.1), high=int(self.w * 0.5))
         pgh = self.rng.randint(low=0, high=mh)
         pgw =  self.rng.randint(low=0, high=mw)
         oh = self.rng.randint(low=1, high=self.h - mh)
