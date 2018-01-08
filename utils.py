@@ -207,6 +207,12 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
         all_probs = np.array(arr).T
         return all_probs
 
+
+def combine_forward_backward(pars_f, pars_b):
+    print(pars_f.shape)
+    print(pars_b.shape)
+    quit()
+
 def tile_images(imgs, size=(6, 6)):
     imgs = imgs[:size[0]*size[1], :, :, :]
     img_h, img_w = imgs.shape[1], imgs.shape[2]
