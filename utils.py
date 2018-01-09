@@ -90,7 +90,7 @@ def sum_exp(x):
     #x = np.minimum(x, 50*np.ones_like(x))
     #return np.sum(np.exp(x), axis=-1)
 
-def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
+def params_to_dis(params, nr_mix, r=None, g=None, b=None, MAP=False):
     ps = params.shape
     assert ps[1]==10*nr_mix, "shape of params should be (batch_size, nr_mix*10)"
     logit_probs = params[:, :nr_mix]
@@ -99,7 +99,8 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
     log_scales = np.maximum(l[:, :, nr_mix:2 * nr_mix], -7.)
     # log_scales -= log_scales_shift
     coeffs = np.tanh(l[:, :, 2 * nr_mix:3 * nr_mix])
-
+    if MAP:
+        log_scales = log_scales - 10.
     inv_stdv = np.exp(-log_scales)
 
     if r is None:
@@ -119,17 +120,18 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
             log_pdf_mid = mid_in - log_scales[:, 0, :] - 2. * softplus(mid_in)
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
-            if log_scales_shift > 0:
-                p = log_softmax(logit_probs)
-                p = np.exp(p).astype(np.float64)
-                p = p / np.sum(p, axis=-1)[:, None]
-                ps = []
-                for i in range(p.shape[0]):
-                    ps.append(np.random.multinomial(1, p[i, :]))
-                ps = np.array(ps) * 7.0 - 7.0
-                log_probs = log_probs + ps # log_softmax(logit_probs)
-            else:
-                log_probs = log_probs + log_softmax(logit_probs)
+
+            # if log_scales_shift > 0:
+            #     p = log_softmax(logit_probs)
+            #     p = np.exp(p).astype(np.float64)
+            #     p = p / np.sum(p, axis=-1)[:, None]
+            #     ps = []
+            #     for i in range(p.shape[0]):
+            #         ps.append(np.random.multinomial(1, p[i, :]))
+            #     ps = np.array(ps) * 7.0 - 7.0
+            #     log_probs = log_probs + ps # log_softmax(logit_probs)
+            # else:
+            log_probs = log_probs + log_softmax(logit_probs)
             probs = sum_exp(log_probs)
             arr.append(probs)
         all_probs = np.array(arr).T
@@ -155,17 +157,17 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
 
-            if log_scales_shift > 0:
-                p = log_softmax(logit_probs)
-                p = np.exp(p).astype(np.float64)
-                p = p / np.sum(p, axis=-1)[:, None]
-                ps = []
-                for i in range(p.shape[0]):
-                    ps.append(np.random.multinomial(1, p[i, :]))
-                ps = np.array(ps) * 7.0 - 7.0
-                log_probs = log_probs + ps # log_softmax(logit_probs)
-            else:
-                log_probs = log_probs + log_softmax(logit_probs)
+            # if MAP:
+            #     p = log_softmax(logit_probs)
+            #     p = np.exp(p).astype(np.float64)
+            #     p = p / np.sum(p, axis=-1)[:, None]
+            #     ps = []
+            #     for i in range(p.shape[0]):
+            #         ps.append(np.random.multinomial(1, p[i, :]))
+            #     ps = np.array(ps) * 7.0 - 7.0
+            #     log_probs = log_probs + ps # log_softmax(logit_probs)
+            # else:
+            log_probs = log_probs + log_softmax(logit_probs)
             probs = sum_exp(log_probs)
             arr.append(probs)
         all_probs = np.array(arr).T
@@ -191,17 +193,17 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
             log_pdf_mid = mid_in - log_scales[:, 2, :] - 2. * softplus(mid_in)
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
-            if log_scales_shift > 0:
-                p = log_softmax(logit_probs)
-                p = np.exp(p).astype(np.float64)
-                p = p / np.sum(p, axis=-1)[:, None]
-                ps = []
-                for i in range(p.shape[0]):
-                    ps.append(np.random.multinomial(1, p[i, :]))
-                ps = np.array(ps) * 7.0 - 7.0
-                log_probs = log_probs + ps # log_softmax(logit_probs)
-            else:
-                log_probs = log_probs + log_softmax(logit_probs)
+            # if MAP:
+            #     p = log_softmax(logit_probs)
+            #     p = np.exp(p).astype(np.float64)
+            #     p = p / np.sum(p, axis=-1)[:, None]
+            #     ps = []
+            #     for i in range(p.shape[0]):
+            #         ps.append(np.random.multinomial(1, p[i, :]))
+            #     ps = np.array(ps) * 7.0 - 7.0
+            #     log_probs = log_probs + ps # log_softmax(logit_probs)
+            # else:
+            log_probs = log_probs + log_softmax(logit_probs)
             probs = sum_exp(log_probs)
             arr.append(probs)
         all_probs = np.array(arr).T
@@ -211,6 +213,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, log_scales_shift=0.0):
 def combine_forward_backward(pars_f, pars_b):
     print(pars_f.shape)
     print(pars_b.shape)
+
     quit()
 
 def tile_images(imgs, size=(6, 6)):
