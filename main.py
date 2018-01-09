@@ -128,8 +128,7 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix)
-        print(pars1)
-        print(pars2)
+        print(sorted(pars1[0][::-1]))
         quit()
         pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
