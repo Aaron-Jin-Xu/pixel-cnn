@@ -82,7 +82,7 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['svhn-forward-new-20'])
+parse_args(args, **configs['svhn-forward-20'])
 #parse_args(args, **configs['celeba-hr-forward'])
 #parse_args(args, **configs['svhn-forward'])
 

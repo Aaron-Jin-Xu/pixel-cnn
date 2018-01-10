@@ -167,9 +167,9 @@ configs["svhn-forward-20"] = {
     "nr_gpu": 8,
     "nr_logistic_mix": 20,
 }
-configs["svhn-backward-20"] = {
+configs["svhn-backward-20-rename"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
-    "save_dir": "/data/ziz/jxu/save-svhn-backward-20",
+    "save_dir": "/data/ziz/jxu/save-svhn-backward-20-rename",
     "nr_filters": 100,
     "nr_resnet": 5,
     "data_set": "svhn",
