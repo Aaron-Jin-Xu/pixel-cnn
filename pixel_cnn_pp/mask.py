@@ -243,8 +243,8 @@ class CenterMaskGenerator(MaskGenerator):
         masks = np.ones((n, self.height, self.width))
         h = int(self.height * self.scale)
         w = int(self.width * self.scale)
-        h_start = (self.height - h) / 2
-        w_start = (self.width - w) / 2
+        h_start = (self.height - h) // 2
+        w_start = (self.width - w) // 2
         masks[:, h_start:h_start+h, w_start:w_start+w] = 0
         return masks
 
