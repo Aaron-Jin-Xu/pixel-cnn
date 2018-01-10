@@ -103,7 +103,7 @@ DataLoader = {'cifar': cifar10_data.DataLoader,
               'svhn': svhn_data.DataLoader}[args.data_set]
 #train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu,
 #                        rng=rng, shuffle=True, return_labels=args.class_conditional)
-test_data = DataLoader(args.data_dir, 'test', args.batch_size *
+test_data = DataLoader(args.data_dir, 'valid', args.batch_size *
                        args.nr_gpu, shuffle=False, return_labels=args.class_conditional)
 obs_shape = test_data.get_observation_size()  # e.g. a tuple (32,32,3)
 assert len(obs_shape) == 3, 'assumed right now'
