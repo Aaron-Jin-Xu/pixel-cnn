@@ -167,6 +167,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, MAP=False):
             #     ps = np.array(ps) * 7.0 - 7.0
             #     log_probs = log_probs + ps # log_softmax(logit_probs)
             # else:
+
             log_probs = log_probs + log_softmax(logit_probs)
             probs = sum_exp(log_probs)
             arr.append(probs)
