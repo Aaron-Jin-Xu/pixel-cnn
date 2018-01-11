@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (8,8)
 
-exp_label = "celeba-hr-map-eye"
+exp_label = "celeba-hr-map-mouth"
 
 with tf.Session() as sess:
 
@@ -74,7 +74,7 @@ with tf.Session() as sess:
     #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 0, 64)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 44, 64, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
