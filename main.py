@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (8,8)
 
-exp_label = "celeba-hr-map-mouth"
+exp_label = "celeba-hr-map-eye-forward"
 
 with tf.Session() as sess:
 
@@ -74,7 +74,7 @@ with tf.Session() as sess:
     #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 44, 64, 0, 64)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -132,7 +132,7 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix)
-        pars = pars1 * pars2 #/ pr[:, 0, :]
+        pars = pars1 #* pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -147,7 +147,7 @@ with tf.Session() as sess:
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r)
-        pars = pars1 * pars2 #/ pr[:, 1, :]
+        pars = pars1 #* pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -162,7 +162,7 @@ with tf.Session() as sess:
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1 * pars2 #/ pr[:, 2, :]
+        pars = pars1 #* pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
