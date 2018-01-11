@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (8,8)
 
-exp_label = "celeba-hr-nomap-center-forward"
+exp_label = "celeba-hr-map-right"
 
 with tf.Session() as sess:
 
@@ -71,7 +71,8 @@ with tf.Session() as sess:
     #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 25)
     #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
-    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
+    #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
+    mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -127,9 +128,9 @@ with tf.Session() as sess:
         o2 = get_params(o2, target_pixels)
 
         # Sample red channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=False)#, log_scales_shift=2.)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix)
-        pars = pars1 #* pars2 #/ pr[:, 0, :]
+        pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -137,14 +138,14 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 0, :]]))
         color_r = []
         for i in range(pars.shape[0]):
-            color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            #color_r.append(np.argmax(pars[i, :]))
+            #color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_r.append(np.argmax(pars[i, :]))
         color_r = np.array(color_r)
 
         # Sample green channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=False)#, log_scales_shift=2.)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r)
-        pars = pars1 #* pars2 #/ pr[:, 1, :]
+        pars = pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -152,14 +153,14 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 1, :]]))
         color_g = []
         for i in range(pars.shape[0]):
-            color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            #color_g.append(np.argmax(pars[i, :]))
+            #color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_g.append(np.argmax(pars[i, :]))
         color_g = np.array(color_g)
 
         # Sample blue channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=False)#, log_scales_shift=2.)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = pars1 #* pars2 #/ pr[:, 2, :]
+        pars = pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -167,8 +168,8 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 2, :]]))
         color_b = []
         for i in range(pars.shape[0]):
-            color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            #color_b.append(np.argmax(pars[i, :]))
+            #color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_b.append(np.argmax(pars[i, :]))
         color_b = np.array(color_b)
 
         color = np.array([color_r, color_g, color_b]).T

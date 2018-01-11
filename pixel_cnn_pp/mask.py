@@ -231,6 +231,19 @@ class HalfMaskGenerator(MaskGenerator):
                 masks[i][:, -self.width//2:] = 0
         return masks
 
+class RightMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width, scale=0.5):
+        self.height = height
+        self.width = width
+        self.scale = scale
+
+    def gen(self, n):
+        masks = np.ones((n, self.height, self.width))
+        w = int(self.width * self.scale)
+        masks[:, :, -w:] = 0
+        return masks
+
 class CenterMaskGenerator(MaskGenerator):
 
 
