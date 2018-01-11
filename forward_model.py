@@ -18,8 +18,8 @@ import tensorflow as tf
 import pixel_cnn_pp.nn as nn
 import pixel_cnn_pp.mask as mk
 #import pixel_cnn_pp.plotting as plotting
-#from pixel_cnn_pp.model_hr import model_spec
-from pixel_cnn_pp.model import model_spec
+from pixel_cnn_pp.model_hr import model_spec
+#from pixel_cnn_pp.model import model_spec
 import data.cifar10_data as cifar10_data
 import data.imagenet_data as imagenet_data
 import data.celeba_data_hr as celeba_data
@@ -82,7 +82,7 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['svhn-forward-20'])
+parse_args(args, **configs['celeba-hr-forward-new-20'])
 #parse_args(args, **configs['celeba-hr-forward'])
 #parse_args(args, **configs['svhn-forward'])
 
