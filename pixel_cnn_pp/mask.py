@@ -261,7 +261,7 @@ class CenterMaskGenerator(MaskGenerator):
         masks[:, h_start:h_start+h, w_start:w_start+w] = 0
         return masks
 
-class RectangleMaskGenerator(MaskGenerator)
+class RectangleMaskGenerator(MaskGenerator):
 
     def __init__(self, height, width, h_start, h_end, w_start, w_end):
         self.height = height
