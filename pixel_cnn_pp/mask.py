@@ -241,7 +241,7 @@ class RightMaskGenerator(MaskGenerator):
     def gen(self, n):
         masks = np.ones((n, self.height, self.width))
         w = int(self.width * self.scale)
-        masks[:, :, -w:] = 0
+        masks[:, 16:48, -w:] = 0
         return masks
 
 class CenterMaskGenerator(MaskGenerator):
