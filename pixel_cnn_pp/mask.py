@@ -107,14 +107,15 @@ class RecNoProgressMaskGenerator(RecMaskGenerator):
 
 class RectangleInProgressMaskGenerator(MaskGenerator):
 
-    def __init__(self, h, w, rng=None):
+    def __init__(self, h, w, forward=False, rng=None):
         super().__init__(h, w, rng)
+        self.forward = forward
 
     def gen_par(self, seed=None):
         if seed is not None:
             self.rng = np.random.RandomState(seed)
-        mh = self.rng.randint(low=int(self.h * 0.1), high=int(self.h * 0.5))
-        mw = self.rng.randint(low=int(self.w * 0.1), high=int(self.w * 0.5))
+        mh = self.rng.randint(low=int(self.h * 0.1), high=int(self.h * 0.4))
+        mw = self.rng.randint(low=int(self.w * 0.1), high=int(self.w * 0.4))
         pgh = self.rng.randint(low=0, high=mh)
         pgw =  self.rng.randint(low=0, high=mw)
         oh = self.rng.randint(low=1, high=self.h - mh)
@@ -129,6 +130,8 @@ class RectangleInProgressMaskGenerator(MaskGenerator):
             missing[:progress_h, :] = 1
             missing[progress_h, :progress_w] = 1
             mask[i, offset_h:offset_h+missing_h, offset_w:offset_w+missing_w] = missing
+        if self.forward:
+            return mask
         return np.rot90(mask, 2, (1,2))
 
 

@@ -80,10 +80,11 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['celeba-hr-backward'])
-args.save_dir = "/data/ziz/jxu/save64-backward-new-20"
+parse_args(args, **configs['celeba-hr-forward'])
+args.save_dir = "/data/ziz/jxu/save64-backward-new-20-missing"
 args.nr_logistic_mix = 20
 args.learning_rate = 0.0005
+args.masked = True
 
 
 print('input args:\n', json.dumps(vars(args), indent=4,
@@ -212,7 +213,7 @@ saver = tf.train.Saver()
 
 
 #mgen = mk.RecMaskGenerator(obs_shape[0], obs_shape[1])
-mgen = mk.RectangleInProgressMaskGenerator(obs_shape[0], obs_shape[1])
+mgen = mk.RectangleInProgressMaskGenerator(obs_shape[0], obs_shape[1], forward=True)
 agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
 
 def make_feed_dict(data, init=False, masks=None, is_test=False):
