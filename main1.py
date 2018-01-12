@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (8,8)
 
-exp_label = "svhn-grid"
+exp_label = "celeba-hr-map-eye"
 
 with tf.Session() as sess:
 
@@ -57,6 +57,7 @@ with tf.Session() as sess:
 
     # Get test images, batch_size X nr_gpu
     d = next(fm.test_data)
+    d = next(fm.test_data)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/original-{0}.png".format(exp_label))
@@ -64,12 +65,16 @@ with tf.Session() as sess:
     # generate masks
     obs_shape = d.shape[1:]
     #mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
-    #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
+    #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 16)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
-    #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-    #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 16, 48)
-    mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
+    #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 32)
+    #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 25)
+    #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
+    #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
+    #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
+    #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -82,8 +87,8 @@ with tf.Session() as sess:
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     # Load prior
-    #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-    prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+    prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+    #prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
 
     dis_record = []
@@ -99,8 +104,10 @@ with tf.Session() as sess:
         print(count)
 
         rgb_record = []
-
-        target_pixels = next_pixel(ms)
+        if count % 2 ==1:
+            target_pixels = next_pixel(ms)
+        else:
+            target_pixels = backward_next_pixel(ms)
         #print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
@@ -125,8 +132,8 @@ with tf.Session() as sess:
         o2 = get_params(o2, target_pixels)
 
         # Sample red channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
-        pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=True)#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix)
         pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -135,12 +142,13 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 0, :]]))
         color_r = []
         for i in range(pars.shape[0]):
-            color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            #color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_r.append(np.argmax(pars[i, :]))
         color_r = np.array(color_r)
 
         # Sample green channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
-        pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=True)#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r)
         pars = pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -149,12 +157,13 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 1, :]]))
         color_g = []
         for i in range(pars.shape[0]):
-            color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            #color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_g.append(np.argmax(pars[i, :]))
         color_g = np.array(color_g)
 
         # Sample blue channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=True)#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars = pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -163,10 +172,14 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 2, :]]))
         color_b = []
         for i in range(pars.shape[0]):
-            color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            #color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            color_b.append(np.argmax(pars[i, :]))
         color_b = np.array(color_b)
 
         color = np.array([color_r, color_g, color_b]).T
+
+
+
         sample_record.append(color)
         #print(color)
         dis_record.append(np.array(rgb_record))
@@ -180,7 +193,7 @@ with tf.Session() as sess:
 
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
-    np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
+    #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
 
     # Store the completed images
 
