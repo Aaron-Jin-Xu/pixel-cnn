@@ -74,7 +74,7 @@ with tf.Session() as sess:
     #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 18, 38, 0, 64)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 18, 28, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -104,7 +104,6 @@ with tf.Session() as sess:
         print(count)
         if count % 2 == 1:
             flag = "forward"
-            continue
         else:
             flag = "backward"
 
@@ -125,7 +124,8 @@ with tf.Session() as sess:
 
         # Forward model prediction
         if flag=="forward":
-            feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+            #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+            feed_dict = fm.make_feed_dict(d, mask_values=backward_ms, rot=False)
             _o1 = sess.run(fm.outputs, feed_dict)
             _o1 = np.concatenate(_o1, axis=0)
         o1 = get_params(_o1, target_pixels)
@@ -143,13 +143,8 @@ with tf.Session() as sess:
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
         if flag=='forward':
             pars = pars1 * pars2 #/ pr[:, 0, :]
-            print(pars1[0] / np.sum(pars1[0]))
-            print(pars2[0] / np.sum(pars2[0]))
         else:
             pars = pars2
-            print(pars1[0] / np.sum(pars1[0]))
-            print(pars2[0] / np.sum(pars2[0]))
-            quit()
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -199,8 +194,6 @@ with tf.Session() as sess:
 
         color = np.array([color_r, color_g, color_b]).T
 
-
-
         sample_record.append(color)
         #print(color)
         dis_record.append(np.array(rgb_record))
@@ -211,6 +204,8 @@ with tf.Session() as sess:
             d[idx, p[0], p[1], :] = color[idx, :]
 
         data_record.append(d.copy())
+
+
 
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
