@@ -123,21 +123,23 @@ with tf.Session() as sess:
         backward_ms = np.rot90(ms, 2, (1,2))
 
         # Forward model prediction
-        feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-        o1 = sess.run(fm.outputs, feed_dict)
-        o1 = np.concatenate(o1, axis=0)
+        if flag=="forward":
+            feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+            o1 = sess.run(fm.outputs, feed_dict)
+            o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
 
         # Backward model prediction
-        feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
-        o2 = sess.run(bm.outputs, feed_dict)
-        o2 = np.concatenate(o2, axis=0)
-        o2 = np.rot90(o2, 2, (1,2))
+        if flag=='forward':
+            feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
+            o2 = sess.run(bm.outputs, feed_dict)
+            o2 = np.concatenate(o2, axis=0)
+            o2 = np.rot90(o2, 2, (1,2))
         o2 = get_params(o2, target_pixels)
 
         # Sample red channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=='forward'))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=='forwar'))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backwar'))
         pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -151,8 +153,8 @@ with tf.Session() as sess:
         color_r = np.array(color_r)
 
         # Sample green channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forwar'))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backwar'))
         pars = pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -166,8 +168,8 @@ with tf.Session() as sess:
         color_g = np.array(color_g)
 
         # Sample blue channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forwar'))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backwar'))
         pars = pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
