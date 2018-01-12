@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (8,8)
 
-exp_label = "celeba-hr-map-eye"
+exp_label = "celeba-hr-map-eye-bidirection"
 
 with tf.Session() as sess:
 
@@ -102,13 +102,17 @@ with tf.Session() as sess:
     while True:
         count += 1
         print(count)
+        if count % 2 == 1:
+            flag = "forward"
+        else:
+            flag = "backward"
 
         rgb_record = []
-        if count % 2 ==1:
+        if flag=='forward':
             target_pixels = next_pixel(ms)
         else:
             target_pixels = backward_next_pixel(ms)
-        #print(target_pixels[0])
+        print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
         pr = get_prior(prior, target_pixels)
@@ -132,8 +136,8 @@ with tf.Session() as sess:
         o2 = get_params(o2, target_pixels)
 
         # Sample red channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=True)#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=='forward'))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
         pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -147,8 +151,8 @@ with tf.Session() as sess:
         color_r = np.array(color_r)
 
         # Sample green channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=True)#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
         pars = pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -162,8 +166,8 @@ with tf.Session() as sess:
         color_g = np.array(color_g)
 
         # Sample blue channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=True)#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g)
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
         pars = pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
