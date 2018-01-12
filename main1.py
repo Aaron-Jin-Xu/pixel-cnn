@@ -180,6 +180,9 @@ with tf.Session() as sess:
             pars = pars1 * pars2 #/ pr[:, 2, :]
         else:
             pars = pars2
+            print(pars1[0])
+            print(pars2[0])
+            quit()
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
