@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (8,8)
 
-exp_label = "celeba-hr-map-eye"
+exp_label = "celeba-hr-map-only-backward"
 
 with tf.Session() as sess:
 
