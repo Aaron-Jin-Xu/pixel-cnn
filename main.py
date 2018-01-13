@@ -30,9 +30,9 @@ def find_coutour(mask):
     return contour
 
 #display_size = (6,6)
-display_size = (8,8)
+display_size = (5,5)
 
-exp_label = "celeba-hr-map-only-backward"
+exp_label = "celeba-hr-map-test"
 
 with tf.Session() as sess:
 
@@ -56,6 +56,7 @@ with tf.Session() as sess:
 
 
     # Get test images, batch_size X nr_gpu
+    d = next(fm.test_data)
     d = next(fm.test_data)
     d = next(fm.test_data)
     # Store original images
@@ -105,7 +106,8 @@ with tf.Session() as sess:
 
         rgb_record = []
 
-        target_pixels = backward_next_pixel(ms) ##
+        #target_pixels = backward_next_pixel(ms) ##
+        target_pixels = next_pixel(ms) ##
         #print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
@@ -114,7 +116,7 @@ with tf.Session() as sess:
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
             backward_ms[idx, p[0], p[1]] = 1
-        backward_ms = np.rot90(ms, 2, (1,2))
+        backward_ms = np.rot90(backward_ms, 2, (1,2))
 
         # Forward model prediction
         feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
@@ -132,7 +134,7 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=True)
-        pars = pars2 #pars1 * pars2 #/ pr[:, 0, :]
+        pars = pars1 #pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -147,7 +149,7 @@ with tf.Session() as sess:
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=True)
-        pars = pars2 #pars1 * pars2 #/ pr[:, 1, :]
+        pars = pars1 #pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -162,7 +164,7 @@ with tf.Session() as sess:
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=True)#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=True)
-        pars = pars2 #pars1 * pars2 #/ pr[:, 2, :]
+        pars = pars1 #pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
