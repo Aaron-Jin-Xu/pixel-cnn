@@ -116,23 +116,24 @@ with tf.Session() as sess:
         if target_pixels[0][0] is None:
             break
         pr = get_prior(prior, target_pixels)
-        backward_ms = ms.copy()
+
+        feed_ms = ms.copy()
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
-            backward_ms[idx, p[0], p[1]] = 1
-        backward_ms = np.rot90(ms, 2, (1,2))
+            feed_ms[idx, p[0], p[1]] = 1
+
 
         # Forward model prediction
         if flag=="forward":
             #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-            feed_dict = fm.make_feed_dict(d, mask_values=backward_ms, rot=False)
+            feed_dict = fm.make_feed_dict(d, mask_values=feed_ms, rot=False)
             _o1 = sess.run(fm.outputs, feed_dict)
             _o1 = np.concatenate(_o1, axis=0)
         o1 = get_params(_o1, target_pixels)
 
         # Backward model prediction
         if flag=='forward':
-            feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
+            feed_dict = bm.make_feed_dict(d, mask_values=np.rot90(feed_ms, 2, (1,2)), rot=True)
             _o2 = sess.run(bm.outputs, feed_dict)
             _o2 = np.concatenate(_o2, axis=0)
             _o2 = np.rot90(_o2, 2, (1,2))
