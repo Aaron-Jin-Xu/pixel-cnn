@@ -145,8 +145,8 @@ with tf.Session() as sess:
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backwar'))
         pars = pars1 * pars2 #/ pr[:, 0, :]
         if flag=='backward':
-            print(pars1[0])
-            print(pars2[0])
+            print(pars1[0] / np.sum(pars1[0]))
+            print(pars2[0] / np.sum(pars2[0]))
             quit()
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
