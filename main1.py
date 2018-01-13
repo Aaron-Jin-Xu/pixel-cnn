@@ -125,25 +125,28 @@ with tf.Session() as sess:
 
 
         # Forward model prediction
-        if flag=="forward":
+        #if flag=="forward":
             #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-            feed_dict = fm.make_feed_dict(d, mask_values=feed_ms, rot=False)
-            _o1 = sess.run(fm.outputs, feed_dict)
-            _o1 = np.concatenate(_o1, axis=0)
+        feed_dict = fm.make_feed_dict(d, mask_values=feed_ms, rot=False)
+        _o1 = sess.run(fm.outputs, feed_dict)
+        _o1 = np.concatenate(_o1, axis=0)
         o1 = get_params(_o1, target_pixels)
 
         # Backward model prediction
-        if flag=='forward':
-            feed_dict = bm.make_feed_dict(d, mask_values=np.rot90(feed_ms, 2, (1,2)), rot=True)
-            _o2 = sess.run(bm.outputs, feed_dict)
-            _o2 = np.concatenate(_o2, axis=0)
-            _o2 = np.rot90(_o2, 2, (1,2))
+        #if flag=='forward':
+        feed_dict = bm.make_feed_dict(d, mask_values=np.rot90(feed_ms, 2, (1,2)), rot=True)
+        _o2 = sess.run(bm.outputs, feed_dict)
+        _o2 = np.concatenate(_o2, axis=0)
+        _o2 = np.rot90(_o2, 2, (1,2))
         o2 = get_params(_o2, target_pixels)
 
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=='forward'))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
         pars = pars1 * pars2 #/ pr[:, 0, :]
+        print(pars1[0] / np.sum(pars1[0]))
+        print(pars2[0] / np.sum(pars2[0]))
+        quit()
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
