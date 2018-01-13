@@ -140,6 +140,18 @@ configs["celeba-hr-forward-new-20"] = {
     "nr_gpu":8,
     "nr_logistic_mix": 20,
 }
+configs["celeba-hr-forward-new-20-missing"] = {
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/save64-forward-new-20-missing",
+    "nr_filters": 100,
+    "nr_resnet": 4,
+    "data_set": "celeba",
+    "batch_size": 8,
+    "init_batch_size": 8,
+    "save_interval":5,
+    "nr_gpu":8,
+    "nr_logistic_mix": 20,
+}
 
 configs["celeba-hr-backward-new-20-rename"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
@@ -155,6 +167,7 @@ configs["celeba-hr-backward-new-20-rename"] = {
     "nr_gpu":8,
     'nr_logistic_mix': 20,
 }
+
 
 configs["svhn-forward-20"] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
