@@ -151,6 +151,7 @@ configs["celeba-hr-forward-new-20-missing"] = {
     "save_interval":5,
     "nr_gpu":8,
     "nr_logistic_mix": 20,
+    "masked": True,  
 }
 
 configs["celeba-hr-backward-new-20-rename"] = {
