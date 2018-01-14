@@ -82,7 +82,7 @@ with tf.Session() as sess:
 
     # Mask the images
     d = d.astype(np.float64)
-    d = np.rot(d, 2, (1,2)) ##
+    d = np.rot90(d, 2, (1,2)) ##
     d *= ms[:, :, :, None]
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/masked-{0}.png".format(exp_label))
