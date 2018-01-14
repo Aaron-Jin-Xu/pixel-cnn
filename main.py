@@ -75,7 +75,7 @@ with tf.Session() as sess:
     #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 0, 64)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 29, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -225,7 +225,11 @@ with tf.Session() as sess:
 
         # Forward model prediction
         #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-        feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+        forward_ms = np.rot90(backward_ms, 2, (1,2))
+        for idx in range(len(target_pixels)):
+            p = target_pixels[idx]
+            forward_ms[idx, :(p[0]-1), :] = 1
+        feed_dict = fm.make_feed_dict(d, mask_values=forward_ms, rot=False)
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
@@ -294,109 +298,6 @@ with tf.Session() as sess:
             d[idx, p[0], p[1], :] = color[idx, :]
 
         data_record.append(d.copy())
-
-    for i in range(d.shape[0]):
-        contour = 1-find_coutour(ms_ori[i])[:, :, None]
-        contour[contour<1] = 0.8
-        d[i] *= contour
-
-    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/plots/complete-{0}-before-2.png".format(exp_label))
-
-
-    ms = ms_ori.copy()
-    while True:
-
-        count += 1
-        print(count)
-
-        rgb_record = []
-
-        target_pixels = backward_next_pixel(ms) ##
-        #target_pixels = next_pixel(ms) ##
-        print(target_pixels[0])
-        if target_pixels[0][0] is None:
-            break
-        pr = get_prior(prior, target_pixels)
-        backward_ms = ms.copy()
-        for idx in range(len(target_pixels)):
-            p = target_pixels[idx]
-            backward_ms[idx, p[0], p[1]] = 1
-        backward_ms = np.rot90(backward_ms, 2, (1,2))
-
-        # Forward model prediction
-        #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-        feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-        o1 = sess.run(fm.outputs, feed_dict)
-        o1 = np.concatenate(o1, axis=0)
-        o1 = get_params(o1, target_pixels)
-
-        # Backward model prediction
-        #feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
-        feed_dict = bm.make_feed_dict(d, mask_values=ams, rot=True)
-        o2 = sess.run(bm.outputs, feed_dict)
-        o2 = np.concatenate(o2, axis=0)
-        o2 = np.rot90(o2, 2, (1,2))
-        o2 = get_params(o2, target_pixels)
-
-        # Sample red channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
-        pars = pars1 * pars2 #/ pr[:, 0, :]
-        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
-        #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars, pr[:, 0, :]]))
-        color_r = []
-        for i in range(pars.shape[0]):
-            #color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            color_r.append(np.argmax(pars[i, :]))
-        color_r = np.array(color_r)
-
-        # Sample green channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
-        pars = pars1 * pars2 #/ pr[:, 1, :]
-        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
-        #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars, pr[:, 1, :]]))
-        color_g = []
-        for i in range(pars.shape[0]):
-            #color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            color_g.append(np.argmax(pars[i, :]))
-        color_g = np.array(color_g)
-
-        # Sample blue channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
-        pars = pars1 * pars2 #/ pr[:, 2, :]
-        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
-        #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
-        rgb_record.append(np.array([pars1, pars2, pars, pr[:, 2, :]]))
-        color_b = []
-        for i in range(pars.shape[0]):
-            #color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            color_b.append(np.argmax(pars[i, :]))
-        color_b = np.array(color_b)
-
-        color = np.array([color_r, color_g, color_b]).T
-        sample_record.append(color)
-        #print(color)
-        dis_record.append(np.array(rgb_record))
-
-        for idx in range(len(target_pixels)):
-            p = target_pixels[idx]
-            ms[idx, p[0], p[1]] = 1
-            d[idx, p[0], p[1], :] = color[idx, :]
-
-        data_record.append(d.copy())
-
-
 
 
     dis_record = np.array(dis_record)
