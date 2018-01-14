@@ -37,23 +37,21 @@ exp_label = "celeba-hr-map-eye-bidirection"
 
 with tf.Session() as sess:
 
-
-
-    # restore backward model
+    # restore forward model
     var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1/')
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
-    ckpt_file = bm.args.save_dir + '/params_' + bm.args.data_set + '.ckpt'
+    ckpt_file = fm.args.save_dir + '/params_' + fm.args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    # restore forward model
+    # restore backward model
     var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model/')
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
-    ckpt_file = fm.args.save_dir + '/params_' + fm.args.data_set + '.ckpt'
+    ckpt_file = bm.args.save_dir + '/params_' + bm.args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
