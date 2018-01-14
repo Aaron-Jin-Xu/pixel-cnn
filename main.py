@@ -122,14 +122,14 @@ with tf.Session() as sess:
 
         # Forward model prediction
         #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-        feed_dict = fm.make_feed_dict(d, mask_values=np.rot90(backward_ms, 2, (1,2)), rot=False)
+        feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
 
         # Backward model prediction
         #feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
-        feed_dict = bm.make_feed_dict(d, mask_values=ams, rot=True)
+        feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
         o2 = sess.run(bm.outputs, feed_dict)
         o2 = np.concatenate(o2, axis=0)
         o2 = np.rot90(o2, 2, (1,2))
