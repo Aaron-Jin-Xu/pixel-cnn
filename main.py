@@ -75,7 +75,7 @@ with tf.Session() as sess:
     #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 35, 48, 0, 64)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 38, 48, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -192,8 +192,19 @@ with tf.Session() as sess:
 
         data_record.append(d.copy())
 
+
+    for i in range(d.shape[0]):
+        contour = 1-find_coutour(ms_ori[i])[:, :, None]
+        contour[contour<1] = 0.8
+        d[i] *= contour
+    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
+    img.save("/homes/jxu/projects/ImageInpainting/plots/complete-{0}-before.png".format(exp_label))
+
+
+
     flag = 'backward'
     ms = ms_ori.copy()
+
 
     while True:
 
