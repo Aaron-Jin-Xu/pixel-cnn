@@ -72,10 +72,10 @@ with tf.Session() as sess:
     #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 25)
     #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
-    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
+    #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
-    #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 48, 0, 64)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 18, 23, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -108,7 +108,7 @@ with tf.Session() as sess:
 
         #target_pixels = backward_next_pixel(ms) ##
         target_pixels = next_pixel(ms) ##
-        #print(target_pixels[0])
+        print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
         pr = get_prior(prior, target_pixels)
@@ -133,8 +133,8 @@ with tf.Session() as sess:
 
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=True)#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=True)
-        pars = pars1 #pars1 * pars2 #/ pr[:, 0, :]
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=False)
+        pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -148,8 +148,8 @@ with tf.Session() as sess:
 
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=True)#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=True)
-        pars = pars1 #pars1 * pars2 #/ pr[:, 1, :]
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=False)
+        pars = pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -163,8 +163,8 @@ with tf.Session() as sess:
 
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=True)#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=True)
-        pars = pars1 #pars1 * pars2 #/ pr[:, 2, :]
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=False)
+        pars = pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
