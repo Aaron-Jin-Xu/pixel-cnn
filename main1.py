@@ -5,8 +5,9 @@ import os
 import sys
 import time
 
-import forward_model as fm
+
 import backward_model as bm
+import forward_model as fm
 
 import pixel_cnn_pp.mask as mk
 from utils import *
