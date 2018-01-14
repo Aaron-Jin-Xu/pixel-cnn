@@ -5,9 +5,8 @@ import os
 import sys
 import time
 
-
-import backward_model as bm
 import forward_model as fm
+import backward_model as bm
 
 import pixel_cnn_pp.mask as mk
 from utils import *
@@ -38,7 +37,7 @@ exp_label = "celeba-hr-map-eye-bidirection"
 with tf.Session() as sess:
 
     # restore forward model
-    var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1/')
+    var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model/')
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
@@ -47,7 +46,7 @@ with tf.Session() as sess:
     saver.restore(sess, ckpt_file)
 
     # restore backward model
-    var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model/')
+    var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1/')
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
@@ -76,13 +75,12 @@ with tf.Session() as sess:
     #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 18, 25, 0, 64)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 18, 23, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
     # Mask the images
     d = d.astype(np.float64)
-    d = np.rot90(d, 2, (1,2)) ##
     d *= ms[:, :, :, None]
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/masked-{0}.png".format(exp_label))
@@ -145,7 +143,7 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=='forward'))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
-        pars = pars1 * pars2 #/ pr[:, 0, :]
+        pars = pars2 #* pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -160,7 +158,7 @@ with tf.Session() as sess:
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
-        pars = pars1  * pars2 #/ pr[:, 1, :]
+        pars = pars2  #* pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -175,7 +173,7 @@ with tf.Session() as sess:
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
-        pars = pars1 * pars2 #/ pr[:, 2, :]
+        pars = pars2 #* pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
