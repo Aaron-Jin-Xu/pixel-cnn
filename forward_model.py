@@ -82,8 +82,8 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['celeba-hr-forward-new-20-missing'])
-#parse_args(args, **configs['celeba-hr-forward-new-20'])
+#parse_args(args, **configs['celeba-hr-forward-new-20-missing'])
+parse_args(args, **configs['celeba-hr-backward-new-20-rename'])
 
 args.nr_gpu = 4
 
@@ -131,7 +131,7 @@ gen_par = model(x_init, None, h_init, init=True,
                 dropout_p=args.dropout_p, **model_opt)
 
 # keep track of moving average
-all_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='model')
+all_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='model_1')
 ema = tf.train.ExponentialMovingAverage(decay=args.polyak_decay)
 maintain_averages_op = tf.group(ema.apply(all_params))
 

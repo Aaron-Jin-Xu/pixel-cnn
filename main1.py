@@ -5,8 +5,8 @@ import os
 import sys
 import time
 
-import forward_model as fm
 import backward_model as bm
+import forward_model as fm
 
 import pixel_cnn_pp.mask as mk
 from utils import *
@@ -37,7 +37,7 @@ exp_label = "celeba-hr-map-eye-bidirection"
 with tf.Session() as sess:
 
     # restore forward model
-    var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model/')
+    var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1/')
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
@@ -46,7 +46,7 @@ with tf.Session() as sess:
     saver.restore(sess, ckpt_file)
 
     # restore backward model
-    var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model_1/')
+    var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='model/')
     print(len(var_list))
     saver = tf.train.Saver(var_list=var_list)
 
@@ -81,6 +81,7 @@ with tf.Session() as sess:
 
     # Mask the images
     d = d.astype(np.float64)
+    d = np.rot90(d, 2, (1,2))
     d *= ms[:, :, :, None]
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/masked-{0}.png".format(exp_label))
