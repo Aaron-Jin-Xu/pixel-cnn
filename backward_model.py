@@ -84,7 +84,7 @@ args = parser.parse_args()
 
 # parse_args(args, **configs['celeba-hr-backward-rename'])
 #parse_args(args, **configs['celeba-hr-backward-new-20-rename'])
-parse_args(args, **configs['celeba-hr-backward-new-20-missing'])
+parse_args(args, **configs['celeba-hr-forward-new-20-missing'])
 
 
 #parse_args(args, **configs['svhn-backward-20-rename'])
