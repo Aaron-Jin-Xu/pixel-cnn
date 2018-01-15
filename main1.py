@@ -127,7 +127,7 @@ with tf.Session() as sess:
         # Forward model prediction
         #if flag=="forward":
             #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-        feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+        feed_dict = fm.make_feed_dict(d, mask_values=ms, rot=False)
         _o1 = sess.run(fm.outputs, feed_dict)
         _o1 = np.concatenate(_o1, axis=0)
         o1 = get_params(_o1, target_pixels)
