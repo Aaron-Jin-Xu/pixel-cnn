@@ -154,7 +154,7 @@ with tf.Session() as sess:
             color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
             #color_r.append(np.argmax(pars[i, :]))
         if flag=='backward':
-            print(pars[0, :])
+            print(o2[0])
         color_r = np.array(color_r)
 
         # Sample green channel
