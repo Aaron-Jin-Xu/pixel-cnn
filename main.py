@@ -30,7 +30,7 @@ def find_coutour(mask):
     return contour
 
 #display_size = (6,6)
-display_size = (8,8)
+display_size = (5, 5)
 
 exp_label = "celeba-hr-map-sampling"
 
