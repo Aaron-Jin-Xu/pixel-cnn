@@ -30,7 +30,7 @@ def find_coutour(mask):
     return contour
 
 #display_size = (6,6)
-display_size = (5, 6)
+display_size = (8,4)
 
 exp_label = "celeba-hr-map-center"
 
@@ -56,6 +56,7 @@ with tf.Session() as sess:
 
 
     # Get test images, batch_size X nr_gpu
+    d = next(fm.test_data)
     d = next(fm.test_data)
     d = next(fm.test_data)
     d = next(fm.test_data)
