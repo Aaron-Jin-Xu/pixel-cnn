@@ -108,7 +108,7 @@ def sample_from_discretized_mix_logistic(l, nr_mix):
     means = tf.reduce_sum(l[:, :, :, :, :nr_mix] * sel, 4)
     log_scales = tf.maximum(tf.reduce_sum(
         l[:, :, :, :, nr_mix:2 * nr_mix] * sel, 4), -7.)
-    log_scales -= 2.0
+    #log_scales -= 2.0
     coeffs = tf.reduce_sum(tf.nn.tanh(
         l[:, :, :, :, 2 * nr_mix:3 * nr_mix]) * sel, 4)
     # sample from logistic & clip to interval
