@@ -187,7 +187,7 @@ with tf.Session() as sess:
 
         color = np.array([color_r, color_g, color_b]).T
         if flag=='backward':
-            print(color[0])
+            print(color[1])
 
         sample_record.append(color)
         #print(color)
