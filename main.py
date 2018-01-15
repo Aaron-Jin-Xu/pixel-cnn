@@ -63,6 +63,7 @@ with tf.Session() as sess:
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/original-{0}.png".format(exp_label))
 
+
     # generate masks
     obs_shape = d.shape[1:]
     #mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
