@@ -140,8 +140,8 @@ with tf.Session() as sess:
         _o2 = np.rot90(_o2, 2, (1,2))
         o2 = get_params(_o2, target_pixels)
 
-        print(o1[0])
-        print(o2[0])
+        print(o1[0].dtype)
+        print(o2[0].dtype)
         quit()
 
         # Sample red channel
