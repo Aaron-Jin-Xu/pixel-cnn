@@ -82,7 +82,8 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['celeba-hr-forward-new-20-missing'])
+#parse_args(args, **configs['celeba-hr-forward-new-20-missing'])
+parse_args(args, **configs['celeba-hr-forward-new-20'])
 #parse_args(args, **configs['celeba-hr-backward-new-20-rename'])
 
 args.nr_gpu = 4
