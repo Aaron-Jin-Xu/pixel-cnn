@@ -186,6 +186,7 @@ with tf.Session() as sess:
         color_b = np.array(color_b)
 
         color = np.array([color_r, color_g, color_b]).T
+        print(color)
 
         sample_record.append(color)
         #print(color)
