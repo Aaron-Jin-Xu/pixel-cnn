@@ -30,7 +30,7 @@ def find_coutour(mask):
     return contour
 
 #display_size = (6,6)
-display_size = (5, 5)
+display_size = (5, 6)
 
 exp_label = "celeba-hr-map-center"
 
@@ -57,8 +57,8 @@ with tf.Session() as sess:
 
     # Get test images, batch_size X nr_gpu
     d = next(fm.test_data)
-    #d = next(fm.test_data)
-    #d = next(fm.test_data)
+    d = next(fm.test_data)
+    d = next(fm.test_data)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/original-{0}.png".format(exp_label))
