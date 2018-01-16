@@ -87,7 +87,7 @@ parse_args(args, **configs['celeba-hr-forward-new-20'])
 #parse_args(args, **configs['celeba-hr-backward-new-20-rename'])
 
 args.nr_gpu = 8
-args.save_dir = "/data/ziz/jxu/save64-backward-new-20-missing"
+#args.save_dir = "/data/ziz/jxu/save64-backward-new-20-missing"
 args.masked = True
 
 print('input args:\n', json.dumps(vars(args), indent=4,
