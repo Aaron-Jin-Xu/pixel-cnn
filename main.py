@@ -76,7 +76,7 @@ with tf.Session() as sess:
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
     #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 33, 2, 62)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 1, 32, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
