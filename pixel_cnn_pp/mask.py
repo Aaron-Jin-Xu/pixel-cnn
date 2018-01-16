@@ -289,9 +289,9 @@ class CrossMaskGenerator(MaskGenerator):
 
     def gen(self, n):
         masks = np.ones((n, self.height, self.width))
-        h_start, h_end, w_start, w_end = rec1
+        h_start, h_end, w_start, w_end = self.rec1
         masks[:, h_start:h_end, w_start:w_end] = 0
-        h_start, h_end, w_start, w_end = rec2
+        h_start, h_end, w_start, w_end = self.rec2
         masks[:, h_start:h_end, w_start:w_end] = 0
         return masks
 
