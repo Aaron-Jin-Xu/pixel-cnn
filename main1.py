@@ -14,7 +14,7 @@ from PIL import Image
 
 from configs import configs
 
-def find_coutour(mask):
+def find_contour(mask):
     contour = np.zeros_like(mask)
     h, w = mask.shape
     for y in range(h):
@@ -210,7 +210,7 @@ with tf.Session() as sess:
     # Store the completed images
 
     for i in range(d.shape[0]):
-        contour = 1-find_coutour(ms_ori[i])[:, :, None]
+        contour = 1-find_contour(ms_ori[i])[:, :, None]
         contour[contour<1] = 0.8
         d[i] *= contour
 
