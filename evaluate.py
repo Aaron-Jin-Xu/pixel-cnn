@@ -70,7 +70,7 @@ with tf.Session() as sess:
 
     for k in range(5):
         print(k, "------------------------")
-        mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1.0 / 16)
+        mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
         #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
         #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
         #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
