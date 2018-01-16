@@ -85,8 +85,8 @@ with tf.Session() as sess:
         ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
         # Load prior
-        #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-        prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+        prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+        #prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
 
         count = 0
@@ -184,3 +184,4 @@ with tf.Session() as sess:
     print(np.mean(psnr))
     print(np.std(psnr))
     print(len(psnr))
+    np.savez("psnr", psnr=psnr)
