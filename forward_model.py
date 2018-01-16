@@ -86,7 +86,7 @@ args = parser.parse_args()
 parse_args(args, **configs['celeba-hr-forward-new-20'])
 #parse_args(args, **configs['celeba-hr-backward-new-20-rename'])
 
-args.nr_gpu = 4
+args.nr_gpu = 8
 
 print('input args:\n', json.dumps(vars(args), indent=4,
                                   separators=(',', ':')))  # pretty print args

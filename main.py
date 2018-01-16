@@ -30,9 +30,9 @@ def find_coutour(mask):
     return contour
 
 #display_size = (6,6)
-display_size = (8,4)
+display_size = (8, 8)
 
-exp_label = "celeba-hr-map-center"
+exp_label = "celeba-hr-map-eye"
 
 with tf.Session() as sess:
 
@@ -58,8 +58,8 @@ with tf.Session() as sess:
     # Get test images, batch_size X nr_gpu
     d = next(fm.test_data)
     d = next(fm.test_data)
-    d = next(fm.test_data)
-    d = next(fm.test_data)
+    #d = next(fm.test_data)
+    #d = next(fm.test_data)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots/original-{0}.png".format(exp_label))
@@ -74,9 +74,9 @@ with tf.Session() as sess:
     #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 25)
     #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
-    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
+    #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
-    #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 61, 20, 32)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 1, 32, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
