@@ -14,6 +14,8 @@ from PIL import Image
 
 from configs import configs
 
+from evaluation import *
+
 def find_contour(mask):
     contour = np.zeros_like(mask)
     h, w = mask.shape
