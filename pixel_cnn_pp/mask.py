@@ -279,6 +279,22 @@ class RectangleMaskGenerator(MaskGenerator):
         masks[:, self.h_start:self.h_end, self.w_start:self.w_end] = 0
         return masks
 
+class CrossMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width, rec1, rec2):
+        self.height = height
+        self.width = width
+        self.rec1 = rec1
+        self.rec2 = rec2
+
+    def gen(self, n):
+        masks = np.ones((n, self.height, self.width))
+        h_start, h_end, w_start, w_end = rec1
+        masks[:, h_start:h_end, w_start:w_end] = 0
+        h_start, h_end, w_start, w_end = rec2
+        masks[:, h_start:h_end, w_start:w_end] = 0
+        return masks
+
 class GridMaskGenerator(MaskGenerator):
 
     def __init__(self, height, width, grid_size):
