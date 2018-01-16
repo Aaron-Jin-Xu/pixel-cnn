@@ -32,7 +32,7 @@ def find_coutour(mask):
 #display_size = (6,6)
 display_size = (8, 8)
 
-exp_label = "celeba-hr-map-eye"
+exp_label = "celeba-hr-map-test"
 
 with tf.Session() as sess:
 
@@ -62,7 +62,7 @@ with tf.Session() as sess:
     #d = next(fm.test_data)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/plots/original-{0}.png".format(exp_label))
+    img.save("/homes/jxu/projects/ImageInpainting/plots1/original-{0}.png".format(exp_label))
 
 
     # generate masks
@@ -85,7 +85,7 @@ with tf.Session() as sess:
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/plots/masked-{0}.png".format(exp_label))
+    img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
