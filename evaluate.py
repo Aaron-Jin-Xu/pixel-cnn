@@ -119,8 +119,8 @@ with tf.Session() as sess:
             o2 = get_params(o2, target_pixels)
 
             # Sample red channel
-            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
-            pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
+            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forwar"))#, log_scales_shift=2.)
+            pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backwar'))
             pars = pars1 * pars2 #/ pr[:, 0, :]
             pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
             #pars = np.power(pars, 0.5)
@@ -128,13 +128,13 @@ with tf.Session() as sess:
             pars = pars / np.sum(pars, axis=-1)[:, None]
             color_r = []
             for i in range(pars.shape[0]):
-                #color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-                color_r.append(np.argmax(pars[i, :]))
+                color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+                #color_r.append(np.argmax(pars[i, :]))
             color_r = np.array(color_r)
 
             # Sample green channel
-            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
-            pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
+            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forwar'))#, log_scales_shift=2.)
+            pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backwar'))
             pars = pars1 * pars2 #/ pr[:, 1, :]
             pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
             #pars = np.power(pars, 0.5)
@@ -142,13 +142,13 @@ with tf.Session() as sess:
             pars = pars / np.sum(pars, axis=-1)[:, None]
             color_g = []
             for i in range(pars.shape[0]):
-                #color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-                color_g.append(np.argmax(pars[i, :]))
+                color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+                #color_g.append(np.argmax(pars[i, :]))
             color_g = np.array(color_g)
 
             # Sample blue channel
-            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
-            pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
+            pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forwar'))#, log_scales_shift=2.)
+            pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backwar'))
             pars = pars1 * pars2 #/ pr[:, 2, :]
             pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
             #pars = np.power(pars, 0.5)
@@ -156,8 +156,8 @@ with tf.Session() as sess:
             pars = pars / np.sum(pars, axis=-1)[:, None]
             color_b = []
             for i in range(pars.shape[0]):
-                #color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-                color_b.append(np.argmax(pars[i, :]))
+                color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+                #color_b.append(np.argmax(pars[i, :]))
             color_b = np.array(color_b)
 
             color = np.array([color_r, color_g, color_b]).T
@@ -179,4 +179,4 @@ with tf.Session() as sess:
     print(np.mean(psnr))
     print(np.std(psnr))
     print(len(psnr))
-    np.savez("psnr-svhn", comp=completed_images_arr, ori=images_ori, psnr=psnr)
+    np.savez("psnr-svhn-nomap", comp=completed_images_arr, ori=images_ori, psnr=psnr)
