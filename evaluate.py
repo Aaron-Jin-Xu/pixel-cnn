@@ -76,7 +76,7 @@ with tf.Session() as sess:
         print(k, "------------------------")
 
         d = images_ori.copy()
-        ms = ms_ori = ms.copy()
+        ms = ms_ori.copy()
 
         # Mask the images
         d *= ms[:, :, :, None]
