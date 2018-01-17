@@ -61,6 +61,7 @@ with tf.Session() as sess:
     d = next(fm.test_data)
     d = next(fm.test_data)
     d = d.astype(np.float64)
+    obs_shape = d.shape[1:]
     # Store original images
     mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     ms_ori = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
