@@ -93,10 +93,10 @@ with tf.Session() as sess:
 
         while True:
             count += 1
-            print(count)
+            if count % 100 ==0:
+                print(count)
             #target_pixels = backward_next_pixel(ms) ##
             target_pixels = next_pixel(ms) ##
-            print(target_pixels[0])
             if target_pixels[0][0] is None:
                 break
             pr = get_prior(prior, target_pixels)
