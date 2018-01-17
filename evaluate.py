@@ -60,7 +60,10 @@ with tf.Session() as sess:
     # Get test images, batch_size X nr_gpu
     d = next(fm.test_data)
     d = next(fm.test_data)
+    d = d.astype(np.float64)
     # Store original images
+    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
+    ms_ori = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     images_ori = d.copy()
     completed_images_arr = []
@@ -70,16 +73,11 @@ with tf.Session() as sess:
 
     for k in range(5):
         print(k, "------------------------")
-        mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
-        #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
-        #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
-        #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
-        #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 1, 32, 0, 64)
-        ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
-        ms_ori = ms.copy()
+
+        d = images_ori.copy()
+        ms = ms_ori = ms.copy()
 
         # Mask the images
-        d = d.astype(np.float64)
         d *= ms[:, :, :, None]
         agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
         ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
@@ -96,9 +94,6 @@ with tf.Session() as sess:
         while True:
             count += 1
             print(count)
-
-            rgb_record = []
-
             #target_pixels = backward_next_pixel(ms) ##
             target_pixels = next_pixel(ms) ##
             print(target_pixels[0])
@@ -179,9 +174,12 @@ with tf.Session() as sess:
         images_completed = d.copy()
         completed_images_arr.append(images_completed)
 
+        print(batch_psnr(images_completed, images_ori, output_mean=True))
+
+    completed_images_arr = np.array(completed_images_arr)
     images_completed = np.mean(completed_images_arr, axis=0)
     psnr = batch_psnr(images_completed, images_ori, output_mean=False)
     print(np.mean(psnr))
     print(np.std(psnr))
     print(len(psnr))
-    np.savez("psnr", psnr=psnr)
+    np.savez("psnr", comp=completed_images_arr, ori=images_ori, psnr=psnr)
