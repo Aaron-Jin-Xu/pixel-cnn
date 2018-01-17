@@ -69,9 +69,6 @@ with tf.Session() as sess:
     images_ori = d.copy()
     completed_images_arr = []
 
-    # generate masks
-    obs_shape = d.shape[1:]
-
     for k in range(5):
         print(k, "------------------------")
 
@@ -84,9 +81,8 @@ with tf.Session() as sess:
         ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
         # Load prior
-        prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-        #prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
-
+        #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+        prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
         count = 0
 
@@ -183,4 +179,4 @@ with tf.Session() as sess:
     print(np.mean(psnr))
     print(np.std(psnr))
     print(len(psnr))
-    np.savez("psnr", comp=completed_images_arr, ori=images_ori, psnr=psnr)
+    np.savez("psnr-svhn", comp=completed_images_arr, ori=images_ori, psnr=psnr)
