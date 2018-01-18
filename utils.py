@@ -161,8 +161,9 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, MAP=False):
 
             probs = sum_exp(log_probs)
             arr.append(probs)
-        print(p[0])
-        print(means[0, 0, :])
+        if MAP:
+            print(p[0])
+            print(means[0, 0, :])
         all_probs = np.array(arr).T
         return all_probs
 
