@@ -151,6 +151,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, MAP=False):
                 p = log_softmax(logit_probs)
                 p = np.exp(p).astype(np.float64)
                 p = p / np.sum(p, axis=-1)[:, None]
+                print(p)
                 ps = []
                 for i in range(p.shape[0]):
                     ps.append(np.random.multinomial(1, p[i, :]))

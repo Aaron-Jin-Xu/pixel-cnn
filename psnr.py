@@ -2,7 +2,7 @@ import numpy as np
 from utils import *
 from evaluation import *
 
-label = "cross-gan"
+label = "svhn-nomap-forward"
 data = np.load("psnr-{0}.npz".format(label))
 if "gan" in label:
     all_completed = data['blended']
