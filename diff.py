@@ -25,14 +25,14 @@ def tile_plot(imgs, file_path="../plots/test.png", display_size=None):
     img = Image.fromarray(tile_images(imgs.astype(np.uint8), size=display_size), 'RGB')
     img.save(file_path)
 
-mgen = mk.CenterMaskGenerator(32, 32, 0.5)
-#mgen = mk.CrossMaskGenerator(64, 64, (28, 38, 2, 62), (5, 59, 28, 36))
+#mgen = mk.CenterMaskGenerator(32, 32, 0.5)
+mgen = mk.CrossMaskGenerator(64, 64, (28, 38, 2, 62), (5, 59, 28, 36))
 mask = mgen.gen(1)[0]
 contour = find_contour(mask)[:, :, None]
 
-data = np.load("psnr-svhn-nomap-forward.npz")
+data = np.load("psnr-cross-gan.npz")
 all_completed = data['comp']
 ground_truth = data['ori']
 delta = np.abs(np.mean(all_completed, axis=0) - ground_truth)
 delta += contour * 100
-tile_plot(delta, "../plots1/svhn-nomap-forward.png")
+tile_plot(delta, "../plots1/celeba-cross-gan.png")
