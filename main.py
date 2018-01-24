@@ -139,8 +139,8 @@ with tf.Session() as sess:
         o2 = get_params(o2, target_pixels)
 
         # Sample red channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forwar"))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backwar'))
         pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -154,8 +154,8 @@ with tf.Session() as sess:
         color_r = np.array(color_r)
 
         # Sample green channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forwar'))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backwar'))
         pars = pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -169,8 +169,8 @@ with tf.Session() as sess:
         color_g = np.array(color_g)
 
         # Sample blue channel
-        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
-        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
+        pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forwar'))#, log_scales_shift=2.)
+        pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backwar'))
         pars = pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
