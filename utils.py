@@ -36,6 +36,9 @@ def parse_args(args, data_dir, save_dir, data_set, save_interval=10, load_params
     args.rot180 = rot180
 
 
+def pick_next_pixel(masks):
+    pass
+
 def next_pixel(masks, start=None):
 
     assert len(masks.shape)==3, "mask shape should be (batch_size, num_row, num_col)"
