@@ -132,11 +132,9 @@ with tf.Session() as sess:
         o1 = get_params(o1, target_pixels)
         c = coeffs[0, :, :, :]
         s = (1. / inv_stdv[0, :, :, 0, :]) * 127.5
-        np.set_printoptions(linewidth=200)
-        print(c)
-        print(s)
-        print(c.shape, s.shape)
-        quit()
+        np.set_printoptions(linewidth=200, precision=4)
+        r = np.sum(c * s, axis=-1)
+        print(r[16:48,16:48])
         print("----------------")
 
         # Backward model prediction
@@ -145,17 +143,12 @@ with tf.Session() as sess:
         o2 = sess.run(bm.outputs, feed_dict)
         o2 = np.concatenate(o2, axis=0)
         o2 = np.rot90(o2, 2, (1,2))
-        o2 = get_params(o2, target_pixels)
-
         coeffs, means, inv_stdv = transform_params(o2, fm.args.nr_logistic_mix)
-        c = coeffs[0, :]
-        m = means[0, 0, :]
-        s = (1. / inv_stdv[0, 0, :]) * 127.5
-        print(c)
-        print(m)
-        print(s)
-        print(c.sum())
-        print(coeffs.shape, means.shape, inv_stdv.shape)
+        o2 = get_params(o2, target_pixels)
+        c = coeffs[0, :, :, :]
+        s = (1. / inv_stdv[0, :, :, 0, :]) * 127.5
+        r = np.sum(c * s, axis=-1)
+        print(r[16:48,16:48])
         quit()
 
         # Sample red channel
