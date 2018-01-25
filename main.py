@@ -111,8 +111,8 @@ with tf.Session() as sess:
 
         rgb_record = []
 
-        #target_pixels = backward_next_pixel(ms) ##
-        target_pixels = next_pixel(ms) ##
+        target_pixels = backward_next_pixel(ms) ##
+        #target_pixels = next_pixel(ms) ##
         print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
