@@ -138,7 +138,7 @@ with tf.Session() as sess:
         print(s)
         print(c.sum())
         print(coeffs.shape, means.shape, inv_stdv.shape)
-        quit()
+        print("----------------")
 
         # Backward model prediction
         #feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
@@ -147,6 +147,17 @@ with tf.Session() as sess:
         o2 = np.concatenate(o2, axis=0)
         o2 = np.rot90(o2, 2, (1,2))
         o2 = get_params(o2, target_pixels)
+
+        coeffs, means, inv_stdv = transform_params(o2, fm.args.nr_logistic_mix)
+        c = coeffs[0, :]
+        m = means[0, 0, :]
+        s = (1. / inv_stdv[0, 0, :]) * 127.5
+        print(c)
+        print(m)
+        print(s)
+        print(c.sum())
+        print(coeffs.shape, means.shape, inv_stdv.shape)
+        quit()
 
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forwar"))#, log_scales_shift=2.)
