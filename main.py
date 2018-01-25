@@ -129,7 +129,8 @@ with tf.Session() as sess:
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
-        print(o1.shape)
+        coeffs, means, inv_stdv = transform_params(o1)
+        print(coeffs.shape, means.shape, inv_stdv.shape)
         quit()
 
         # Backward model prediction
