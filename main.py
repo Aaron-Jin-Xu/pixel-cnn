@@ -130,16 +130,14 @@ with tf.Session() as sess:
         o1 = np.concatenate(o1, axis=0)
         coeffs, means, inv_stdv = transform_params(o1, fm.args.nr_logistic_mix)
         o1 = get_params(o1, target_pixels)
-        coeffs, means, inv_stdv = transform_params(o1, fm.args.nr_logistic_mix)
-        c = coeffs[0, :]
-        m = means[0, 0, :]
-        s = (1. / inv_stdv[0, 0, :]) * 127.5
+        c = coeffs[0, :, :, :]
+        s = (1. / inv_stdv[0, :, :, 0, :]) * 127.5
         print(c)
-        print(m)
         print(s)
         print(c.sum())
         print(coeffs.shape, means.shape, inv_stdv.shape)
         print("----------------")
+        quit()
 
         # Backward model prediction
         #feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
