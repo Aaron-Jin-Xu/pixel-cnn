@@ -132,7 +132,7 @@ with tf.Session() as sess:
         coeffs, means, inv_stdv = transform_params(o1, fm.args.nr_logistic_mix)
         c = coeffs[0, :]
         m = means[0, 0, :]
-        s = (1 /. inv_stdv[0, 0, :]) * 127.5
+        s = (1. / inv_stdv[0, 0, :]) * 127.5
         print(c)
         print(m)
         print(s)
