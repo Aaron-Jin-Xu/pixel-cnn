@@ -130,7 +130,7 @@ with tf.Session() as sess:
         o1 = np.concatenate(o1, axis=0)
         o1 = get_params(o1, target_pixels)
         coeffs, means, inv_stdv = transform_params(o1, fm.args.nr_logistic_mix)
-        print(coeffs[0, 0, :])
+        print(coeffs[0, :])
         print(means[0, 0, :])
         print(inv_stdv[0, 0, :])
         print(coeffs.shape, means.shape, inv_stdv.shape)
