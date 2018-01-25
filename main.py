@@ -130,10 +130,11 @@ with tf.Session() as sess:
         o1 = np.concatenate(o1, axis=0)
         coeffs, means, inv_stdv = transform_params(o1, fm.args.nr_logistic_mix)
         o1 = get_params(o1, target_pixels)
-        c = coeffs[0, :, :, :]
-        s = (1. / inv_stdv[0, :, :, 0, :]) * 127.5
+        c = coeffs[:, :, :, :]
+        s = (1. / inv_stdv[:, :, :, 0, :]) * 127.5
         np.set_printoptions(linewidth=200, precision=4)
         r = np.sum(c * s, axis=-1)
+        r = np.mean(r, axis=0)
         print(r[16:48,16:48])
         print("----------------")
 
@@ -145,9 +146,10 @@ with tf.Session() as sess:
         o2 = np.rot90(o2, 2, (1,2))
         coeffs, means, inv_stdv = transform_params(o2, fm.args.nr_logistic_mix)
         o2 = get_params(o2, target_pixels)
-        c = coeffs[0, :, :, :]
-        s = (1. / inv_stdv[0, :, :, 0, :]) * 127.5
+        c = coeffs[:, :, :, :]
+        s = (1. / inv_stdv[:, :, :, 0, :]) * 127.5
         r = np.sum(c * s, axis=-1)
+        r = np.mean(r, axis=0)
         print(r[16:48,16:48])
         quit()
 
