@@ -128,7 +128,10 @@ with tf.Session() as sess:
         feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
+        print(o1.shape)
         o1 = get_params(o1, target_pixels)
+        print(o1.shape)
+        quit()
         coeffs, means, inv_stdv = transform_params(o1, fm.args.nr_logistic_mix)
         c = coeffs[0, :]
         m = means[0, 0, :]
