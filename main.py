@@ -132,12 +132,12 @@ with tf.Session() as sess:
         o1 = get_params(o1, target_pixels)
         c = coeffs[0, :, :, :]
         s = (1. / inv_stdv[0, :, :, 0, :]) * 127.5
+        np.set_printoptions(linewidth=200)
         print(c)
         print(s)
-        print(c.sum())
-        print(coeffs.shape, means.shape, inv_stdv.shape)
-        print("----------------")
+        print(c.shape, s.shape)
         quit()
+        print("----------------")
 
         # Backward model prediction
         #feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
