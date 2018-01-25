@@ -82,14 +82,14 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['celeba-hr-forward-new-20-missing'])
-#parse_args(args, **configs['celeba-hr-forward-new-20'])
+#parse_args(args, **configs['celeba-hr-forward-new-20-missing'])
+parse_args(args, **configs['celeba-hr-forward-new-20'])
 #parse_args(args, **configs['celeba-hr-backward-new-20-rename'])
 
 #parse_args(args, **configs['svhn-forward-20'])
 
 args.nr_gpu = 8
-#args.save_dir = "/data/ziz/jxu/save64-backward-new-20-missing"
+args.save_dir = "/data/ziz/jxu/save64-backward-new-20-missing"
 args.masked = True
 
 print('input args:\n', json.dumps(vars(args), indent=4,
