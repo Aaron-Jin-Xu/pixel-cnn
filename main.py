@@ -132,10 +132,9 @@ with tf.Session() as sess:
         o1 = get_params(o1, target_pixels)
         c = coeffs[:, :, :, :]
         s = (1. / inv_stdv[:, :, :, 0, :]) * 127.5
-        np.set_printoptions(linewidth=200, precision=4)
         r = np.sum(c * s, axis=-1)
         r = np.mean(r, axis=0)
-        print(r[16:48,16:48])
+        print(r[28:36,28:36])
         print("----------------")
 
         # Backward model prediction
@@ -150,7 +149,7 @@ with tf.Session() as sess:
         s = (1. / inv_stdv[:, :, :, 0, :]) * 127.5
         r = np.sum(c * s, axis=-1)
         r = np.mean(r, axis=0)
-        print(r[16:48,16:48])
+        print(r[28:36,28:36])
         quit()
 
         # Sample red channel
