@@ -125,7 +125,7 @@ with tf.Session() as sess:
 
         # Forward model prediction
         #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-        feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+        feed_dict = fm.make_feed_dict(d, mask_values=np.rot90(backward_ms, 2, (1,2)), rot=False)
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
         coeffs, means, inv_stdv = transform_params(o1, fm.args.nr_logistic_mix)
