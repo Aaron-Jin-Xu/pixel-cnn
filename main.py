@@ -85,6 +85,7 @@ with tf.Session() as sess:
     # Mask the images
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
+    d = np.load('last_d.npz')['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
@@ -103,7 +104,7 @@ with tf.Session() as sess:
 
     count = 0
 
-    flag = "backward"
+    flag = "forward"
 
     while True:
         count += 1
@@ -111,14 +112,19 @@ with tf.Session() as sess:
 
         rgb_record = []
 
-        target_pixels = backward_next_pixel(ms) ##
-        #target_pixels = next_pixel(ms) ##
+        #target_pixels = backward_next_pixel(ms) ##
+        target_pixels = next_pixel(ms) ##
         #target_pixels = find_next_pixel(ms)
         print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
         pr = get_prior(prior, target_pixels)
         backward_ms = ms.copy()
+        ##
+        for idx in range(len(target_pixels)):
+            p = target_pixels[idx]
+            backward_ms[idx, p[0]+1:, :] = 1
+        print(np.sum(1-backward_ms))
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
             backward_ms[idx, p[0], p[1]] = 1
@@ -322,7 +328,7 @@ with tf.Session() as sess:
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
     #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
-    np.savez("last_d", d=d)
+    #np.savez("last_d", d=d)
     # Store the completed images
 
     for i in range(d.shape[0]):
