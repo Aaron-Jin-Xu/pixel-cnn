@@ -128,10 +128,10 @@ with tf.Session() as sess:
         feed_dict = fm.make_feed_dict(d, mask_values=np.rot90(backward_ms, 2, (1,2)), rot=False)
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
-        coeffs, means, inv_stdv = transform_params(o1, fm.args.nr_logistic_mix)
+        coeffs, means, stds = transform_params(o1, fm.args.nr_logistic_mix)
         o1 = get_params(o1, target_pixels)
         c = coeffs[:, :, :, :]
-        s = (1. / inv_stdv[:, :, :, 0, :]) * 127.5
+        s = stds[:, :, :, 0, :] * 127.5
         r = np.sum(c * s, axis=-1)
         r = np.mean(r, axis=0)
         print(r[28:36,28:36])
@@ -143,10 +143,10 @@ with tf.Session() as sess:
         o2 = sess.run(bm.outputs, feed_dict)
         o2 = np.concatenate(o2, axis=0)
         o2 = np.rot90(o2, 2, (1,2))
-        coeffs, means, inv_stdv = transform_params(o2, fm.args.nr_logistic_mix)
+        coeffs, means, stds = transform_params(o2, fm.args.nr_logistic_mix)
         o2 = get_params(o2, target_pixels)
         c = coeffs[:, :, :, :]
-        s = (1. / inv_stdv[:, :, :, 0, :]) * 127.5
+        s = stds[:, :, :, 0, :] * 127.5
         r = np.sum(c * s, axis=-1)
         r = np.mean(r, axis=0)
         print(r[28:36,28:36])
