@@ -111,8 +111,8 @@ with tf.Session() as sess:
 
         rgb_record = []
 
-        target_pixels = backward_next_pixel(ms) ##
-        #target_pixels = next_pixel(ms) ##
+        #target_pixels = backward_next_pixel(ms) ##
+        target_pixels = next_pixel(ms) ##
         print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
@@ -134,6 +134,7 @@ with tf.Session() as sess:
         s = stds[:, :, :, 0, :] * 127.5
         r = np.sum(c * s, axis=-1)
         r = np.mean(r, axis=0)
+        r *= (1-ms[0])
         print(r[28:36,28:36])
         print("----------------")
 
@@ -149,8 +150,9 @@ with tf.Session() as sess:
         s = stds[:, :, :, 0, :] * 127.5
         r = np.sum(c * s, axis=-1)
         r = np.mean(r, axis=0)
+        r *= (1-ms[0])
         print(r[28:36,28:36])
-        quit()
+        
 
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forwar"))#, log_scales_shift=2.)
