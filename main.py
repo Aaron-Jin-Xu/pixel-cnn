@@ -112,7 +112,8 @@ with tf.Session() as sess:
         rgb_record = []
 
         #target_pixels = backward_next_pixel(ms) ##
-        target_pixels = next_pixel(ms) ##
+        #target_pixels = next_pixel(ms) ##
+        target_pixels = find_next_pixel(ms)
         print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
@@ -128,15 +129,15 @@ with tf.Session() as sess:
         feed_dict = fm.make_feed_dict(d, mask_values=np.rot90(backward_ms, 2, (1,2)), rot=False)
         o1 = sess.run(fm.outputs, feed_dict)
         o1 = np.concatenate(o1, axis=0)
-        coeffs, means, stds = transform_params(o1, fm.args.nr_logistic_mix)
+        # coeffs, means, stds = transform_params(o1, fm.args.nr_logistic_mix)
         o1 = get_params(o1, target_pixels)
-        c = coeffs[:, :, :, :]
-        s = stds[:, :, :, 0, :] * 127.5
-        r = np.sum(c * s, axis=-1)
-        r = np.mean(r, axis=0)
-        r *= (1-ms[0])
-        print(r[28:36,28:36])
-        print("----------------")
+        # c = coeffs[:, :, :, :]
+        # s = stds[:, :, :, 0, :] * 127.5
+        # r = np.sum(c * s, axis=-1)
+        # r = np.mean(r, axis=0)
+        # r *= (1-ms[0])
+        # print(r[28:36,28:36])
+        # print("----------------")
 
         # Backward model prediction
         #feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
@@ -144,15 +145,17 @@ with tf.Session() as sess:
         o2 = sess.run(bm.outputs, feed_dict)
         o2 = np.concatenate(o2, axis=0)
         o2 = np.rot90(o2, 2, (1,2))
-        coeffs, means, stds = transform_params(o2, fm.args.nr_logistic_mix)
+        # coeffs, means, stds = transform_params(o2, fm.args.nr_logistic_mix)
         o2 = get_params(o2, target_pixels)
-        c = coeffs[:, :, :, :]
-        s = stds[:, :, :, 0, :] * 127.5
-        r = np.sum(c * s, axis=-1)
-        r = np.mean(r, axis=0)
-        r *= (1-ms[0])
-        print(r[28:36,28:36])
-        
+        # c = coeffs[:, :, :, :]
+        # s = stds[:, :, :, 0, :] * 127.5
+        # r = np.sum(c * s, axis=-1)
+        # r = np.mean(r, axis=0)
+        # r *= (1-ms[0])
+        # print(r[28:36,28:36])
+
+
+
 
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forwar"))#, log_scales_shift=2.)

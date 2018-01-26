@@ -36,8 +36,33 @@ def parse_args(args, data_dir, save_dir, data_set, save_interval=10, load_params
     args.rot180 = rot180
 
 
-def pick_next_pixel(masks):
-    pass
+def find_next_pixel(masks):
+    start = None
+    assert len(masks.shape)==3, "mask shape should be (batch_size, num_row, num_col)"
+    if start is not None:
+        assert len(start)==masks.shape[0], "number of start points should be batch_size"
+    else:
+        start = [(0, 0) for i in range(masks.shape[0])]
+
+    ret = []
+
+    for idx in range(masks.shape[0]):
+        s = start[idx]
+        m = masks[idx, :, :]
+        for i in range(s[1], masks.shape[2]):
+            c = 0
+            if i==s[1]:
+                c = s[1]
+            for j in range(c, masks.shape[1]):
+                if m[j, i]==0:
+                    ret.append((j, i))
+                    break
+            if len(ret)==idx+1:
+                break
+        if len(ret)==idx:
+            ret.append((None, None))
+
+    return ret
 
 def next_pixel(masks, start=None):
 
