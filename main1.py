@@ -32,7 +32,7 @@ def find_contour(mask):
 #display_size = (6,6)
 display_size = (8, 8)
 
-exp_label = "celeba-mouth-1"
+exp_label = "celeba-mouth-multiple-run"
 
 with tf.Session() as sess:
 
@@ -84,6 +84,7 @@ with tf.Session() as sess:
 
     # Mask the images
     d = d.astype(np.float64)
+    [d[i]=d[19] for i in range(d.shape[0])]
     d *= ms[:, :, :, None]
     #d = np.load('last_d.npz')['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
