@@ -80,7 +80,7 @@ parser.add_argument('-j', '--rot180', dest='rot180',
 
 args = parser.parse_args()
 
-parse_args(args, **configs['svhn-backward-20'])
+parse_args(args, **configs['svhn-forward-20-missing'])
 args.learning_rate = 0.0005
 
 print('input args:\n', json.dumps(vars(args), indent=4,
