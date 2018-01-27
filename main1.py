@@ -32,7 +32,7 @@ def find_contour(mask):
 #display_size = (6,6)
 display_size = (8, 8)
 
-exp_label = "celeba-haircut-1"
+exp_label = "celeba-mouth-1"
 
 with tf.Session() as sess:
 
@@ -76,7 +76,7 @@ with tf.Session() as sess:
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
     #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1. / 4)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 0, 28, 0, 64)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 44, 64, 16, 48)
     #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 1, 32, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
@@ -85,7 +85,7 @@ with tf.Session() as sess:
     # Mask the images
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
-    d = np.load('last_d.npz')['d']
+    #d = np.load('last_d.npz')['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
@@ -104,7 +104,7 @@ with tf.Session() as sess:
 
     count = 0
 
-    flag = "backward"
+    flag = "forward"
 
     while True:
         count += 1
@@ -120,11 +120,6 @@ with tf.Session() as sess:
             break
         pr = get_prior(prior, target_pixels)
         backward_ms = ms.copy()
-        ##
-        for idx in range(len(target_pixels)):
-            p = target_pixels[idx]
-            backward_ms[idx, p[0]+1:, :] = 1
-        # print(np.sum(1-backward_ms[0]))
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
             backward_ms[idx, p[0], p[1]] = 1
@@ -163,7 +158,7 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
-        pars = pars2 #pars1 * pars2**0.5 #/ pr[:, 0, :]
+        pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -178,7 +173,7 @@ with tf.Session() as sess:
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
-        pars = pars2 #pars1 * pars2**0.5 #/ pr[:, 1, :]
+        pars = pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -193,7 +188,7 @@ with tf.Session() as sess:
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
-        pars = pars2 #pars1 * pars2**0.5 #/ pr[:, 2, :]
+        pars = pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -222,7 +217,7 @@ with tf.Session() as sess:
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
     #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
-    #np.savez("last_d", d=d)
+    np.savez("pics-{0}".format(exp_label), d=d)
     # Store the completed images
 
     for i in range(d.shape[0]):
