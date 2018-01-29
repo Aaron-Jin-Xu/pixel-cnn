@@ -32,7 +32,7 @@ def find_contour(mask):
 #display_size = (6,6)
 display_size = (8, 8)
 
-exp_label = "celeba-mouth-multiple-run"
+exp_label = "svhn-center-test"
 
 with tf.Session() as sess:
 
@@ -74,9 +74,9 @@ with tf.Session() as sess:
     #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 25)
     #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
-    #mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1. / 4)
+    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1. / 2)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
+    #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
     #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 1, 32, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
@@ -84,8 +84,6 @@ with tf.Session() as sess:
 
     # Mask the images
     d = d.astype(np.float64)
-    for i in range(d.shape[0]):
-        d[i] = d[19].copy()
     d *= ms[:, :, :, None]
     #d = np.load('last_d.npz')['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
@@ -106,7 +104,7 @@ with tf.Session() as sess:
 
     count = 0
 
-    flag = "forward"
+    flag = "backward"
 
     while True:
         count += 1
@@ -114,8 +112,8 @@ with tf.Session() as sess:
 
         rgb_record = []
 
-        #target_pixels = backward_next_pixel(ms) ##
-        target_pixels = next_pixel(ms) ##
+        target_pixels = backward_next_pixel(ms) ##
+        #target_pixels = next_pixel(ms) ##
         #target_pixels = find_next_pixel(ms)
         print(target_pixels[0])
         if target_pixels[0][0] is None:
@@ -160,7 +158,7 @@ with tf.Session() as sess:
         # Sample red channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
-        pars = pars1 #* pars2 #/ pr[:, 0, :]
+        pars = pars1 * pars2 #/ pr[:, 0, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -175,7 +173,7 @@ with tf.Session() as sess:
         # Sample green channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
-        pars = pars1 #* pars2 #/ pr[:, 1, :]
+        pars = pars1 * pars2 #/ pr[:, 1, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
@@ -190,7 +188,7 @@ with tf.Session() as sess:
         # Sample blue channel
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
-        pars = pars1 #* pars2 #/ pr[:, 2, :]
+        pars = pars1 * pars2 #/ pr[:, 2, :]
         pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         pars = pars.astype(np.float64)
