@@ -60,10 +60,14 @@ with tf.Session() as sess:
     d = next(fm.test_data)
     #d = next(fm.test_data)
     #d = next(fm.test_data)
+    from scipy.ndimage import zoom
+    z = zoom(d[0], 0.1)
+    print(z)
+    print(z.shape)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/original-{0}.png".format(exp_label))
-    quit()
+
 
 
     # generate masks
