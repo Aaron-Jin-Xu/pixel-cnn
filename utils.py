@@ -279,7 +279,7 @@ def params_to_dis(params, nr_mix, r=None, g=None, b=None, MAP=False):
         return all_probs
 
 
-def combine_forward_backward(pars_f, pars_b):
+def combine_forward_backward_distribution(output_f, output_b, nr_logistic_mix):
     print(pars_f.shape)
     print(pars_b.shape)
 
