@@ -60,9 +60,9 @@ with tf.Session() as sess:
     d = next(fm.test_data)
     #d = next(fm.test_data)
     #d = next(fm.test_data)
-    d = d.astype(np.float64)
-    d[:, 16:48, 16:48, :] = rgb_resize(rgb_resize(d[:, 16:48, 16:48, :], 1 / 4.0), 4.0)
-    np.savez("pics-{0}".format(exp_label), d=d)
+    #d = d.astype(np.float64)
+    #d[:, 16:48, 16:48, :] = rgb_resize(rgb_resize(d[:, 16:48, 16:48, :], 1 / 4.0), 4.0)
+    #np.savez("pics-{0}".format(exp_label), d=d)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/original-{0}.png".format(exp_label))
@@ -89,8 +89,13 @@ with tf.Session() as sess:
 
     # Mask the images
     d = d.astype(np.float64)
-    d *= ms[:, :, :, None]
-    d = np.load("pics-{0}.npz".format(exp_label))['d']
+    #d *= ms[:, :, :, None]
+    rgb_resize(rgb_resize(d[:, 16:48, 16:48, :], 1 / 4.0), 4.0)
+    d = d * ms[:, :, :, None] + rgb_resize(rgb_resize(d * (1-ms[:, :, :, None]), 1/4.0), 4.0)
+    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
+    img.save("/homes/jxu/projects/ImageInpainting/plots1/original-{0}.png".format(exp_label))
+    quit()
+    #d = np.load("pics-{0}.npz".format(exp_label))['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
@@ -128,7 +133,7 @@ with tf.Session() as sess:
 
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
-            backward_ms[idx, p[0]+1:, :] = 1
+            backward_ms[idx, p[0]+2:, :] = 1
         print(np.sum(1-backward_ms[0]))
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
