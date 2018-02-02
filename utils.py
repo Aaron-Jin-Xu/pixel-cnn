@@ -3,7 +3,7 @@ import pixel_cnn_pp.mask as mk
 from scipy.misc import logsumexp
 from scipy.special import expit
 import os
-
+from PIL import Image
 
 def parse_args(args, data_dir, save_dir, data_set, save_interval=10, load_params=False,
                     nr_resnet=5, nr_filters=160, nr_logistic_mix=10,
@@ -304,3 +304,13 @@ from scipy.stats import entropy
 
 def KL_divergence(p, q):
     return entropy(p, q)
+
+
+def rgb_resize(imgs, ratio=1.0):
+    img_shape = imgs.shape[1:-1]
+    ret_imgs = []
+    for i in range(imgs.shape[0]):
+        img = imgs[i]
+        img = Image.fromarray(img.astype(np.uint8), 'RGB').resize((int(img_shape[0]*ratio), int(img_shape[1]*ratio)))
+        ret_imgs.append(img)
+    return np.array(ret_imgs, dtype=np.float64)
