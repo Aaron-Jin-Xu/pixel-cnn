@@ -61,7 +61,7 @@ with tf.Session() as sess:
     #d = next(fm.test_data)
     #d = next(fm.test_data)
     d = d.astype(np.float64)
-    d[:, 24:40, 24:40, :] = rgb_resize(rgb_resize(d[:, 24:40, 24:40, :], 0.5), 2.0)
+    d[:, 16:48, 16:48, :] = rgb_resize(rgb_resize(d[:, 16:48, 16:48, :], 0.5), 2.0)
     np.savez("pics-{0}".format(exp_label), d=d)
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
@@ -78,7 +78,7 @@ with tf.Session() as sess:
     #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 25)
     #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
-    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1. / 4)
+    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1. / 2)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
     #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
