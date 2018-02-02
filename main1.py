@@ -85,6 +85,7 @@ with tf.Session() as sess:
     # Mask the images
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
+    d = np.load("pics-{0}.npz".format(exp_label))['d']
     #d = np.load('last_d.npz')['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
@@ -92,8 +93,8 @@ with tf.Session() as sess:
     ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
 
     # Load prior
-    prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-    #prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+    #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+    prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
 
     dis_record = []
@@ -104,7 +105,7 @@ with tf.Session() as sess:
 
     count = 0
 
-    flag = "backward"
+    flag = ""#"backward"
 
     while True:
         count += 1
@@ -112,14 +113,19 @@ with tf.Session() as sess:
 
         rgb_record = []
 
-        target_pixels = backward_next_pixel(ms) ##
-        #target_pixels = next_pixel(ms) ##
+        #target_pixels = backward_next_pixel(ms) ##
+        target_pixels = next_pixel(ms) ##
         #target_pixels = find_next_pixel(ms)
         print(target_pixels[0])
         if target_pixels[0][0] is None:
             break
         pr = get_prior(prior, target_pixels)
         backward_ms = ms.copy()
+
+        for idx in range(len(target_pixels)):
+            p = target_pixels[idx]
+            backward_ms[idx, p[0]+1:, :] = 1
+        print(np.sum(1-backward_ms[0]))
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
             backward_ms[idx, p[0], p[1]] = 1
@@ -166,8 +172,8 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 0, :]]))
         color_r = []
         for i in range(pars.shape[0]):
-            #color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            color_r.append(np.argmax(pars[i, :]))
+            color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            #color_r.append(np.argmax(pars[i, :]))
         color_r = np.array(color_r)
 
         # Sample green channel
@@ -181,8 +187,8 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 1, :]]))
         color_g = []
         for i in range(pars.shape[0]):
-            #color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            color_g.append(np.argmax(pars[i, :]))
+            color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            #color_g.append(np.argmax(pars[i, :]))
         color_g = np.array(color_g)
 
         # Sample blue channel
@@ -196,8 +202,8 @@ with tf.Session() as sess:
         rgb_record.append(np.array([pars1, pars2, pars, pr[:, 2, :]]))
         color_b = []
         for i in range(pars.shape[0]):
-            #color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-            color_b.append(np.argmax(pars[i, :]))
+            color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+            #color_b.append(np.argmax(pars[i, :]))
         color_b = np.array(color_b)
 
         color = np.array([color_r, color_g, color_b]).T
@@ -217,7 +223,7 @@ with tf.Session() as sess:
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
     #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
-    np.savez("pics-{0}".format(exp_label), d=d)
+    #np.savez("pics-{0}".format(exp_label), d=d)
     # Store the completed images
 
     for i in range(d.shape[0]):
