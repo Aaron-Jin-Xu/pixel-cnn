@@ -82,7 +82,7 @@ with tf.Session() as sess:
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
     #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 40, 2, 62)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -91,9 +91,7 @@ with tf.Session() as sess:
     d = d.astype(np.float64)
     #d *= ms[:, :, :, None]
     d = d * ms[:, :, :, None] + rgb_resize(rgb_resize(d * (1-ms[:, :, :, None]), 1/4.0), 4.0)
-    img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
-    img.save("/homes/jxu/projects/ImageInpainting/plots1/original-{0}.png".format(exp_label))
-    quit()
+
     #d = np.load("pics-{0}.npz".format(exp_label))['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
