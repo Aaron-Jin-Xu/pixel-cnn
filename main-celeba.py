@@ -61,10 +61,11 @@ with tf.Session() as sess:
     #d = next(fm.test_data)
     #d = next(fm.test_data)
     d[:, 16:48, 16:48, :] = rgb_resize(rgb_resize(d[:, 16:48, 16:48, :], 0.5), 2.0)
+    np.savez("pics-{0}".format(exp_label), d=d)
+    quit()
     # Store original images
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/original-{0}.png".format(exp_label))
-    quit()
 
 
 
