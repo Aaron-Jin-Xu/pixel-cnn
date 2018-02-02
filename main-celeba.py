@@ -89,7 +89,7 @@ with tf.Session() as sess:
     # Mask the images
     d = d.astype(np.float64)
     d *= ms[:, :, :, None]
-    d = np.load("pics-{0}".format(exp_label))['d']
+    d = np.load("pics-{0}.npz".format(exp_label))['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
