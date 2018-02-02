@@ -122,10 +122,10 @@ with tf.Session() as sess:
         pr = get_prior(prior, target_pixels)
         backward_ms = ms.copy()
 
-        for idx in range(len(target_pixels)):
-            p = target_pixels[idx]
-            backward_ms[idx, p[0]+1:, :] = 1
-        print(np.sum(1-backward_ms[0]))
+        # for idx in range(len(target_pixels)):
+        #     p = target_pixels[idx]
+        #     backward_ms[idx, p[0]+1:, :] = 1
+        # print(np.sum(1-backward_ms[0]))
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
             backward_ms[idx, p[0], p[1]] = 1
