@@ -313,4 +313,4 @@ def rgb_resize(imgs, ratio=1.0):
         img = imgs[i]
         img = Image.fromarray(img.astype(np.uint8), 'RGB').resize((int(img_shape[0]*ratio), int(img_shape[1]*ratio)))
         ret_imgs.append(img)
-    return np.array(ret_imgs, dtype=np.float64)
+    return np.array(ret_imgs).astype(np.float64)
