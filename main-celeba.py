@@ -60,7 +60,7 @@ with tf.Session() as sess:
     d = next(fm.test_data)
     #d = next(fm.test_data)
     #d = next(fm.test_data)
-    d[:, 16:48, 16:48, :] = rgb_resize(rgb_resize(d[:, 16:48, 16:48, :], 0.5), 2.0)
+    d[:, 24:40, 24:40, :] = rgb_resize(rgb_resize(d[:, 24:40, 24:40, :], 0.5), 2.0)
     np.savez("pics-{0}".format(exp_label), d=d)
     quit()
     # Store original images
