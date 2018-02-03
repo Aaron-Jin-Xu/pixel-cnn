@@ -387,8 +387,17 @@ def rgb_resize(imgs, ratio=1.0):
         ret_imgs.append(np.array(img))
     return np.array(ret_imgs).astype(np.float64)
 
+def sample_coeffs(coeffs):
+    s = []
+    for i in range(coeffs.shape[0]):
+        s.append(np.random.multinomial(1, coeffs[i, :]))
+    s = np.array(s)
+
 
 def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
+
+    coeffs1 = sample_coeffs(coeffs1)
+    print(coeffs1)
 
     coeffs1_stack = np.stack([coeffs1 for i in range(dis_log_compons1.shape[-1])], axis=-1)
     dis1 = np.sum(coeffs1_stack * np.exp(dis_log_compons1), axis=1)
@@ -401,6 +410,7 @@ def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
     dis2 = dis2 / np.sum(dis2, axis=-1)[:, None]
 
     dis = dis1 * dis2
-    dis = dis / np.sum(dis, axis=-1)[:, None]
 
+    dis[:, 0], dis[:, 255] = dis[:, 1], dis[:, 254]
+    dis = dis / np.sum(dis, axis=-1)[:, None]
     return dis

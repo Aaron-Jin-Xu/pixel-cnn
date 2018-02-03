@@ -175,10 +175,10 @@ with tf.Session() as sess:
         coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix)
         pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2)
         # pars = pars1* pars2 #/ pr[:, 0, :]
-        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
+        # pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
+        # pars = pars.astype(np.float64)
+        # pars = pars / np.sum(pars, axis=-1)[:, None]
         #rgb_record.append(np.array([pars1, pars2, pars, pr[:, 0, :]]))
         color_r = []
         for i in range(pars.shape[0]):
@@ -193,10 +193,10 @@ with tf.Session() as sess:
         coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r)
         coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r)
         pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2)
-        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
+        #pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
+        #pars = pars.astype(np.float64)
+        #pars = pars / np.sum(pars, axis=-1)[:, None]
         #rgb_record.append(np.array([pars1, pars2, pars, pr[:, 1, :]]))
         color_g = []
         for i in range(pars.shape[0]):
@@ -211,10 +211,10 @@ with tf.Session() as sess:
         coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2)
-        pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
+        #pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
-        pars = pars.astype(np.float64)
-        pars = pars / np.sum(pars, axis=-1)[:, None]
+        #pars = pars.astype(np.float64)
+        #pars = pars / np.sum(pars, axis=-1)[:, None]
         #rgb_record.append(np.array([pars1, pars2, pars, pr[:, 2, :]]))
         color_b = []
         for i in range(pars.shape[0]):
