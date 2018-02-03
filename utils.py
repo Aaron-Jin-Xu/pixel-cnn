@@ -157,9 +157,6 @@ def transform_params(params, nr_mix, r=None, g=None, b=None):
     p = log_softmax(logit_probs)
     p = np.exp(p).astype(np.float64)
     p = p / np.sum(p, axis=-1)[:, None]
-    print(p)
-    print(p.shape)
-    quit()
 
     if r is None:
         arr = []
@@ -178,23 +175,12 @@ def transform_params(params, nr_mix, r=None, g=None, b=None):
             log_pdf_mid = mid_in - log_scales[:, 0, :] - 2. * softplus(mid_in)
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
-
-            if MAP:
-                p = log_softmax(logit_probs)
-                p = np.exp(p).astype(np.float64)
-                p = p / np.sum(p, axis=-1)[:, None]
-                ps = []
-                for i in range(p.shape[0]):
-                    ps.append(np.random.multinomial(1, p[i, :]))
-                ps = np.array(ps) * 7.0 - 7.0
-                log_probs = log_probs + ps # log_softmax(logit_probs)
-            else:
-                log_probs = log_probs + log_softmax(logit_probs)
-
             probs = sum_exp(log_probs)
             arr.append(probs)
         all_probs = np.array(arr).T
-        return all_probs
+        print(all_probs)
+        print(all_probs.shape)
+        quit()
 
     if g is None:
         arr = []
