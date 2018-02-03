@@ -392,6 +392,7 @@ def sample_coeffs(coeffs):
     for i in range(coeffs.shape[0]):
         s.append(np.random.multinomial(1, coeffs[i, :]))
     s = np.array(s)
+    return s
 
 
 def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
