@@ -82,7 +82,7 @@ with tf.Session() as sess:
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
     #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 40, 2, 62)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -119,8 +119,8 @@ with tf.Session() as sess:
 
         rgb_record = []
 
-        #target_pixels = backward_next_pixel(ms) ##
-        target_pixels = next_pixel(ms) ##
+        target_pixels = backward_next_pixel(ms) ##
+        #target_pixels = next_pixel(ms) ##
         #target_pixels = find_next_pixel(ms)
         print(target_pixels[0])
         if target_pixels[0][0] is None:
@@ -223,7 +223,6 @@ with tf.Session() as sess:
         color_b = np.array(color_b)
 
         color = np.array([color_r, color_g, color_b]).T
-        print(color[0])
         sample_record.append(color)
         #print(color)
         dis_record.append(np.array(rgb_record))
