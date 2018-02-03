@@ -405,7 +405,7 @@ def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
     shifted_dis_compons1 = dis_compons1 * np.stack([dis2 for i in range(dis_compons1.shape[1])], axis=1)
     coeffs1 = coeffs1 * shifted_dis_compons1.sum(-1)
     coeffs1 /= np.sum(coeffs1, axis=-1)[:, None]
-    shifted_dis_compons1 /= shifted_dis_compons1.sum(-1)[:, None]
+    shifted_dis_compons1 /= shifted_dis_compons1.sum(-1)[:,:, None]
 
     coeffs1_stack = np.stack([coeffs1 for i in range(dis_log_compons1.shape[-1])], axis=-1)
     dis = np.sum(shifted_dis_compons1 * coeffs1_stack, axis=1)
