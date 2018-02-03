@@ -177,10 +177,7 @@ def transform_params(params, nr_mix, r=None, g=None, b=None):
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             arr.append(log_probs)
         all_log_probs = np.moveaxis(np.array(arr), 0, -1)
-        print(coeffs.shape, all_log_probs.shape)
-        print(coeffs.sum(1))
-        print(all_log_probs)
-        quit()
+        return coeffs.shape, all_log_probs
 
     if g is None:
         arr = []
@@ -418,6 +415,9 @@ def rgb_resize(imgs, ratio=1.0):
     return np.array(ret_imgs).astype(np.float64)
 
 
-def combine_dis(coeffs1, dis_compons1, coeffs2, dis_compons2):
-    coeffs2_stack = np.stack([coeffs2 for i in range(dis_compons2.shape[-1])], axis=-1)
-    dis2 = np.sum(coeffs2_stack * dis_compons2, axis=1)
+def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
+    coeffs2_stack = np.stack([coeffs2 for i in range(dis_log_compons2.shape[-1])], axis=-1)
+    dis2 = np.sum(coeffs2_stack * np.exp(dis_log_compons2), axis=1)
+    print(dis2.shape)
+    print(dis2)
+    quit()

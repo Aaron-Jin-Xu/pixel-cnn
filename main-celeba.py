@@ -168,7 +168,8 @@ with tf.Session() as sess:
         # print(r[28:36,28:36])
 
         # Sample red channel
-        transform_params(o1, fm.args.nr_logistic_mix)
+        coeffs, log_probs = transform_params(o1, fm.args.nr_logistic_mix)
+        combine_dis(coeffs, log_probs, coeffs, log_probs)
 
 
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
