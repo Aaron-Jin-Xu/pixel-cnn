@@ -416,7 +416,7 @@ def rgb_resize(imgs, ratio=1.0):
 
 
 def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
-    coeffs2_b = np.broadcast_to(coeffs, dis_log_compons2.shape)
+    coeffs2_b = np.broadcast_to(coeffs2, dis_log_compons2.shape)
     print(coeffs2_b.shape)
     quit()
     dis_log_compons2 + log_softmax(coeffs2)
