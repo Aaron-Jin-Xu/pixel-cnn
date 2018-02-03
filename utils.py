@@ -394,19 +394,18 @@ def sample_coeffs(coeffs):
     s = np.array(s)
     return s
 
-
 def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
-
-
-    coeffs1_stack = np.stack([coeffs1 for i in range(dis_log_compons1.shape[-1])], axis=-1)
-    dis1 = np.sum(coeffs1_stack * np.exp(dis_log_compons1), axis=1)
-    dis1 = dis1.astype(np.float64)
-    dis1 = dis1 / np.sum(dis1, axis=-1)[:, None]
 
     coeffs2_stack = np.stack([coeffs2 for i in range(dis_log_compons2.shape[-1])], axis=-1)
     dis2 = np.sum(coeffs2_stack * np.exp(dis_log_compons2), axis=1)
     dis2 = dis2.astype(np.float64)
     dis2 = dis2 / np.sum(dis2, axis=-1)[:, None]
+
+    coeffs1_stack = np.stack([coeffs1 for i in range(dis_log_compons1.shape[-1])], axis=-1)
+    dis_compons1 = np.stack([np.exp(dis_log_compons1) for i in range(dis_log_compons1.shape[1])], axis=1)
+    print(coeffs1_stack.shape)
+    print(dis_compons1.shape)
+    quit()
 
     dis = dis1 * dis2
 
