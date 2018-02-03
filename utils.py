@@ -156,7 +156,7 @@ def transform_params(params, nr_mix, r=None, g=None, b=None):
 
     p = log_softmax(logit_probs)
     p = np.exp(p).astype(np.float64)
-    p = p / np.sum(p, axis=-1)[:, None]
+    coeffs = p / np.sum(p, axis=-1)[:, None]
 
     if r is None:
         arr = []
@@ -176,9 +176,8 @@ def transform_params(params, nr_mix, r=None, g=None, b=None):
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             arr.append(log_probs)
-        all_log_probs = np.array(arr).T
-        print(all_log_probs)
-        print(all_log_probs.shape)
+        all_log_probs = np.array(arr)
+        print(coeffs.shape, all_log_probs.shape)
         quit()
 
     if g is None:
