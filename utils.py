@@ -177,7 +177,7 @@ def transform_params(params, nr_mix, r=None, g=None, b=None):
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
             arr.append(log_probs)
         all_log_probs = np.moveaxis(np.array(arr), 0, -1)
-        return coeffs.shape, all_log_probs
+        return coeffs, all_log_probs
 
     if g is None:
         arr = []
