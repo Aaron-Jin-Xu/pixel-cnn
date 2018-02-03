@@ -417,12 +417,6 @@ def rgb_resize(imgs, ratio=1.0):
 
 def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
     coeffs2_stack = np.stack([coeffs2 for i in range(dis_log_compons2.shape[-1])], axis=-1)
-    print(coeffs2_stack.shape)
-    quit()
-    dis_log_compons2 + log_softmax(coeffs2)
-
-
-    coeffs2_stack = np.stack([coeffs2 for i in range(dis_log_compons2.shape[-1])], axis=-1)
     dis2 = np.sum(coeffs2_stack * np.exp(dis_log_compons2), axis=1)
     print(dis2.shape)
     print(dis2)
