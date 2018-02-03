@@ -175,11 +175,10 @@ def transform_params(params, nr_mix, r=None, g=None, b=None):
             log_pdf_mid = mid_in - log_scales[:, 0, :] - 2. * softplus(mid_in)
             log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
                                                             np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
-            probs = sum_exp(log_probs)
-            arr.append(probs)
-        all_probs = np.array(arr).T
-        print(all_probs)
-        print(all_probs.shape)
+            arr.append(lob_probs)
+        all_log_probs = np.array(arr).T
+        print(all_log_probs)
+        print(all_log_probs.shape)
         quit()
 
     if g is None:
