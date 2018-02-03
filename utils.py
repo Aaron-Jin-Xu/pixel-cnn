@@ -144,16 +144,132 @@ def sum_exp(x):
     #x = np.minimum(x, 50*np.ones_like(x))
     #return np.sum(np.exp(x), axis=-1)
 
-def transform_params(params, nr_mix):
+def transform_params(params, nr_mix, r=None, g=None, b=None):
     ps = params.shape
-    logit_probs = params[:, :, :, :nr_mix]
-    l = params[:, :, :, nr_mix:].reshape([ps[0], ps[1], ps[2], 3, 3*nr_mix])
-    means = l[:, :, :, :, :nr_mix]
-    log_scales = np.maximum(l[:, :, :, :, nr_mix:2 * nr_mix], -7.)
-    coeffs = np.tanh(l[:, :, :, :, 2 * nr_mix:3 * nr_mix])
-    stdv = np.exp(log_scales)
-    stds = np.sqrt((stdv*np.pi)**2 / 3.0)
-    return np.exp(log_softmax(logit_probs)), means, stds
+    assert ps[1]==10*nr_mix, "shape of params should be (batch_size, nr_mix*10)"
+    logit_probs = params[:, :nr_mix]
+    l = params[:, nr_mix:].reshape([ps[0], 3, 3*nr_mix])
+    means = l[:, :, :nr_mix]
+    log_scales = np.maximum(l[:, :, nr_mix:2 * nr_mix], -7.)
+    coeffs = np.tanh(l[:, :, 2 * nr_mix:3 * nr_mix])
+    inv_stdv = np.exp(-log_scales)
+
+    p = log_softmax(logit_probs)
+    p = np.exp(p).astype(np.float64)
+    p = p / np.sum(p, axis=-1)[:, None]
+    print(p)
+    print(p.shape)
+    quit()
+
+    if r is None:
+        arr = []
+        for i in range(256):
+            x = (i - 127.5) / 127.5
+            centered_x = x - means[:, 0, :]
+            plus_in = inv_stdv[:, 0, :] * (centered_x + 1. / 255.)
+            cdf_plus = sigmoid(plus_in)
+            min_in = inv_stdv[:, 0, :] * (centered_x - 1. / 255.)
+            cdf_min = sigmoid(min_in)
+            cdf_delta = cdf_plus - cdf_min
+            log_cdf_plus = plus_in - softplus(plus_in)
+            log_one_minus_cdf_min = - softplus(min_in)
+
+            mid_in = inv_stdv[:, 0, :] * centered_x
+            log_pdf_mid = mid_in - log_scales[:, 0, :] - 2. * softplus(mid_in)
+            log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
+                                                            np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
+
+            if MAP:
+                p = log_softmax(logit_probs)
+                p = np.exp(p).astype(np.float64)
+                p = p / np.sum(p, axis=-1)[:, None]
+                ps = []
+                for i in range(p.shape[0]):
+                    ps.append(np.random.multinomial(1, p[i, :]))
+                ps = np.array(ps) * 7.0 - 7.0
+                log_probs = log_probs + ps # log_softmax(logit_probs)
+            else:
+                log_probs = log_probs + log_softmax(logit_probs)
+
+            probs = sum_exp(log_probs)
+            arr.append(probs)
+        all_probs = np.array(arr).T
+        return all_probs
+
+    if g is None:
+        arr = []
+        r = (r - 127.5) / 127.5
+        for i in range(256):
+            x = (i - 127.5) / 127.5
+            m2 = means[:, 1, :] + coeffs[:, 0, :] * r[:, None]
+            centered_x = x - m2
+            plus_in = inv_stdv[:, 1, :] * (centered_x + 1. / 255.)
+            cdf_plus = sigmoid(plus_in)
+            min_in = inv_stdv[:, 1, :] * (centered_x - 1. / 255.)
+            cdf_min = sigmoid(min_in)
+            cdf_delta = cdf_plus - cdf_min
+            log_cdf_plus = plus_in - softplus(plus_in)
+            log_one_minus_cdf_min = - softplus(min_in)
+
+            mid_in = inv_stdv[:, 1, :] * centered_x
+            log_pdf_mid = mid_in - log_scales[:, 1, :] - 2. * softplus(mid_in)
+            log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
+                                                            np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
+
+            if MAP:
+                p = log_softmax(logit_probs)
+                p = np.exp(p).astype(np.float64)
+                p = p / np.sum(p, axis=-1)[:, None]
+                ps = []
+                for i in range(p.shape[0]):
+                    ps.append(np.random.multinomial(1, p[i, :]))
+                ps = np.array(ps) * 7.0 - 7.0
+                log_probs = log_probs + ps # log_softmax(logit_probs)
+            else:
+                log_probs = log_probs + log_softmax(logit_probs)
+
+            probs = sum_exp(log_probs)
+            arr.append(probs)
+
+        all_probs = np.array(arr).T
+        return all_probs
+
+    if b is None:
+        arr = []
+        r = (r - 127.5) / 127.5
+        g = (g - 127.5) / 127.5
+        for i in range(256):
+            x = (i - 127.5) / 127.5
+            m3 = means[:, 2, :] + coeffs[:, 1, :] * r[:, None] + coeffs[:, 2, :] * g[:, None]
+            centered_x = x - m3
+            plus_in = inv_stdv[:, 2, :] * (centered_x + 1. / 255.)
+            cdf_plus = sigmoid(plus_in)
+            min_in = inv_stdv[:, 2, :] * (centered_x - 1. / 255.)
+            cdf_min = sigmoid(min_in)
+            cdf_delta = cdf_plus - cdf_min
+            log_cdf_plus = plus_in - softplus(plus_in)
+            log_one_minus_cdf_min = - softplus(min_in)
+
+            mid_in = inv_stdv[:, 2, :] * centered_x
+            log_pdf_mid = mid_in - log_scales[:, 2, :] - 2. * softplus(mid_in)
+            log_probs = np.where(x < -0.999, log_cdf_plus, np.where(x > 0.999, log_one_minus_cdf_min,
+                                                            np.where(cdf_delta > 1e-5, np.log(np.maximum(cdf_delta, 1e-12)), log_pdf_mid - np.log(127.5))))
+            if MAP:
+                p = log_softmax(logit_probs)
+                p = np.exp(p).astype(np.float64)
+                p = p / np.sum(p, axis=-1)[:, None]
+                ps = []
+                for i in range(p.shape[0]):
+                    ps.append(np.random.multinomial(1, p[i, :]))
+                ps = np.array(ps) * 7.0 - 7.0
+                log_probs = log_probs + ps # log_softmax(logit_probs)
+            else:
+                log_probs = log_probs + log_softmax(logit_probs)
+
+            probs = sum_exp(log_probs)
+            arr.append(probs)
+        all_probs = np.array(arr).T
+        return all_probs
 
 def params_to_dis(params, nr_mix, r=None, g=None, b=None, MAP=False):
     ps = params.shape
@@ -314,3 +430,8 @@ def rgb_resize(imgs, ratio=1.0):
         img = Image.fromarray(img.astype(np.uint8), 'RGB').resize((int(img_shape[0]*ratio), int(img_shape[1]*ratio)))
         ret_imgs.append(np.array(img))
     return np.array(ret_imgs).astype(np.float64)
+
+
+def combine_dis(coeffs1, dis_compons1, coeffs2, dis_compons2):
+    coeffs2_stack = np.stack([coeffs2 for i in range(dis_compons2.shape[-1])], axis=-1)
+    dis2 = np.sum(coeffs2_stack * dis_compons2, axis=1)

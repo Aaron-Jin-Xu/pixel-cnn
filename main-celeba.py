@@ -168,6 +168,9 @@ with tf.Session() as sess:
         # print(r[28:36,28:36])
 
         # Sample red channel
+        transform_params(o1, fm.args.nr_logistic_mix)
+
+
         pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
         pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
         pars = pars1* pars2 #/ pr[:, 0, :]
