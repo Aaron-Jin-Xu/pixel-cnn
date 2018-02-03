@@ -174,6 +174,7 @@ with tf.Session() as sess:
         coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix)
         coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix)
         pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2)
+        print(pars)
         # pars = pars1* pars2 #/ pr[:, 0, :]
         # pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
