@@ -111,7 +111,7 @@ with tf.Session() as sess:
 
     count = 0
 
-    flag = "forward"
+    flag = "backward"
 
     while True:
         count += 1
@@ -172,8 +172,8 @@ with tf.Session() as sess:
 
         #pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
         #pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
-        coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix)
-        coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix)
+        coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, mode=flag, power=0.5)
+        coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, mode=flag, power=0.5)
         pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2)
         # pars = pars1* pars2 #/ pr[:, 0, :]
         # pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
@@ -191,8 +191,8 @@ with tf.Session() as sess:
         # pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
         # pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
         # pars = pars1 * pars2 #/ pr[:, 1, :]
-        coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r)
-        coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r)
+        coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r, mode=flag, power=0.5)
+        coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r, mode=flag, power=0.5)
         pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2)
         #pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -209,8 +209,8 @@ with tf.Session() as sess:
         # pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
         # pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
         # pars = pars1 * pars2 #/ pr[:, 2, :]
-        coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
+        coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, mode=flag, power=0.5)
+        coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g, mode=flag, power=0.5)
         pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2)
         #pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)

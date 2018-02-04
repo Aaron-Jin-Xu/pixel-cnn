@@ -394,20 +394,23 @@ def sample_coeffs(coeffs):
     s = np.array(s)
     return s
 
-def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
+def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2, mode="forward", power=1.0):
 
-    # temp = coeffs1
-    # coeffs1 = coeffs2
-    # coeffs2 = temp
-    #
-    # temp = dis_log_compons1
-    # dis_log_compons1 = dis_log_compons2
-    # dis_log_compons2 = temp
+    if mode=='backward':
+
+        temp = coeffs1
+        coeffs1 = coeffs2
+        coeffs2 = temp
+
+        temp = dis_log_compons1
+        dis_log_compons1 = dis_log_compons2
+        dis_log_compons2 = temp
 
     coeffs2_stack = np.stack([coeffs2 for i in range(dis_log_compons2.shape[-1])], axis=-1)
     dis2 = np.sum(coeffs2_stack * np.exp(dis_log_compons2), axis=1)
     dis2 = dis2.astype(np.float64)
     dis2 = dis2 / np.sum(dis2, axis=-1)[:, None]
+    dis2 = dis2 ** power
 
     dis_compons1 = np.exp(dis_log_compons1)
     shifted_dis_compons1 = dis_compons1 * np.stack([dis2 for i in range(dis_compons1.shape[1])], axis=1)
