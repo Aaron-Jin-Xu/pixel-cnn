@@ -174,7 +174,7 @@ with tf.Session() as sess:
         #pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
         coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix)
         coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix)
-        pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=0.5)
+        pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=1.0)
         # pars = pars1* pars2 #/ pr[:, 0, :]
         # pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
@@ -193,7 +193,7 @@ with tf.Session() as sess:
         # pars = pars1 * pars2 #/ pr[:, 1, :]
         coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r)
         coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r)
-        pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=0.5)
+        pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=1.0)
         #pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         #pars = pars.astype(np.float64)
@@ -211,7 +211,7 @@ with tf.Session() as sess:
         # pars = pars1 * pars2 #/ pr[:, 2, :]
         coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
         coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-        pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=0.5)
+        pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=1.0)
         #pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
         #pars = np.power(pars, 0.5)
         #pars = pars.astype(np.float64)
