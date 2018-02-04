@@ -239,7 +239,7 @@ with tf.Session() as sess:
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
     #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
-    #np.savez("pics-{0}".format(exp_label), d=d)
+    np.savez("pics-{0}".format(exp_label), d=d)
     # Store the completed images
 
     for i in range(d.shape[0]):
