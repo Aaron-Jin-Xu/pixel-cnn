@@ -396,13 +396,13 @@ def sample_coeffs(coeffs):
 
 def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2):
 
-    temp = coeffs1
-    coeffs1 = coeffs2
-    coeffs2 = temp
-
-    temp = dis_log_compons1
-    dis_log_compons1 = dis_log_compons2
-    dis_log_compons2 = temp
+    # temp = coeffs1
+    # coeffs1 = coeffs2
+    # coeffs2 = temp
+    #
+    # temp = dis_log_compons1
+    # dis_log_compons1 = dis_log_compons2
+    # dis_log_compons2 = temp
 
     coeffs2_stack = np.stack([coeffs2 for i in range(dis_log_compons2.shape[-1])], axis=-1)
     dis2 = np.sum(coeffs2_stack * np.exp(dis_log_compons2), axis=1)
