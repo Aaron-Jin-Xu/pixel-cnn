@@ -32,7 +32,7 @@ def find_contour(mask):
 #display_size = (6,6)
 display_size = (8, 8)
 
-exp_label = "celeba-center-test-1"
+exp_label = "celeba-center-test"
 
 with tf.Session() as sess:
 
