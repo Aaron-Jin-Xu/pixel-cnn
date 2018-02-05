@@ -83,7 +83,7 @@ with tf.Session() as sess:
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
     #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 40, 12, 52)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 50, 64, 0, 64)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -113,7 +113,7 @@ with tf.Session() as sess:
 
     count = 0
 
-    flag = "backward"
+    flag = "forward"
 
     while True:
         count += 1
