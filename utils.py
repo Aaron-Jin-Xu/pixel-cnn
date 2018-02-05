@@ -410,6 +410,7 @@ def combine_dis(coeffs1, dis_log_compons1, coeffs2, dis_log_compons2, mode="forw
     dis2 = np.sum(coeffs2_stack * np.exp(dis_log_compons2), axis=1)
     dis2 = dis2.astype(np.float64)
     dis2 = dis2 ** power
+    dis2 = np.ones_like(dis2, dtype=np.float64)
     dis2 = dis2 / np.sum(dis2, axis=-1)[:, None]
 
     dis_compons1 = np.exp(dis_log_compons1)
