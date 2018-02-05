@@ -32,7 +32,7 @@ def find_contour(mask):
 #display_size = (6,6)
 display_size = (8, 8)
 
-exp_label = "celeba-center-test"
+exp_label = "celeba-diversity"
 
 with tf.Session() as sess:
 
@@ -82,7 +82,8 @@ with tf.Session() as sess:
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
     #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
-    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
+    #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
+    mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 20, 40, 12, 52)
     ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
     ms_ori = ms.copy()
 
@@ -91,7 +92,8 @@ with tf.Session() as sess:
     d = d.astype(np.float64)
     #d *= ms[:, :, :, None]
     d = d * ms[:, :, :, None] #+ rgb_resize(rgb_resize(d * (1-ms[:, :, :, None]), 1/4.0), 4.0)
-
+    for i in range(d.shape[0]):
+        d[i] = d[13].copy()
     d = np.load("pics-{0}.npz".format(exp_label))['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
@@ -119,7 +121,10 @@ with tf.Session() as sess:
 
         rgb_record = []
 
-        target_pixels = backward_next_pixel(ms) ##
+        if flag == 'forward':
+            target_pixels = next_pixel(ms)
+        elif flag == 'backward':
+            target_pixels = backward_next_pixel(ms) ##
         #target_pixels = next_pixel(ms) ##
         #target_pixels = find_next_pixel(ms)
         print(target_pixels[0])
@@ -128,11 +133,12 @@ with tf.Session() as sess:
         pr = get_prior(prior, target_pixels)
         backward_ms = ms.copy()
 
-        for idx in range(len(target_pixels)):
-            p = target_pixels[idx]
-            #backward_ms[idx, p[0]+2:, :] = 1
-            backward_ms[idx, :p[0], :] = 1
-        print(np.sum(1-backward_ms[0]))
+        # for idx in range(len(target_pixels)):
+        #     p = target_pixels[idx]
+        #     #backward_ms[idx, p[0]+2:, :] = 1
+        #     backward_ms[idx, :p[0], :] = 1
+        # print(np.sum(1-backward_ms[0]))
+
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
             backward_ms[idx, p[0], p[1]] = 1
@@ -240,7 +246,7 @@ with tf.Session() as sess:
     dis_record = np.array(dis_record)
     data_record = np.array(data_record)
     #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
-    #np.savez("pics-{0}".format(exp_label), d=d)
+    np.savez("pics-{0}".format(exp_label), d=d)
     # Store the completed images
 
     for i in range(d.shape[0]):
