@@ -32,7 +32,7 @@ def find_contour(mask):
 #display_size = (6,6)
 display_size = (8, 8)
 
-exp_label = "celeba-eye-backward"
+exp_label = "celeba-eye-forward"
 
 with tf.Session() as sess:
 
@@ -113,7 +113,7 @@ with tf.Session() as sess:
 
     count = 0
 
-    flag = "backward"
+    flag = "forward"
 
     while True:
         count += 1
