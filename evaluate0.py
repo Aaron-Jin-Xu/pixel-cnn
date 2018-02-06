@@ -12,11 +12,27 @@ import pixel_cnn_pp.mask as mk
 from utils import *
 from PIL import Image
 
-from evaluation import *
-
 from configs import configs
 
-exp_label = "svhn-center"
+def find_contour(mask):
+    contour = np.zeros_like(mask)
+    h, w = mask.shape
+    for y in range(h):
+        for x in range(w):
+            if mask[y, x] > 0:
+                lower_bound = max(y-1, 0)
+                upper_bound = min(y+1, h-1)
+                left_bound = max(x-1, 0)
+                right_bound = min(x+1, w-1)
+                nb = mask[lower_bound:upper_bound+1, left_bound:right_bound+1]
+                if np.min(nb)  == 0:
+                    contour[y, x] = 1
+    return contour
+
+#display_size = (6,6)
+display_size = (8, 8)
+
+exp_label = "celeba-center-test"
 
 with tf.Session() as sess:
 
@@ -38,137 +54,158 @@ with tf.Session() as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    for d in fm.test_data:
 
-        print("new batch, ", d.shape)
+    # Get test images, batch_size X nr_gpu
+    d = next(fm.test_data)
+    d = next(fm.test_data)
+    #np.savez("pics-{0}".format(exp_label), d=d)
 
-        # Get test images, batch_size X nr_gpu
-        #d = next(fm.test_data)
 
-        # Store original images
+    # generate masks
+    obs_shape = d.shape[1:]
+    #mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
+    #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 16)
+    #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
+    #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 32)
+    #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 25)
+    #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
+    #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
+    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1. / 16)
+    #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
+    #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
+    #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
+    # mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 28, 38, 2, 62)
+    #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 44, 64, 0, 64)
+    ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
+    ms_ori = ms.copy()
+
+
+    # Mask the images
+    d = d.astype(np.float64)
+    d_ori = d.copy()
+
+    for k in range(5):
+
+        d = d_ori.copy()
+        ms = ms_ori.copy()
+
+        #d *= ms[:, :, :, None]
+        d = d * ms[:, :, :, None]
+        # d = np.load("pics-{0}.npz".format("celeba-eye-forward"))['d']
+
+        agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
+        ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
+
         # Load prior
-        #prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
-        prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
+        prior = np.load("/data/ziz/jxu/prior64.npz")["arr"]
+        #prior = np.load("/data/ziz/jxu/prior-svhn.npz")["arr"]
 
-        # generate masks
-        obs_shape = d.shape[1:]
-        #mgen = mk.RecNoProgressMaskGenerator(obs_shape[0], obs_shape[1])
-        #mgen = mk.CircleMaskGenerator(obs_shape[0], obs_shape[1], 8)
-        #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1])
-        #mgen = mk.BottomMaskGenerator(obs_shape[0], obs_shape[1], 16)
-        #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 8, 24)
-        #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
-        #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
-        mgen = mk.HalfMaskGenerator(obs_shape[0], obs_shape[1])
-        ms = mgen.gen(fm.args.nr_gpu * fm.args.batch_size)
-        ms_ori = ms.copy()
+        count = 0
 
-        d = d.astype(np.float64)
-        images_ori = d.copy()
+        flag = "forward"
 
-        completed_images_arr = []
+        while True:
+            count += 1
+            print(count)
 
-        for k in range(5):
-            print("------------", k)
-
-            d = images_ori.copy()
-            ms = ms_ori.copy()
-
-            # Mask the images
-            d *= ms[:, :, :, None]
-            agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
-            ams = agen.gen(fm.args.nr_gpu * fm.args.batch_size)
-
-            count = 0
-
-            while True:
-                count += 1
-                #print(count)
+            if flag == 'forward':
                 target_pixels = next_pixel(ms)
-                #print(target_pixels[0])
-                if target_pixels[0][0] is None:
-                    break
-                pr = get_prior(prior, target_pixels)
-                backward_ms = ms.copy()
-                for idx in range(len(target_pixels)):
-                    p = target_pixels[idx]
-                    backward_ms[idx, p[0], p[1]] = 1
-                backward_ms = np.rot90(ms, 2, (1,2))
+            elif flag == 'backward':
+                target_pixels = backward_next_pixel(ms) ##
+            print(target_pixels[0])
+            if target_pixels[0][0] is None:
+                break
+            pr = get_prior(prior, target_pixels)
+            backward_ms = ms.copy()
 
-                # Forward model prediction
-                feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
-                o1 = sess.run(fm.outputs, feed_dict)
-                o1 = np.concatenate(o1, axis=0)
-                o1 = get_params(o1, target_pixels)
+            # for idx in range(len(target_pixels)):
+            #     p = target_pixels[idx]
+            #     #backward_ms[idx, p[0]+2:, :] = 1
+            #     backward_ms[idx, :p[0], :] = 1
+            # print(np.sum(1-backward_ms[0]))
 
-                # Backward model prediction
-                feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
-                o2 = sess.run(bm.outputs, feed_dict)
-                o2 = np.concatenate(o2, axis=0)
-                o2 = np.rot90(o2, 2, (1,2))
-                o2 = get_params(o2, target_pixels)
+            for idx in range(len(target_pixels)):
+                p = target_pixels[idx]
+                backward_ms[idx, p[0], p[1]] = 1
+            backward_ms = np.rot90(backward_ms, 2, (1,2))
 
-                # Sample red channel
-                pars1 = params_to_dis(o1, fm.args.nr_logistic_mix)
-                pars2 = params_to_dis(o2, fm.args.nr_logistic_mix)
-                pars = pars1 * pars2 / pr[:, 0, :]
-                pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
-                #pars[:, 0] = 0.
-                #pars[:, 255] = 0.
-                #pars = np.power(pars, 0.5)
-                pars = pars.astype(np.float64)
-                pars = pars / np.sum(pars, axis=-1)[:, None]
-                color_r = []
-                for i in range(pars.shape[0]):
-                    color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-                color_r = np.array(color_r)
+            # Forward model prediction
+            #feed_dict = fm.make_feed_dict(d, mask_values=ams, rot=False)
+            feed_dict = fm.make_feed_dict(d, mask_values=np.rot90(backward_ms, 2, (1,2)), rot=False)
+            o1 = sess.run(fm.outputs, feed_dict)
+            o1 = np.concatenate(o1, axis=0)
+            # coeffs, means, stds = transform_params(o1, fm.args.nr_logistic_mix)
+            o1 = get_params(o1, target_pixels)
 
-                # Sample green channel
-                pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r)
-                pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r)
-                pars = pars1 * pars2 / pr[:, 1, :]
-                pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
-                #pars[:, 0] = 0.
-                #pars[:, 255] = 0.
-                #pars = np.power(pars, 0.5)
-                pars = pars.astype(np.float64)
-                pars = pars / np.sum(pars, axis=-1)[:, None]
-                color_g = []
-                for i in range(pars.shape[0]):
-                    color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-                color_g = np.array(color_g)
-
-                # Sample blue channel
-                pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-                pars2 = params_to_dis(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
-                pars = pars1 * pars2 / pr[:, 2, :]
-                pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
-                #pars[:, 0] = 0.
-                #pars[:, 255] = 0.
-                #pars = np.power(pars, 0.5)
-                pars = pars.astype(np.float64)
-                pars = pars / np.sum(pars, axis=-1)[:, None]
-                color_b = []
-                for i in range(pars.shape[0]):
-                    color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
-                color_b = np.array(color_b)
-
-                color = np.array([color_r, color_g, color_b]).T
-
-                for idx in range(len(target_pixels)):
-                    p = target_pixels[idx]
-                    ms[idx, p[0], p[1]] = 1
-                    d[idx, p[0], p[1], :] = color[idx, :]
+            feed_dict = bm.make_feed_dict(d, mask_values=backward_ms, rot=True)
+            o2 = sess.run(bm.outputs, feed_dict)
+            o2 = np.concatenate(o2, axis=0)
+            o2 = np.rot90(o2, 2, (1,2))
+            o2 = get_params(o2, target_pixels)
 
 
-            images_completed = d.copy()
-            completed_images_arr.append(images_completed)
+            #pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, MAP=(flag=="forward"))#, log_scales_shift=2.)
+            #pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, MAP=(flag=='backward'))
+            coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix)
+            coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix)
+            pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=1.)
+            # pars = pars1* pars2 #/ pr[:, 0, :]
+            # pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
+            #pars = np.power(pars, 0.5)
+            # pars = pars.astype(np.float64)
+            # pars = pars / np.sum(pars, axis=-1)[:, None]
+            #rgb_record.append(np.array([pars1, pars2, pars, pr[:, 0, :]]))
+            color_r = []
+            for i in range(pars.shape[0]):
+                #color_r.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+                color_r.append(np.argmax(pars[i, :]))
+            color_r = np.array(color_r)
 
-        images_completed = np.mean(completed_images_arr, axis=0)
+            # Sample green channel
+            # pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, MAP=(flag=='forward'))#, log_scales_shift=2.)
+            # pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, MAP=(flag=='backward'))
+            # pars = pars1 * pars2 #/ pr[:, 1, :]
+            coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r)
+            coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r)
+            pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=1.)
+            #pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
+            #pars = np.power(pars, 0.5)
+            #pars = pars.astype(np.float64)
+            #pars = pars / np.sum(pars, axis=-1)[:, None]
+            #rgb_record.append(np.array([pars1, pars2, pars, pr[:, 1, :]]))
+            color_g = []
+            for i in range(pars.shape[0]):
+                #color_g.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+                color_g.append(np.argmax(pars[i, :]))
+            color_g = np.array(color_g)
 
-        psnr = batch_psnr(images_completed, images_ori, output_mean=False)
-        print(np.mean(psnr))
-        print(np.std(psnr))
-        print(len(psnr))
+            # Sample blue channel
+            # pars1 = params_to_dis(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='forward'))#, log_scales_shift=2.)
+            # pars2 = params_to_dis(o2, bm.args.nr_logistic_mix, r=color_r, g=color_g, MAP=(flag=='backward'))
+            # pars = pars1 * pars2 #/ pr[:, 2, :]
+            coeffs1, log_probs1 = transform_params(o1, fm.args.nr_logistic_mix, r=color_r, g=color_g)
+            coeffs2, log_probs2 = transform_params(o2, fm.args.nr_logistic_mix, r=color_r, g=color_g)
+            pars = combine_dis(coeffs1, log_probs1, coeffs2, log_probs2, mode=flag, power=1.)
+            #pars[:, 0], pars[:, 255] = pars[:, 1], pars[:, 254]
+            #pars = np.power(pars, 0.5)
+            #pars = pars.astype(np.float64)
+            #pars = pars / np.sum(pars, axis=-1)[:, None]
+            #rgb_record.append(np.array([pars1, pars2, pars, pr[:, 2, :]]))
+            color_b = []
+            for i in range(pars.shape[0]):
+                #color_b.append(np.argmax(np.random.multinomial(1, pars[i, :])))
+                color_b.append(np.argmax(pars[i, :]))
+            color_b = np.array(color_b)
 
-        break
+            color = np.array([color_r, color_g, color_b]).T
+
+            for idx in range(len(target_pixels)):
+                p = target_pixels[idx]
+                ms[idx, p[0], p[1]] = 1
+                d[idx, p[0], p[1], :] = color[idx, :]
+
+        print(d.sum())
+
+        #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
+        #np.savez("pics-{0}".format(exp_label), d=d)
+        # Store the completed images
