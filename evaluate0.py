@@ -84,6 +84,8 @@ with tf.Session() as sess:
     d = d.astype(np.float64)
     d_ori = d.copy()
 
+    all_d = []
+
     for k in range(5):
 
         d = d_ori.copy()
@@ -204,8 +206,9 @@ with tf.Session() as sess:
                 ms[idx, p[0], p[1]] = 1
                 d[idx, p[0], p[1], :] = color[idx, :]
 
-        print(d.sum())
+        all_d.append(d)
 
         #np.savez_compressed("/data/ziz/jxu/inpainting-record-{0}".format(exp_label), dis=dis_record, img=data_record, smp=sample_record, ms=ms_ori)
         #np.savez("pics-{0}".format(exp_label), d=d)
         # Store the completed images
+    np.savez("celeba-d5", d=np.array(all_d))
