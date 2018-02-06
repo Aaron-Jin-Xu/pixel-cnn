@@ -32,7 +32,7 @@ def find_contour(mask):
 #display_size = (6,6)
 display_size = (8, 8)
 
-exp_label = "celeba-eye-forward"
+exp_label = "celeba-eye-forward-backward-negotiation"
 
 with tf.Session() as sess:
 
@@ -94,7 +94,7 @@ with tf.Session() as sess:
     d = d * ms[:, :, :, None] #+ rgb_resize(rgb_resize(d * (1-ms[:, :, :, None]), 1/4.0), 4.0)
     # for i in range(d.shape[0]):
     #     d[i] = d[13].copy()
-    # d = np.load("pics-{0}.npz".format(exp_label))['d']
+    d = np.load("pics-{0}.npz".format("celeba-eye-forward"))['d']
     img = Image.fromarray(tile_images(d.astype(np.uint8), size=display_size), 'RGB')
     img.save("/homes/jxu/projects/ImageInpainting/plots1/masked-{0}.png".format(exp_label))
     agen = mk.AllOnesMaskGenerator(obs_shape[0], obs_shape[1])
@@ -113,7 +113,7 @@ with tf.Session() as sess:
 
     count = 0
 
-    flag = "forward"
+    flag = "backward"
 
     while True:
         count += 1
@@ -133,11 +133,11 @@ with tf.Session() as sess:
         pr = get_prior(prior, target_pixels)
         backward_ms = ms.copy()
 
-        # for idx in range(len(target_pixels)):
-        #     p = target_pixels[idx]
-        #     #backward_ms[idx, p[0]+2:, :] = 1
-        #     backward_ms[idx, :p[0], :] = 1
-        # print(np.sum(1-backward_ms[0]))
+        for idx in range(len(target_pixels)):
+            p = target_pixels[idx]
+            #backward_ms[idx, p[0]+2:, :] = 1
+            backward_ms[idx, :p[0], :] = 1
+        print(np.sum(1-backward_ms[0]))
 
         for idx in range(len(target_pixels)):
             p = target_pixels[idx]
