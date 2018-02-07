@@ -58,7 +58,8 @@ with tf.Session() as sess:
     # Get test images, batch_size X nr_gpu
     d = next(fm.test_data)
     d = next(fm.test_data)
-    #np.savez("pics-{0}".format(exp_label), d=d)
+    np.savez("original.npz", d=d.astype(np.float64))
+    quit()
 
 
     # generate masks
