@@ -70,7 +70,7 @@ with tf.Session() as sess:
     #mgen = mk.HorizontalMaskGenerator(obs_shape[0], obs_shape[1], 10, 25)
     #mgen = mk.GridMaskGenerator(obs_shape[0], obs_shape[1], 8)
     #mgen = mk.RandomNoiseMaskGenerator(obs_shape[0], obs_shape[1], 0.8)
-    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1. / 32)
+    mgen = mk.CenterMaskGenerator(obs_shape[0], obs_shape[1], 1. / 2)
     #mgen = mk.RightMaskGenerator(obs_shape[0], obs_shape[1], 0.5)
     #mgen = mk.RectangleMaskGenerator(obs_shape[0], obs_shape[1], 52, 64, 12, 52)
     #mgen = mk.CrossMaskGenerator(obs_shape[0], obs_shape[1], (28, 38, 2, 62), (5, 59, 28, 36))
